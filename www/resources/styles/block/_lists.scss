@@ -1,0 +1,100 @@
+
+// LISTS ======================================================================
+
+$list-background-color: transparent;
+$list-item-border: $quadrary;
+$list-item-background: tint($page-background, 80%);
+
+
+$list-number-color: tint($primary, 80%);;
+$list-number-background: $list-item-border;
+$list-number-font-family: "Helvetica Neue", Arial, sans-serif;
+
+// circle square
+$unordered-bullet: circle;
+
+$ordered-style-type: none;
+
+// Set optional alternate list rows
+$list-background-stripe: tint($tertiary , 60%) ;
+$list-background-hover: tint($primary , 40%) ;
+
+// Set list font-family.
+$list-font-family: $base-font-family;
+
+/**
+ *
+ * Default semantic blocks
+ *  ordered-list
+ *    http://www.456bereastreet.com/archive/201105/styling_ordered_list_numbers
+ *  unordered-list
+ *  definition lists
+**/
+
+ol, ul {
+	@include adjust-font-size-to(16px);
+	margin: 0 0 rhythm(4, 16px) 0;	// 4 lines below, based on font size
+}
+
+
+li {
+    line-height: auto;
+}
+
+
+ul {
+  list-style-type: $unordered-bullet;
+}
+
+li ol,
+li ul {margin-top: rhythm(4, 16px);}
+ol ol li:last-child {margin-bottom:0;}
+
+nav ul{
+  list-style-type: none;
+}
+
+
+ol {
+    counter-reset:li; /* Initiate a counter */
+    margin-left:0; /* Remove the default left margin */
+    padding-left:0; /* Remove the default left padding */
+}
+
+ol > li , ol > li:before{
+  border-top:2px solid $list-item-border;
+  padding-bottom: 4px;
+  padding-top: 4px;
+}
+
+
+ol > li {
+    position:relative; /* Create a positioning context */
+    margin:0 0 6px 2em; /* Give each list item a left margin to make room for the numbers */
+    padding-left:8px;
+    padding-right:8px;; /* Add some spacing around the content */
+    list-style: $ordered-style-type; /* Disable the normal item numbering */
+    background: $list-item-background ;
+}
+ol > li:before {
+    content:counter(li); /* Use the counter as content */
+    counter-increment:li; /* Increment the counter by 1 */
+    /* Position and style the number */
+    position:absolute;
+    top:-2px;
+    left:-2em;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    box-sizing:border-box;
+    width:2em;
+    /* Some space between the number and the content in browsers that support
+       generated content but not positioning it (Camino 2 is one example) */
+    margin-right:8px;
+    padding-left:4px;
+    padding-right:4px;
+    color: $list-number-color;
+    background: $list-number-background;
+    font-weight:bold;
+    font-family: $list-number-font-family;
+    text-align:center;
+}

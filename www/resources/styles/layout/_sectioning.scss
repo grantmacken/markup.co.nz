@@ -1,0 +1,137 @@
+
+/*
+ *https://developer.mozilla.org/en-US/docs/Web/HTML/Sections_and_Outlines_of_an_HTML5_document
+Explicitly-defined sections are the content within <body>,  <section>,  <article>,  <aside>, <footer>,  <header>, and <nav> tags.
+*/
+
+/**
+ * generic html5 sections
+ * Note h1 not displayed unless made explict late on
+ * this allows for html5 outlines ref: accessibility
+*/
+
+
+/*
+ * $slicer-breakpoints: 0 400px 600px 800px 1050px;
+ * Slice numbers:    | 1 | 2 | 3 | 4 | 5
+ *
+ * grid | collums | breakpoint
+ *  1,2 - 3 cols @  bp  < 600
+ *  3   - 6 cols @  bp  > 601 < 800
+ *  4   - 9 cols @  bp  > 601 < 1050
+ *  5  - 12 cols @  bp  > 1050
+ *
+ */
+
+
+
+body{
+color: $page-text;
+font-family: $base-font-family;
+font-size: $base-font-size;
+background-color:  $page-background;
+@include background-grid;
+
+}
+
+//secrion gridless
+/*section{
+
+  }*/
+
+
+header[role='banner'],
+footer[role="contentinfo"],
+nav[role='navigation'],
+article[role='main']{
+  background-color: tint( $page-background, 50% );
+  //@include layout-block;
+  @include at(5) {
+    @include grid-span(10, 2);
+    clear: both;
+    }
+
+   @include at(4) {
+    @include grid-span(7, 2);
+    clear: both;
+    }
+
+   @include at(3) {
+    @include grid-span(6);
+    clear: both;
+    }
+
+    @include between(1,2) {
+    @include grid-span(3);
+    clear: both;
+    }
+}
+
+header[role='banner']{
+  @include layout-block;
+  // background-color: tint( $page-background, 70% );
+}
+
+article{
+  @include layout-block;
+    //background-color: tint( $page-background, 70% );
+    @include between(1,3) {
+    padding-right: gutter-span($grid: 3 );
+    padding-left: gutter-span($grid: 3 );
+    }
+}
+
+section[role='main']{
+  @include at(5) {
+    @include grid-span(7,2);
+    clear: both;
+    }
+
+  @include at(4) {
+    @include grid-span(5, 2);
+    clear: both;
+    }
+
+  @include at(3) {
+    @include grid-span(4);
+    clear: both;
+
+    }
+
+    @include between(1,2) {
+    @include grid-span(3);
+    clear: both;
+    }
+}
+
+aside{
+  @include at(5) {
+    @include grid-span(2, 10);
+    clear: right;
+    }
+
+  @include at(4) {
+    @include grid-span(2, 8);
+    }
+
+  @include at(3) {
+    @include grid-span(2,5);
+    }
+
+  @include between(1,2) {
+    @include grid-span(3);
+    }
+}
+
+nav, footer, aside{
+    h1{
+    display: none;
+  }
+}
+
+
+footer{
+     min-height: 80px;
+  }
+
+@import "layout/headers";

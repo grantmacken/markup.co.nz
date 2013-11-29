@@ -1,0 +1,140 @@
+// Colours
+// ------------------------------------------------------------
+//solarized
+//https://github.com/zroger/jekyll-starter/blob/master/_sass/_solarized.scss
+$solarized-base03: #002b36;
+$solarized-base02: #073642;
+$solarized-base01: #586e75;
+$solarized-base00: #657b83;
+$solarized-base0: #839496;
+$solarized-base1: #93a1a1;
+$solarized-base2: #eee8d5;
+$solarized-base3: #fdf6e3;
+$solarized-yellow: #b58900;
+$solarized-orange: #cb4b16;
+$solarized-red: #dc322f;
+$solarized-magenta: #d33682;
+$solarized-violet: #6c71c4;
+$solarized-blue: #268bd2;
+$solarized-cyan: #2aa198;
+$solarized-green: #859900;
+
+
+/*
+ * https://addons.mozilla.org/en-us/firefox/addon/colorzilla/
+ *
+ * http://colorschemedesigner.com/
+ * https://github.com/Team-Sass/color-schemer
+ * https://github.com/heygrady/scss-blend-modes
+ * http://robots.thoughtbot.com/post/12974565313/controlling-color-with-sass-color-functions
+ * http://sassme.arc90.com/
+ * http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html
+ * http://www.richbray.me/cms
+ * http://blog.12spokes.com/web-design-development/simple-css-color-management-with-sass/
+ * http://nex-3.com/posts/89-powerful-color-manipulation-with-sass
+ *    $cs-primary — set the primary color in a color scheme.
+    $cs-scheme — mono, complement, triad, tetrad, analogic, accented-analogic
+    $cs-hue-offset — Amount of hue adjustment in schemes.
+    $cs-brightness-offset — Amount of brightness adjustment in schemes.
+    $cs-color-model — rgb, ryb
+
+
+    functions
+
+Drop these functions in wherever you want to use a color from the scheme.
+You can manipulate them further to make them work with your design.
+These should be considered a good starting point as you might want to tweak a little further.
+
+    cs-primary() — primary color.
+    cs-secondary() — secondary color.
+    cs-tertiary() — tertiary color.
+    cs-quadrary() — quadrary color.
+
+ */
+
+/* Base Color
+ *
+
+We start with
+defining our primary color
+
+pick a scheme
+mono | complement |triad | tetrad | analogic | accented-analogic
+
+Analogous color schemes use adjacent colors from the color wheel.
+
+The last one is Accented Analogic which is the same as analogic except it features
+a fourth color which is the Complementary color to the original color
+
+Analogic colors
+
+This scheme is made by base color and its adjacent colors - two colors identically on both sides. It always looks very elegantly and clear, the result has less tension and it's uniformly warm, or cold. If a color on the warm-cold border is chosen, the color with opposite "temperature" may be used for accenting the other two colors.
+
+http://colorschemedesigner.com/previous/colorscheme1/help-en.html
+Additional input field sets the distance of adjacent colors - values between 15-30° are optimal.
+You can also add the contrast color, the scheme is then supplemented with the complement of the base color.
+It must be treated only as a complement - it adds tension to the palette, and it's too aggressive when overused.
+However, used in details and as accent of main colors, it can be very effective and elegan
+
+a color model
+rgb | ryb
+
+$cs-primary :#839496;
+$cs-primary : #CCCABB;
+#9DA0CC
+*/
+$cs-primary : $solarized-green;
+$cs-scheme: accented-analogic;
+$cs-hue-offset: 10%;
+$cs-cs-brightness-offset: 10%;
+$cs-color-model: rgb;
+
+
+$primary: cs-primary();
+$secondary: cs-secondary();
+//if too light, darkening this up a bit.
+//$secondary: darken(cs-secondary(), 10%);
+$tertiary: cs-tertiary();
+$quadrary: cs-quadrary();
+
+// add test pattern
+// block out
+//@include cs-test($primary $secondary $tertiary $quadrary);
+
+
+//page
+
+$page-text: shade($secondary, 50%);
+$page-background: set-alpha( $tertiary, .5);
+
+// titles headings
+$title-text:           tint($secondary, 40%);
+$title-text-shadow:    shade($secondary, 50%);
+$subtitle-text:       shade($secondary, 50%);
+$title-background:      $primary;
+$subtitle-background:   $primary;
+
+
+// block code and quotes
+$code-background: tint($secondary, 60%);
+$code-text: shade($tertiary, 40%);
+$code-border: $secondary;
+
+$quote-background: tint($secondary, 40%);
+$quote-text: shade($tertiary, 40%);
+$quote-border: tint($tertiary, 40%);
+
+// actions links
+
+$link-text:         shade($primary, 50%);
+$link-normal:       tint($secondary, 50%);
+$link-text-hover:   $link-normal;
+$link-hover:        $link-text;
+$link-here:         tint($tertiary, 60%);
+$link-border-normal: tint($quadrary, 25%);
+$link-border-hover: tint($quadrary, 50%);
+$link-border-active:$primary;
+$link-border-visited:$primary;
+$link-active:       $primary;
+$link-visited:      $primary;
+$link-focus:        $primary;

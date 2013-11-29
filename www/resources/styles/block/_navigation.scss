@@ -1,0 +1,172 @@
+
+%nav_pages{
+  //@include horizontal-list;
+  //@include grid-span(10, 2, $options: 'both');
+   li{
+   display: block;
+   float:left;
+    @include at(5) {
+    width: column-span(2, 1, $grid: 10 );
+    margin-right: gutter-span($grid: 10 );
+    }
+
+   @include at(4) {
+    width: column-span(2, 1, $grid: 7 );
+    margin-right: gutter-span($grid: 7 );
+    }
+
+   @include at(3) {
+    width: column-span(2, 1, $grid: 6 );
+    margin-right: gutter-span($grid: 6 );
+    }
+
+    @include between(1, 2) {
+    width: column-span(1, 1, $grid: 3 );
+    margin-right: gutter-span($grid: 3 );
+    }
+ }
+
+.last{
+  margin-right:0;
+ }
+}
+
+ %nav-collection{
+  margin: 0;
+  padding: 0;
+  font-size: smaller;
+ }
+
+
+/***
+ * A nav list item
+ * should fit into our grid
+ *
+*/
+
+%nav-item{
+   display: block;
+   color: $link-text;
+   text-align: center;
+
+}
+
+%nav-item-anchor{
+  background-color: $link-normal;
+  border-bottom: solid 3px $link-border-normal;
+  text-decoration: none;
+}
+
+%nav_pages-item{
+  //float: left;
+  //width: 17.66%;   //width: grid-span(1, 1)/12;
+  //margin-right: 20px;
+  //margin-left: 0;
+   //min-width: 130px;
+ }
+
+%nav_collection-item{
+    padding-left: 20px;
+    border-right: solid 2px $link-border-normal;
+ }
+
+%nav_pages-item--indicate-u-r-here{
+   font-weight: 900;
+   background-color: $link-here;
+   border-bottom: solid 8px $link-border-normal;
+ }
+
+%nav_collection-item--indicate-u-r-here{
+    font-weight: 900;
+    background-color: $link-here;
+    padding-left: 5px;
+    border-left: solid 8px $link-border-normal;
+ }
+
+
+%nav_pages-item--link-hover{
+   background-color: $link-hover;
+   color: $link-text-hover;
+   border-bottom: solid 8px $link-border-hover;
+ }
+
+
+%nav_collection-item--link-hover{
+   background-color: $link-hover;
+   color: $link-text-hover;
+   padding-left: 10px;
+   border-left: solid 8px $link-border-hover;
+ }
+
+
+
+#nav-pages , #nav-collection{
+   h1{
+    display: none;
+    }
+
+    a, strong, a[href="index"], a:hover{
+    @extend %nav-item;
+    }
+
+   a{
+    @extend %nav-item-anchor;
+    }
+}
+
+
+
+
+#nav-pages{
+ @extend %nav_pages;
+   a{
+      @extend %nav_pages-item;
+
+      &:hover {
+        @extend %nav_pages-item;
+        @extend %nav_pages-item--link-hover;
+      }
+   }
+/*
+ u r here states
+   is at category    : xpath li/strong              no hyperlink
+   is under category : xpath li/a[./@href="index"]  hyperlink to category index page
+   is not here       : xpath li/a[not(./@href="index" )]       ""
+*/
+   strong{
+      @extend %nav_pages-item;
+      @extend %nav_pages-item--indicate-u-r-here
+   }
+
+   li[class="at-location"] a{
+      @extend %nav_pages-item;
+      @extend %nav_pages-item--indicate-u-r-here;
+         &:hover {
+        @extend %nav_pages-item;
+        @extend %nav_pages-item--link-hover;
+      }
+
+
+   }
+
+
+
+}
+
+
+#nav-collection{
+
+    @extend %nav-collection;
+   a{
+    @extend %nav_collection-item;
+   }
+
+    a:hover{
+        @extend %nav_collection-item--link-hover;
+   }
+
+   strong{
+      @extend %nav_collection-item;
+      @extend %nav_collection-item--indicate-u-r-here
+   }
+}

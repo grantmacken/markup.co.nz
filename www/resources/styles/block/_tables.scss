@@ -1,0 +1,70 @@
+
+// Set a default duration for CSS transitions
+$transition-duration: .25s;
+
+
+// TABLES ======================================================================
+
+$table-padding: 8px;
+
+// Set table background colour
+$table-background-color: tint($primary , 75%) ;
+
+// Set optional alternate table row background colour
+$table-background-stripe: tint($tertiary , 60%) ;
+$table-background-hover: tint($secondary, 50%) ;
+
+// Set table border widths. Default is $borderwidth defined above
+$table-border-width: 1px;
+$table-border-style: solid;
+$table-border-color: $tertiary;
+
+// Set tables’ font-family. Default is $altfontfamily defined above
+$table-font-family: $base-font-family;
+
+caption{
+    	@include adjust-font-size-to(18px);
+	font-weight: $header-font-weight;
+        padding : $table-padding;
+}
+
+table {
+width : 80%;
+max-width : 80%;
+background-color : $table-background-color;
+border-collapse : collapse;
+margin-bottom : $base-line-height;
+margin: rhythm(4, 25px) 0 rhythm(2, 25px) 0;
+
+th,
+td {
+padding : $table-padding;
+vertical-align : top;
+border-top : $table-border-width $table-border-style $table-border-color;
+font-size : ( $base-font-size / 1.25 );
+line-height : $base-line-height;
+text-align : left; }
+
+th {
+font-weight : bold; }
+
+thead th {
+vertical-align : bottom; }
+
+colgroup + thead tr:first-child th,
+colgroup + thead tr:first-child td,
+thead:first-child tr:first-child th,
+thead:first-child tr:first-child td {
+border-top : 0; }
+
+tbody + tbody {
+border-top : $table-border-width * 2 $table-border-style $table-border-color; }
+
+tbody tr td,
+tbody tr th {
+@include transition(background-color $transition-duration 0 ease); }
+
+tbody tr:hover td,
+tbody tr:hover th {
+background-color : $table-background-hover; }
+}

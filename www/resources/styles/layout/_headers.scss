@@ -1,0 +1,61 @@
+/*
+ * $slicer-breakpoints: 0 400px 600px 800px 1050px;
+ * Slice numbers:    | 1 | 2 | 3 | 4 | 5
+ *
+ * grid | collums | breakpoint
+ *  1,2 - 3 cols @  bp  < 600
+ *  3   - 6 cols @  bp  > 601 < 800
+ *  4   - 9 cols @  bp  > 601 < 1050
+ *  5  - 12 cols @  bp  > 1050
+ *
+ */
+
+%text-shadow{
+
+
+}
+
+/*
+ *@include adjust-font-size-to(32px);
+margin-top : rhythm(2, 32px);// 2 lines below, based on font size
+margin-left : 1em ;
+font-weight: $header-font-weight ;
+*/
+
+
+header[role="banner"]{
+   //@include background-grid;
+   //min-height: 180px;
+    //@include layout-block;
+      h1{
+       // if this is a good pattern create as a reusable mixin
+       color: $title-text;
+       text-shadow: -1px 0 0 $title-text-shadow, 1px 1px 0 $title-text-shadow,
+        2px -1px 0 $title-text-shadow, 3px 0 0 $title-text-shadow;
+
+        @include at(5) {
+         letter-spacing: 30px;
+         }
+
+        @include at(4) {
+         letter-spacing: 20px;
+         }
+
+        @include at(3) {
+         padding-left: .5em;
+         letter-spacing: 10px;
+         }
+
+         @include between(1, 2) {
+      @include adjust-font-size-to(24px);
+         letter-spacing: 2px;
+         margin-left : .5em ;
+         }
+      }
+
+      p{
+      padding-left: 1em;
+      padding-right:  auto;
+     }
+
+  }

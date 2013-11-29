@@ -1,0 +1,61 @@
+
+
+/*
+http://www.paulirish.com/2012/box-sizing-border-box-ftw/
+*/
+
+* {
+  @include box-sizing('border-box');
+}
+
+$output: 'isolation';
+//$output: 'float';
+$include-clearfix: true;
+$direction: 'ltr';
+$background-grid-color : $tertiary;
+
+$bpXXSmall: 480;
+$bpXSmall: 768;
+$bpSmall: 800;
+$bpMedium: 980;
+$bpLarge: 1050;
+$bpXLarge: 1280;
+$bpXXLarge: 1920;
+
+
+// Define breakpoints in a Slicer list
+//$slicer-breakpoints: 0 $bpXXSmall $bpXSmall $bpSmall $bpMedium $bpLarge $bpXLarge $bpXXLarge;
+//$slicer-breakpoints: 0 400px 768px 800px 980px 1050px 1280px 1920px;
+
+// Slice numbers:    | 1 | 2 | 3 | 4 | 5 | 6| 7 | 8
+$breakpoint-no-query-wrappers:  true;
+$slicer-anti-overlap-corrections: 1px, -0.1em, -0.1rem;
+
+// Configuring Singularity.
+$grids: 3;
+
+//$grids: add-grid(3  at bp(2));
+$grids: add-grid(6  at bp(3));
+$grids: add-grid(9  at bp(4));
+$grids: add-grid(12 at bp(5));
+
+$gutters: 1/5;
+$gutters: add-gutter(1/3 at bp(5));
+//$gutter-styles: 'split';
+//$gutter-styles: ;
+//$gutter-styles: 'fixed' 'split';
+
+
+$amount-of-slices:   length($slicer-breakpoints);
+
+
+//$breakpoint-default-feature: min-width;
+/**
+ * https://github.com/Team-Sass/Singularity/wiki/Creating-Grids
+ * ratio based grids
+ * gutters are proportion to grid
+ *  http://vimeo.com/63509346
+ *
+ *  https://github.com/lolmaus/breakpoint-slicer
+ *
+*/

@@ -1,0 +1,28 @@
+
+/**
+ * ANCHORS
+*/
+@import "base/colors";
+
+a{
+   color: $link-text;
+   background-color: transparent;
+
+
+    &:link {
+        border-bottom: dotted 2px $link-border-normal;
+        }
+
+
+    &:visited {
+        text-decoration: none;
+        border-bottom: dotted 2px $link-border-normal;
+        }
+
+
+    &:hover {
+        background-color: $link-hover;
+        color: $link-text-hover;
+        border-bottom: solid 4px $link-border-hover;
+        }
+  }

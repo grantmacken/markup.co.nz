@@ -1,0 +1,531 @@
+<project
+    basedir="."
+    default="info"
+    name="project-deployment"
+    xmlns:xdb="http://exist-db.org/ant">
+
+    <!--
+    targets
+    xar-undeploy-remove
+        + local fs remove 'build' dir
+        + exist-db undeploy and remove $domain
+    xar-build-upload
+    -->
+
+    <property file="build.properties" />
+
+    <property environment="env"/>
+    <property name="project.base" value="${basedir}"/>
+    <property name="dir.build" value=".build"/>
+    <property name="dir.deploy" value=".deploy"/>
+    <property name="dir.www" value="www"/>
+    <property name="dir.data" value="${dir.deploy}/data"/>
+    <property name="dir.categories" value="${dir.data}/categories"/>
+    <property name="dir.pages" value="${dir.data}/pages"/>
+
+    <property name="browser" value="firefox"/>
+    <!-- import eXist-db tasks -->
+    <path id="classpath.core">
+        <fileset dir="${dir.exist}/lib/core">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${dir.exist}/exist.jar"/>
+        <pathelement path="${dir.exist}/exist-optional.jar"/>
+    </path>
+
+     <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+        <classpath refid="classpath.core"/>
+    </typedef>
+
+
+<target name="info">
+    <echo>info</echo>
+</target>
+<target name="browse">
+    <exec executable="${browser}" spawn="true">
+        <arg value="${project.url.browse}" />
+    </exec>
+</target>
+
+
+
+
+<target name="store-xqm">
+<echo>${relativePath}</echo>
+<echo>${fileName}</echo>
+<property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/${relativePath}</property>
+<property name="srcfile">${relativePath}/${fileName}.xqm</property>
+<echo>${exist.uri}</echo>
+<xdb:store
+    uri="${exist.uri}"
+    createcollection="true"
+    srcfile="${srcfile}"
+    user="${exist.username}"
+    password="${exist.password}"
+    permissions="rwxrwxr-x"
+/>
+</target>
+
+<target name="store-html">
+<echo>${relativePath}</echo>
+<echo>${fileName}</echo>
+<property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/${relativePath}</property>
+<property name="srcfile">${relativePath}/${fileName}.html</property>
+<echo>${exist.uri}</echo>
+<xdb:store
+    uri="${exist.uri}"
+    createcollection="true"
+    srcfile="${srcfile}"
+    user="${exist.username}"
+    password="${exist.password}"
+/>
+</target>
+
+<target name="store-scss">
+<exec executable="compass"
+    failonerror="false">
+    <arg value="compile"/>
+    <!-- <redirector outputproperty="md" alwayslog="true"/> -->
+</exec>
+
+<property name="srcfile">${dir.deploy}/resources/styles/style.css</property>
+<property name="dbCssDir">resources/styles</property>
+<property name="gzCssFile">www/resources/styles/style.css-gz</property>
+
+<property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/${dbCssDir}</property>
+
+<echo>${exist.uri}</echo>
+<xdb:store
+    uri="${exist.uri}"
+    createcollection="false"
+    srcfile="${srcfile}"
+    user="${exist.username}"
+    password="${exist.password}"
+/>
+</target>
+
+
+<target name="setHomeConditions">
+  <condition property="is.home">
+    <equals arg1="${relativePath}" arg2="www" />
+  </condition>
+
+  <condition property="is.mdPage">
+    <not>
+    <contains string="${relativePath}" substring="_post" />
+    </not>
+  </condition>
+
+  <condition property="is.mdPost">
+    <contains string="${relativePath}" substring="_post" />
+  </condition>
+
+</target>
+
+<target name="hasMd2Failed">
+  <condition property="has.md2Failed">
+    <equals arg1="${outfile}" arg2="FAIL" />
+  </condition>
+</target>
+
+
+
+
+<target name="isHome" if="is.home">
+ <property name="path">home</property>
+</target>
+
+<target name="isNotHome" unless="is.home">
+  <loadresource property="path">
+  <propertyresource name="relativePath"/>
+  <filterchain>
+    <tokenfilter>
+      <filetokenizer/>
+      <replacestring from="www/" to=""/>
+    </tokenfilter>
+  </filterchain>
+</loadresource>
+</target>
+
+
+<target name="store-md" depends="setHomeConditions, isHome, isNotHome">
+<property name="pyFile">.bin/md2.py</property>
+<property name="srcfile">${relativePath}/${fileName}.md</property>
+<echo>srcfile:  ${srcfile}</echo>
+
+
+<exec executable="python"
+    dir="${project.base}"
+    failonerror="false">
+    <arg value="${pyFile}"/>
+    <arg value="-i"/>
+    <arg value="${srcfile}"/>
+    <redirector outputproperty="outfile" alwayslog="true" />
+</exec>
+
+
+
+<antcall target="hasMd2Failed"  />
+<antcall target="store-page"  />
+<antcall target="store-post"  />
+</target>
+
+<target name="store-page" if="is.mdPage">
+    <property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/data/pages/${path}</property>
+    <echo>OUTFILE:  ${outfile}  </echo>
+    <echo>EXIST.URI:  ${exist.uri} </echo>
+
+    <xdb:store
+        uri="${exist.uri}"
+        createcollection="true"
+        srcfile="${outfile}"
+        user="${exist.username}"
+        password="${exist.password}"
+    />
+</target>
+
+
+
+
+<target name="store-post" unless="has.md2Failed"  if="is.mdPost">
+
+
+
+<echo>outfile:  ${outfile}</echo>
+ <exec executable="/bin/sh">
+       <arg value="-c"/>
+       <arg line="&quot; echo ${outfile} | sed 's:^\.deploy\/data\/\(.*\)\/.*$:\1:' &quot;" />
+       <redirector outputproperty="bash.out.collection" />
+   </exec>
+
+<echo>bash.out.collection:  ${bash.out.collection}</echo>
+
+
+ <property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/data/${bash.out.collection}</property>
+    <echo>OUTFILE:  ${outfile}  </echo>
+    <echo>EXIST.URI:  ${exist.uri} </echo>
+
+ <xdb:store
+        uri="${exist.uri}"
+        createcollection="true"
+        srcfile="${outfile}"
+        user="${exist.username}"
+        password="${exist.password}"
+    />
+
+</target>
+
+
+<target name="proccess-md">
+    <echo>delete ${dir.data} </echo>
+    <delete dir="${dir.data}" />
+    <property name="pyFile">.bin/md2.py</property>
+     <echo>${pyFile}</echo>
+    <apply executable="python" failonerror="false" dir="${project.base}">
+        <arg value="${pyFile}" />
+        <arg value="-i" />
+        <srcfile />
+        <fileset dir="${dir.www}">
+            <exclude name="**/resources/**" />
+            <include name="**/*.md" />
+        </fileset>
+    </apply>
+</target>
+
+<target name="proccess-sass">
+    <echo>compile sass and generate a single stylesheet. ${dir.deploy}/resources/styles/style.css. Ref. rb file at root</echo>
+    <exec executable="compass" failonerror="true">
+        <arg value="compile" />
+        <redirector outputproperty="md" alwayslog="true" />
+    </exec>
+</target>
+
+<target name="proccess-templatesAndModules">
+    <echo>copy our changed working template files to ${dir.deploy}/templates</echo>
+    <copy todir="${dir.deploy}/templates">
+        <fileset dir="templates" />
+    </copy>
+    <echo>copy our changed working modules files to ${dir.deploy}/modules</echo>
+    <copy todir="${dir.deploy}/modules">
+        <fileset dir="modules" />
+    </copy>
+</target>
+
+<target name="proccess-imagesAndScripts">
+    <echo>TODO: optimise images then copy to ${dir.deploy}/resources/images</echo>
+    <copy todir="${dir.deploy}/resources/images" includeemptydirs="true">
+        <fileset dir="www/resources/images" />
+    </copy>
+    <echo>TODO: lint and minify js then copy to ${dir.deploy}/resources/scripts</echo>
+    <copy todir="${dir.deploy}/resources/scripts" includeemptydirs="true">
+        <fileset dir="www/resources/scripts" />
+    </copy>
+</target>
+
+
+<target name="eXist-data">
+    <echo>Everything gets driven locally</echo>
+    <antcall target="proccess-md" />
+    <antcall target="proccess-sass" />
+    <antcall target="proccess-templatesAndModules" />
+    <antcall target="proccess-imagesAndScripts" />
+</target>
+
+<target name="eXist-data-remote">
+    <echo>Everything gets driven locally</echo>
+    <antcall target="proccess-md" />
+    <antcall target="proccess-sass" />
+    <antcall target="proccess-templatesAndModules" />
+    <antcall target="proccess-imagesAndScripts" />
+</target>
+
+
+<target name="deployment-folder">
+<echo>The repo: update repo just in case changes made to properties file</echo>
+<echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
+    <meta xmlns="http://exist-db.org/xquery/repo">
+        <description>${project.description}</description>
+        <author>${project.author}</author>
+        <website>http://${project.domain}</website>
+        <status>alpha</status>
+        <license>GNU-LGPL</license>
+        <copyright>true</copyright>
+        <type>application</type>
+        <target>${project.domain}</target>
+        <prepare />
+        <finish />
+        <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
+    </meta>
+</echoxml>
+</target>
+
+
+<target name="build-xar">
+    <mkdir dir="${dir.build}" />
+    <zip destfile="${xar-location}" basedir="${dir.project}/${dir.deploy}" whenempty="create" fallbacktoUTF8="true" excludes=".git*" />
+</target>
+
+<target name="xar-upload" >
+        <exec executable="curl">
+            <arg line="-T ${xar-location} -u ${exist.username}:${exist.password} ${repo.url}/${xar-file}" />
+        </exec>
+        <exec executable="curl">
+            <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}" />
+        </exec>
+
+    <!--
+     Note: issue#4  exist-db deployment should use sem.version
+     deploy based on project.version
+    -->
+
+<property name="install-and-deploy">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
+</property>
+
+<xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />
+</target>
+
+
+<target name="deploy-bumpversion">
+        <!--
+    Everytime we upload increment our semversion
+    We use bumpversion patch ref. .bumpversion.cfg
+    which alters semversion.txt and our pac
+    -->
+    <exec executable="bumpversion" failonerror="true">
+        <arg value="patch" />
+    </exec>
+    <!-- Everytime we upload semversion patch -->
+    <exec executable="cat" failonerror="true">
+        <arg value="sem.version" />
+        <redirector outputproperty="out.project.version"/>
+    </exec>
+    <echo>Build number in version.txt: ${out.project.version}  </echo>
+</target>
+
+<target name="xar-build-upload" depends="deploy-bumpversion">
+    <property name="project.version" value="${out.project.version}" />
+    <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
+    <property name="project.url" value="http://${project.domain}" />
+    <property name="project.url.browse" value="http://${project.domain}" />
+    <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
+    <property name="repo.url" value="http://${host.local}:8080/exist/apps/public-repo/public/" />
+    <property name="repo.update" value="http://${host.local}:8080/exist/apps/public-repo/modules/update.xql" />
+    <property name="repo.find" value="http://${host.local}:8080/exist/apps/public-repo/modules/find.xql" />
+    <property name="xar-file" value="${project.abbrev}-${project.version}.xar" />
+    <property name="uri.project" value="${project.abbrev}-${project.version}.xar" />
+    <echo>project.version: ${project.version}</echo>
+    <echo>xar-location: ${xar-location}</echo>
+    <echo>repo.url: ${repo.url}</echo>
+    <echo>repo.update: ${repo.update}</echo>
+    <echo>xar-file: ${xar-file}</echo>
+
+    <antcall target="deployment-folder" />
+    <antcall target="eXist-data" />
+    <antcall target="build-xar" />
+    <antcall target="xar-upload" />
+    <antcall target="browse" />
+</target>
+
+<target name="condition-hostRomote">
+  <condition property="isNotSet.hostRomote">
+    <not>
+       <isset property="host.remote" />
+    </not>
+   </condition>
+</target>
+
+<target name="set-hostRomote" if="isNotSet.hostRomote">
+    <echo>Set remote host</echo>
+    <property name="project.domain.remote" value="www.${project.domain}" />
+    <property name="dir.exec" value="${dir.generator}/.bin" />
+    <echo>${dir.exec}</echo>
+    <echo>CHECK: if we can resolve project.domain remotely using :
+    ${project.domain.remote} we want ${project.domain.remote} not to be loopback
+    to ${host.local} and we want check if it is reachable</echo>
+    <exec executable="python" dir="${dir.generator}/.bin" failonerror="false">
+        <arg value="validateDomains.py" />
+        <arg value="-d" />
+        <arg value="${project.domain.remote}" />
+        <redirector outputproperty="project.domain.remoteIP" />
+    </exec>
+    <echo>python out: ${project.domain.remoteIP}</echo>
+    <condition property="out.hostbyname">
+        <isset property="project.domain.remoteIP" />
+    </condition>
+    <echo>${out.hostbyname}</echo>
+    <condition property="has.resolved.remote-domain">
+        <not>
+            <equals arg1="${host.local}" arg2="${project.domain.remoteIP}" />
+        </not>
+    </condition>
+    <echo>CHECK has.resolved - ${has.resolved.remote-domain} ${host.local} not
+    equal ${project.domain.remoteIP}</echo>
+    <condition property="reachable.remotelhost8080">
+        <isreachable url="http://${project.domain.remoteIP}" />
+    </condition>
+    <echo>CHECK ${project.domain.remoteIP} is reachable on port 8080</echo>
+    <fail message="CHECK DEPENDENCIES: failed">
+        <condition>
+            <or>
+                <isfalse value="${out.hostbyname}" />
+                <isfalse value="${has.resolved.remote-domain}" />
+                <isfalse value="${reachable.remotelhost8080}" />
+            </or>
+        </condition>
+    </fail>
+    <property name="host.remote" value="${project.domain.remoteIP}" />
+    <propertyfile file="build.properties">
+        <entry key="host.remote" value="${project.domain.remoteIP}" />
+    </propertyfile>
+</target>
+
+<target name="deploy-remote" depends="condition-hostRomote, set-hostRomote, deploy-bumpversion" >
+<echo> DEPLOY TO REMOTE HOST: ${host.remote}</echo>
+    <condition property="reachable.remotelhost8080">
+        <isreachable url="http://${host.remote}" />
+    </condition>
+    <echo>CHECK: ${reachable.remotelhost8080} -  ${host.remote} is reachable on port 8080 </echo>
+    <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
+    <property name="project.version" value="${out.project.version}" />
+    <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
+    <property name="project.url" value="http://${project.domain}" />
+    <property name="project.url.browse" value="http://www.${project.domain}" />
+    <property name="repo.url" value="http://${host.remote}:8080/exist/apps/public-repo/public/" />
+    <property name="repo.update" value="http://${host.remote}:8080/exist/apps/public-repo/modules/update.xql" />
+    <property name="repo.find" value="http://${host.remote}:8080/exist/apps/public-repo/modules/find.xql" />
+    <property name="xar-file" value="${project.abbrev}-${project.version}.xar" />
+    <echo>project.version: ${project.version}</echo>
+    <echo>xar-location: ${xar-location}</echo>
+    <echo>repo.url: ${repo.url}</echo>
+    <echo>repo.update: ${repo.update}</echo>
+    <echo>xar-file: ${xar-file}</echo>
+    <antcall target="deployment-folder" />
+    <antcall target="eXist-data-remote" />
+    <antcall target="build-xar" />
+    <antcall target="xar-upload" />
+    <antcall target="browse" />
+</target>
+
+<target name="xar-undeploy-remove">
+<property name="repo.update" value="http://${host.local}:8080/exist/apps/public-repo/modules/update.xql"/>
+<property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
+
+<property name="repo-undeploy-remove">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+repo:undeploy("http://${project.domain}"),
+repo:remove("http://${project.domain}")
+</property>
+<xdb:xquery
+    uri="${exist.db}"
+    query="${repo-undeploy-remove}"
+    user="${exist.username}"
+    password="${exist.password}"
+    outputproperty="undeploy-remove"
+/>
+
+<echo>eXist reply:  ${undeploy-remove}</echo>
+
+<exec executable="curl">
+    <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
+</exec>
+</target>
+
+<target name="theme">
+<mkdir dir="${dir.generator}/themes/${project.theme}"/>
+<sync todir="${dir.generator}/themes/${project.theme}">
+        <fileset dir="${basedir}">
+            <include name="build.xml" />
+            <include name="config.rb" />
+            <include name=".deploy/controller.xql" />
+            <include name="www/resources/**/*.scss" />
+            <include name="templates/**/*.html" />
+            <include name="modules/**/*.xqm" />
+            <include name="modules/**/*.xql" />
+        </fileset>
+
+<!-- Add stuff that we don't want  to overide in the orginal theme       -->
+        <preserveintarget>
+            <include name="www/resources/**" />
+            <include name="www/**/*.md" />
+            <include name="templates/includes/tagline.html" />
+        </preserveintarget>
+</sync>
+</target>
+
+<target name="deploy-info">
+<property name="q_repo-list">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+let $seq := repo:list()
+return string-join($seq, ',')
+</property>
+
+<xdb:xquery
+            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_repo-list}" user="${exist.username}"
+            password="${exist.password}"
+            outputproperty="repo-list" />
+<echo>${repo-list}</echo>
+
+<property name="q_repo-find">xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+let $seq := repo:list()
+return $seq[contains(., '${project.domain}')]</property>
+
+<xdb:xquery uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_repo-find}" user="${exist.username}"
+            password="${exist.password}"
+            outputproperty="repo-find" />
+<echo>${repo-find}</echo>
+<echo>LIST resources and collections in: xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}</echo>
+<xdb:list uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}"
+          collections="true"
+          resources="true"
+          outputproperty="collections" />
+<echo>${collections}</echo>
+</target>
+</project>
