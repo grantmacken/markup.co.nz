@@ -9,5 +9,3 @@ It won't build because it lacks a properties file.
 It is used to generate a 'theme' for my
 [mu-generator](https://github.com/grantmacken/mu-generator) project by invoking
 ```ant theme```
-
-

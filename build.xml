@@ -106,6 +106,17 @@
 
 
 <target name="setHomeConditions">
+
+  <fail>
+     <condition>
+       <not>
+         <contains string="${relativePath}" substring="www" />
+       </not>
+     </condition>
+   </fail>
+
+
+
   <condition property="is.home">
     <equals arg1="${relativePath}" arg2="www" />
   </condition>
