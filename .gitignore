@@ -1,0 +1,10 @@
+build.properties
+.build/
+.deploy/repo.xml
+.deploy/expath-pkg.xml
+.deploy/templates/
+.deploy/resources/
+.deploy/data/
+.deploy/modules/
+.komodotools/
+.sass-cache/
