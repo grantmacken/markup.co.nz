@@ -3,7 +3,29 @@
  <body>
  <header class="templates:include?path=templates/includes/headers/articles.html"/>
  <nav class="templates:include?path=templates/includes/nav-pages.html" />
-   <article data-template="post:feed" />
+   <article data-template="post:feed" >
+<!--
+ A collection of entries.
+
+ UX (User Experience)
+ users sees
+  'listed' last 20 p'listed'osted entries ( articles notes )
+  'ordered by' recent entry first
+         'recent': may be or 'last updated' or 'first published'
+
+  listed entries
+   * may be 'summarised' or 'shortened'
+   * if article
+     * should have a title
+     * should have a author ( author may be implicit as in feed author)
+       getAuthor()
+     * should have link to the 'archived' permalink page
+
+
+ref: http://microformats.org/wiki/h-entry
+-->
+
+    </feed>
  <footer class="templates:include?path=templates/includes/footer.html" />
  </body>
 </html>
