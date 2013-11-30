@@ -19,6 +19,5 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
 declare
 function auth:token($node as node(), $model as map(*)) {
-<p{ string('token') }</p>
+<p>{ string('token') }</p>
 };
-
