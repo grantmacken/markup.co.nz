@@ -41,20 +41,24 @@ function post:feed($node as node(), $model as map(*)) {
 
 return
 <section id="main" role="main">
-<h1>Latest 20 posts</h1>
+<ul>
 {
  for $item  at $i in collection($model('data-posts-path'))//atom:entry
    where $i lt 20
-   order by $item/atom:updated
-   return <article>
-   {$item/atom:content/*/node()}
-   <footer role="contentinfo">
-   <p>
-   Updated on the {$getPageUpdated($item)} by { $getAuthor() } , archived as
-   <a href="{ $getPermalink($item) }">{$getTitle($item)}</a></p>
-   </footer>
-   </article>
+   order by $item/atom:updated descending
+   return
+   <li>
+
+   <article  class="h-entry">
+   <h2 class="p-name">{$item/atom:title/string()}</h2>
+   <div class="e-content">
+     {$item/atom:content/*/node()}
+   </div>
+   <p>permalink: <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a></p>
+ </article>
+   </li>
   }
+</ul>
 </section>
 };
 
@@ -62,6 +66,23 @@ return
 
 (:
  http://microformats.org/wiki/h-entry
+
+
+h-entry properties, inside an element with class h-entry:
+
+    p-name - entry name/title
+    p-summary - short entry summary
+    e-content - full content of the entry
+    dt-published - when the entry was published
+    dt-updated - when the entry was updated
+    p-author - who wrote the entry, optionally embedded h-card(s)
+    p-category - entry categories/tags
+    u-url - entry permalink URL
+    u-uid - unique entry ID
+    p-location - location the entry was posted from, optionally embed h-card, h-adr, or h-geo
+
+
+
 <article class="h-entry">
   <h1 class="p-name">Microformats are amazing</h1>
   <p>Published by <a class="p-author h-card">W. Developer</a>
