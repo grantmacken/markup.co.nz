@@ -8,7 +8,7 @@ import module namespace page="http://markup.co.nz/#page" at "mu/page.xqm";
 import module namespace post="http://markup.co.nz/#post" at "mu/post.xqm";
 import module namespace header="http://markup.co.nz/#header" at "mu/header.xqm";
 import module namespace nav="http://markup.co.nz/#nav" at "mu/nav.xqm";
-import module namespace nav="http://markup.co.nz/#auth" at "mu/auth.xqm";
+import module namespace auth="http://markup.co.nz/#auth" at "mu/auth.xqm";
 
 declare option exist:serialize "method=html5 media-type=text/html enforce-xhtml=yes";
 
