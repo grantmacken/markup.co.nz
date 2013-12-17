@@ -7,7 +7,7 @@ opened in a modern 'text editor' ( komodo , sublime , etc ), and these project
 work-spaces enabling a 'rapid prototyping' workflow for quickly building
 websites that can be packaged and deployed as eXist-db apps. You can also
 feedback the project to the generator as a reusable theme for generating other
-projects
+projects.
 
 2. [NGINX-EXIST-UBUNTU](https://github.com/grantmacken/nginx-eXist-ubuntu) The
 projects purpose is to help users set up Nginx as as a reverse proxy for
