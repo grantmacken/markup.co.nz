@@ -5,6 +5,7 @@ import module namespace templates="http://exist-db.org/xquery/templates" ;
 import module namespace util="http://exist-db.org/xquery/util";
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 import module namespace config="http://exist-db.org/xquery/apps/config"  at "../../modules/config.xqm";
+import module namespace session="http://exist-db.org/xquery/session";
 
 declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
 declare namespace  atom =  "http://www.w3.org/2005/Atom";
@@ -164,9 +165,17 @@ a 'data-item' is going to be a resource without an extension
    return $updated
   }
 
+  let $session-login :=  session:get-attribute('login')
+  let $session-has-login-attr  :=  not(empty(session:get-attribute('login')))
+  let $session-current-user  :=  xmldb:get-current-user()
+  let $session-exists  :=  session:exists()
 
  return
        map {
+       'session-login' := $session-login,
+       'session-current-user' := $session-current-user,
+       'session-has-login-attr' := $session-has-login-attr,
+       'session-exists' := $session-exists,
        'site-title' := $site-title,
        'site-domain' := $site-domain,
        'request-path' := $request-path,
