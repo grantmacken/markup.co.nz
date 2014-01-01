@@ -39,8 +39,17 @@
 
 
 <target name="info">
+
     <echo>info</echo>
+
+    <echo>${env.WORKSPACE}</echo>
+    <echo>${env.BUILD_NUMBER}</echo>
+    <echo>${env.JAVA_HOME}</echo>
+
+
 </target>
+
+
 <target name="browse">
     <exec executable="${browser}" spawn="true">
         <arg value="${project.url.browse}" />
