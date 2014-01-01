@@ -40,20 +40,28 @@
 
 <target name="info">
     <echo>info</echo>
-    <echo>${user.home}</echo>
-    <echo>${user.name}</echo>
+<echo>
 
-   <echo>${os.name}</echo>
+USER
+user home: ${user.home}
+user.name: ${user.name}
 
-    <echo>${java.version}</echo>
-    <echo>${java.home}</echo>
+OS
+os.name: ${os.name}
 
+JAVA
+java.version ${java.version}
+java.home: ${java.home}
 
-    <echo>${env.WORKSPACE}</echo>
-    <echo>${env.BUILD_NUMBER}</echo>
-    <echo>${project.domain}</echo>
-    <echo>${project.abbrev}</echo>
-    <echo>${project.description}</echo>
+JENKINS
+env.WORKSPACE: ${env.WORKSPACE}
+env.BUILD_NUMBER: ${env.BUILD_NUMBER}
+
+PROJECT
+project.domain: ${project.domain}
+project.abbrev: ${project.abbrev}
+project.description: ${project.description}
+</echo>
 </target>
 
 
