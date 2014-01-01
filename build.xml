@@ -62,6 +62,7 @@ project.domain: ${project.domain}
 project.abbrev: ${project.abbrev}
 project.description: ${project.description}
 </echo>
+
 </target>
 
 
@@ -217,6 +218,8 @@ project.description: ${project.description}
         user="${exist.username}"
         password="${exist.password}"
     />
+
+
 </target>
 
 
@@ -457,12 +460,22 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
     </propertyfile>
 </target>
 
-<target name="deploy-remote" depends="condition-hostRomote, set-hostRomote, deploy-bumpversion" >
+<target name="deploy-remote" depends="condition-hostRomote, set-hostRomote" >
 <echo> DEPLOY TO REMOTE HOST: ${host.remote}</echo>
     <condition property="reachable.remotelhost8080">
         <isreachable url="http://${host.remote}" />
     </condition>
     <echo>CHECK: ${reachable.remotelhost8080} -  ${host.remote} is reachable on port 8080 </echo>
+
+    <!-- Everytime we upload semversion patch -->
+    <exec executable="cat" failonerror="true">
+        <arg value="sem.version" />
+        <redirector outputproperty="out.project.version"/>
+    </exec>
+    <echo>Build number in version.txt: ${out.project.version}  </echo>
+
+    <!--
+
     <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
     <property name="project.version" value="${out.project.version}" />
     <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
@@ -472,6 +485,7 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
     <property name="repo.update" value="http://${host.remote}:8080/exist/apps/public-repo/modules/update.xql" />
     <property name="repo.find" value="http://${host.remote}:8080/exist/apps/public-repo/modules/find.xql" />
     <property name="xar-file" value="${project.abbrev}-${project.version}.xar" />
+
     <echo>project.version: ${project.version}</echo>
     <echo>xar-location: ${xar-location}</echo>
     <echo>repo.url: ${repo.url}</echo>
@@ -482,6 +496,7 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="browse" />
+    -->
 </target>
 
 <target name="xar-undeploy-remove">
