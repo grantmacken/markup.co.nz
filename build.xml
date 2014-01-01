@@ -44,7 +44,9 @@
 
     <echo>${env.WORKSPACE}</echo>
     <echo>${env.BUILD_NUMBER}</echo>
-    <echo>${env.JAVA_HOME}</echo>
+    <echo>${project.domain}</echo>
+    <echo>${project.abbrev}</echo>
+    <echo>${project.description}</echo>
 
 
 </target>
