@@ -8,3 +8,4 @@ build.properties
 .deploy/modules/
 .komodotools/
 .sass-cache/
+Gemfile.lock

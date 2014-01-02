@@ -312,8 +312,8 @@ project.description: ${project.description}
 <target name="eXist-data-remote">
     <echo>Everything gets driven remotely</echo>
     <antcall target="proccess-md" />
-    <!--
     <antcall target="proccess-sass" />
+    <!--
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />-->
 </target>
