@@ -1,6 +1,6 @@
 build.properties
 .build/
-
+.bundle
 .deploy/templates/
 .deploy/resources/
 .deploy/data/
