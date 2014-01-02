@@ -355,7 +355,7 @@ project.description: ${project.description}
      Note: issue#4  exist-db deployment should use sem.version
      deploy based on project.version
     -->
-
+<!--
 <property name="install-and-deploy">
 xquery version "3.0";
 import module namespace repo="http://exist-db.org/xquery/repo";
@@ -363,6 +363,7 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
 </property>
 
 <xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />
+-->
 </target>
 
 
@@ -493,6 +494,7 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
     <antcall target="eXist-data-remote" />
 
     <antcall target="build-xar" />
+
     <antcall target="xar-upload" />
 
 </target>
