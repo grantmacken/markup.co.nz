@@ -200,7 +200,6 @@ project.description: ${project.description}
 </exec>
 
 
-
 <antcall target="hasMd2Failed"  />
 <antcall target="store-page"  />
 <antcall target="store-post"  />
@@ -210,7 +209,6 @@ project.description: ${project.description}
     <property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/data/pages/${path}</property>
     <echo>OUTFILE:  ${outfile}  </echo>
     <echo>EXIST.URI:  ${exist.uri} </echo>
-
     <xdb:store
         uri="${exist.uri}"
         createcollection="true"
@@ -218,16 +216,9 @@ project.description: ${project.description}
         user="${exist.username}"
         password="${exist.password}"
     />
-
-
 </target>
 
-
-
-
 <target name="store-post" unless="has.md2Failed"  if="is.mdPost">
-
-
 
 <echo>outfile:  ${outfile}</echo>
  <exec executable="/bin/sh">
