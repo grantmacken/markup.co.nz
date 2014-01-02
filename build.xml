@@ -473,12 +473,7 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
         <redirector outputproperty="out.project.version"/>
     </exec>
     <echo>Semantic Build number in sem.version: ${out.project.version}  </echo>
-
     <echo>Jenkins Workspace: ${env.WORKSPACE}  </echo>
-
-
-
-
     <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
     <property name="project.version" value="${out.project.version}" />
     <property name="xar-location" value="${env.WORKSPACE}/${dir.build}/${project.abbrev}-${project.version}.xar" />
@@ -501,10 +496,9 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
 
     <antcall target="build-xar" />
 
-    <!--
+
     <antcall target="xar-upload" />
-    <antcall target="browse" />
-    -->
+    <!-- <antcall target="browse" /> -->
 </target>
 
 <target name="xar-undeploy-remove">
