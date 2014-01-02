@@ -9,12 +9,14 @@ import re
 
 
 try:
-    #import elementtree.ElementTree as ET
     from lxml import etree as  ET
     #print("running with lxml.etree")
 except ImportError:
-    print("Failed to import ElementTree from any known place")
-    sys.exit('Error!')
+    try:
+        import elementtree.ElementTree as ET
+    except ImportError:
+        print("Failed to import ElementTree from any known place")
+        sys.exit('Error!')
 
 parser = argparse.ArgumentParser(description='Ony one arg')
 parser.add_argument('-i','--input', help='Input file name',required=True)
