@@ -22,6 +22,8 @@
     <property name="dir.data" value="${dir.deploy}/data"/>
     <property name="dir.categories" value="${dir.data}/categories"/>
     <property name="dir.pages" value="${dir.data}/pages"/>
+    <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
+
 
     <property name="browser" value="firefox"/>
     <!-- import eXist-db tasks -->
@@ -510,16 +512,28 @@ repo:remove("http://${project.domain}")
 
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
-
-  <echo>Empty Ngnix cache EVERYTHING in it</echo>
-  <delete includeemptydirs="true">
-    <fileset dir="/usr/local/nginx/cache" includes="**/*"/>
-  </delete>
-
+    <antcall target="clear-nginx-cache" />
 </target>
 
-<target name="xar-undeploy-remove">
 
+
+<target name="check-nginx-cache">
+  <condition property="has-nginx-cache">
+    <available file="${dir.nginx-cache}" type="dir"/>
+  </condition>
+ </target>
+
+<target name="clear-nginx-cache" depends="check-nginx-cache" if="has-nginx-cache">
+<echo>Empty Ngnix cache EVERYTHING in it</echo>
+
+  <delete includeemptydirs="true">
+    <fileset dir="${dir.nginx-cache}" includes="**/*"/>
+  </delete>
+</target>
+
+
+
+<target name="xar-undeploy-remove">
 <property name="repo.update" value="http://${host.local}:8080/exist/apps/public-repo/modules/update.xql"/>
 <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
 
