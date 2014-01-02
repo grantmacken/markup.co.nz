@@ -310,11 +310,11 @@ project.description: ${project.description}
 </target>
 
 <target name="eXist-data-remote">
-    <echo>Everything gets driven locally</echo>
-    <antcall target="proccess-md" />
+    <echo>Everything gets driven remotely</echo>
+ <!--   <antcall target="proccess-md" />
     <antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
-    <antcall target="proccess-imagesAndScripts" />
+    <antcall target="proccess-imagesAndScripts" />-->
 </target>
 
 
@@ -472,13 +472,16 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
         <arg value="sem.version" />
         <redirector outputproperty="out.project.version"/>
     </exec>
-    <echo>Build number in version.txt: ${out.project.version}  </echo>
+    <echo>Semantic Build number in sem.version: ${out.project.version}  </echo>
+
+    <echo>Jenkins Workspace: ${env.WORKSPACE}  </echo>
+
 
 
 
     <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
     <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
+    <property name="xar-location" value="{env.WORKSPACE}/${dir.build}/${project.abbrev}-${project.version}.xar" />
     <property name="project.url" value="http://${project.domain}" />
     <property name="project.url.browse" value="http://www.${project.domain}" />
     <property name="repo.url" value="http://${host.remote}:8080/exist/apps/public-repo/public/" />
@@ -492,9 +495,11 @@ repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
-    <!--
+
     <antcall target="deployment-folder" />
     <antcall target="eXist-data-remote" />
+
+    <!--
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="browse" />
