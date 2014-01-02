@@ -1,6 +1,7 @@
 build.properties
 .build/
 .bundle
+.bumpversion.cfg
 .deploy/templates/
 .deploy/resources/
 .deploy/data/
