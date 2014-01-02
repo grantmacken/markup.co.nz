@@ -9,7 +9,8 @@ import re
 
 
 try:
-    from lxml import etree as  ET
+    import elementtree.ElementTree as ET
+    #from lxml import etree as  ET
     #print("running with lxml.etree")
 except ImportError:
     print("Failed to import ElementTree from any known place")
