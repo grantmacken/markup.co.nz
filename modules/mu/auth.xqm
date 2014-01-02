@@ -120,8 +120,8 @@ sm:is-account-enabled($username)
 declare function auth:token($node as node(), $model as map(*) , $token as
 xs:string, $me as
 xs:string ) {
-let $user-id  :=  string('grant')
-let $password  :=  string('ntere37')
+let $user-id  :=  string('')
+let $password  :=  string('')
 
 let $domain :=  substring-after($me ,'//')
 
