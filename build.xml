@@ -481,16 +481,45 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.url: ${repo.url}</echo>
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
+
+    <echo>On eXist Remove existing deployment</echo>
+
+<property name="repo-undeploy-remove">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+repo:undeploy("http://${project.domain}"),
+repo:remove("http://${project.domain}")
+</property>
+<xdb:xquery
+    uri="${exist.db}"
+    query="${repo-undeploy-remove}"
+    user="${exist.username}"
+    password="${exist.password}"
+    outputproperty="undeploy-remove"
+/>
+
+<echo>eXist reply:  ${undeploy-remove}</echo>
+
+<exec executable="curl">
+    <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
+</exec>
+
+
     <antcall target="deployment-folder" />
     <antcall target="eXist-data-remote" />
 
     <antcall target="build-xar" />
-
     <antcall target="xar-upload" />
+
+  <echo>Empty Ngnix cache EVERYTHING in it</echo>
+  <delete includeemptydirs="true">
+    <fileset dir="/usr/local/nginx/cache" includes="**/*"/>
+  </delete>
 
 </target>
 
 <target name="xar-undeploy-remove">
+
 <property name="repo.update" value="http://${host.local}:8080/exist/apps/public-repo/modules/update.xql"/>
 <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
 
@@ -513,6 +542,7 @@ repo:remove("http://${project.domain}")
 <exec executable="curl">
     <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
 </exec>
+
 </target>
 
 <target name="theme">
