@@ -359,7 +359,7 @@ project.description: ${project.description}
 <property name="install-and-deploy">
 xquery version "3.0";
 import module namespace repo="http://exist-db.org/xquery/repo";
-repo:install-and-deploy("${project.url}","${repo.find}")
+repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 </property>
 <!--repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
 --><xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />
