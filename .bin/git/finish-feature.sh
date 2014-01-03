@@ -13,18 +13,21 @@ REF=$(git symbolic-ref HEAD 2> /dev/null) || exit 0
 CURRENT="${REF#refs/heads/}"
 echo ${CURRENT}
 
-exit
-
 git flow feature list -v
 
-echo 'add FEATURE NAME _____________'
+git checkout komodo-toolbox
+
+
+exit
+
+echo 'FEATURE NAME _____________'
 read -p "FEATURE?" FEATURE
 
 echo "FEATURE $FEATURE Continue (y/n)"
 read -p "Continue (y/n)?" choice
 case "$choice" in
     y|Y )
-        echo "Adding FEATURE BRANCH: $FEATURE";;
+        echo "Finish FEATURE BRANCH: $FEATURE";;
     n|N )
         echo "no"
         exit;;
@@ -33,9 +36,7 @@ case "$choice" in
         exit;;
 esac
 
-git flow feature start $FEATURE
 bumpversion patch --commit
 VERSION=$(cat sem.version)
 
-git flow feature publish  $FEATURE
-#git flow feature track  $FEATURE
+git flow feature finish $FEATURE
