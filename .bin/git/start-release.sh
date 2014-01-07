@@ -33,7 +33,6 @@ git flow release publish  $RELEASE
 git flow release finish -F -m 'fin' -p $RELEASE
 
 
-
 exit
 
 #echo 'add FEATURE NAME _____________'
@@ -51,6 +50,3 @@ exit
 #        echo "invalid"
 #        exit;;
 #esac
-
-
-
