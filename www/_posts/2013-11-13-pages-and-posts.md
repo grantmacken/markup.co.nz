@@ -2,7 +2,6 @@
 title:  pages and posts
 ---
 
-
 Pages and  Posts
 -----------------
 
