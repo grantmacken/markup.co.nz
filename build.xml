@@ -467,10 +467,10 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
         <redirector outputproperty="out.project.version"/>
     </exec>
     <echo>Semantic Build number in sem.version: ${out.project.version}  </echo>
-    <echo>Jenkins Workspace: ${env.WORKSPACE}  </echo>
+   <!-- <echo>Jenkins Workspace: ${env.WORKSPACE}  </echo>-->
     <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
     <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${env.WORKSPACE}/${dir.build}/${project.abbrev}-${project.version}.xar" />
+    <property name="xar-location" value="${dir.build}/${project.abbrev}-${project.version}.xar" />
     <property name="project.url" value="http://${project.domain}" />
     <property name="project.url.browse" value="http://www.${project.domain}" />
     <property name="repo.url" value="http://${host.remote}:8080/exist/apps/public-repo/public/" />
@@ -491,7 +491,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
-    <antcall target="clear-nginx-cache" />
+    <!--<antcall target="clear-nginx-cache" />-->
 </target>
 
 <target name="check-nginx-cache">
