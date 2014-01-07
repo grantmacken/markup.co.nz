@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package abbrev="mu" name="http://markup.co.nz" spec="1.0" version="0.9.0" xmlns="http://expath.org/ns/pkg">
+<package abbrev="mu" name="http://markup.co.nz" spec="1.0" version="0.10.0" xmlns="http://expath.org/ns/pkg">
   <title>markup.co.nz</title>
 </package>
