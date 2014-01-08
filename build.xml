@@ -55,9 +55,6 @@ JAVA
 java.version ${java.version}
 java.home: ${java.home}
 
-JENKINS
-env.WORKSPACE: ${env.WORKSPACE}
-env.BUILD_NUMBER: ${env.BUILD_NUMBER}
 
 PROJECT
 project.domain: ${project.domain}
@@ -467,10 +464,10 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
         <redirector outputproperty="out.project.version"/>
     </exec>
     <echo>Semantic Build number in sem.version: ${out.project.version}  </echo>
-    <echo>Jenkins Workspace: ${env.WORKSPACE}  </echo>
+
     <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
     <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${env.WORKSPACE}/${dir.build}/${project.abbrev}-${project.version}.xar" />
+    <property name="xar-location" value="${dir.build}/${project.abbrev}-${project.version}.xar" />
     <property name="project.url" value="http://${project.domain}" />
     <property name="project.url.browse" value="http://www.${project.domain}" />
     <property name="repo.url" value="http://${host.remote}:8080/exist/apps/public-repo/public/" />
