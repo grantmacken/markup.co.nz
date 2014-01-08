@@ -1,0 +1,7 @@
+//h-card
+
+.h-card{
+@include layout-block;
+min-height: 160px;
+//width: 320px;
+}
