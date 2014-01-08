@@ -8,4 +8,5 @@ build.properties
 .deploy/modules/
 .komodotools/
 .sass-cache/
+sem.version
 Gemfile.lock
