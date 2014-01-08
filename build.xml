@@ -497,12 +497,19 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
   </condition>
  </target>
 
-<target name="clear-nginx-cache" depends="check-nginx-cache" if="has-nginx-cache">
+<target name="clear-nginx-cache">
 <echo>Empty Ngnix cache EVERYTHING in it</echo>
+    <exec executable="ssh">
+        <arg value="featon" />
+        <arg value="cd ${dir.nginx-cache};" />
+        <arg value="rm -R *" />
+    </exec>
 
-  <delete includeemptydirs="true">
+
+<!--  <delete includeemptydirs="true">
     <fileset dir="${dir.nginx-cache}" includes="**/*"/>
   </delete>
+-->
 </target>
 
 <target name="local-xar-undeploy-remove">
