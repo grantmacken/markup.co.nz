@@ -25,8 +25,12 @@ function page:head-title($node as node(), $model as map(*)) {
 declare
 function page:article($node as node(), $model as map(*)) {
 let $content :=
-    if( $model('page-isHome') ) then ( <article id="home-page-article" role="main">{ $model('page-content')/*/node() }</article> )
-    else ( <article role="main">{ $model('page-content')/*/node() }</article> )
+    if( $model('page-isHome') ) then (
+     <article id="home-page-article" role="main" class="h-entry" >{
+     $model('page-content')/*/node()}</article>)
+    else (
+     <article role="main" class="h-entry" >{
+     $model('page-content')/*/node()}</article>)
 return
 templates:process( $content, $model )
 };
