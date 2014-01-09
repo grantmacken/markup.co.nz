@@ -104,6 +104,9 @@ let $content :=
    <div class="e-content">
      { $model('page-content')/*/node() }
    </div>
+
+<hr/>
+   <a rel="author" class="p-author h-card" href="/">$model('page-author')</a>
  </article>
 return
 templates:process( $content, $model )
