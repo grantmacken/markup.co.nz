@@ -374,6 +374,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>Build number in version.txt: ${out.project.version}  </echo>
 </target>
 
+
+
 <target name="xar-build-upload" depends="deploy-bumpversion">
     <property name="project.version" value="${out.project.version}" />
     <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
@@ -390,6 +392,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.url: ${repo.url}</echo>
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
+
+    <antcall target="xar-undeploy-remove" />
 
     <antcall target="deployment-folder" />
     <antcall target="eXist-data" />
@@ -512,11 +516,13 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 -->
 </target>
 
+<!--
 <target name="local-xar-undeploy-remove">
 <property name="repo.update" value="http://${host.local}:8080/exist/apps/public-repo/modules/update.xql"/>
 <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
 <antcall target="xar-undeploy-remove" />
 </target>
+-->
 
 <target name="xar-undeploy-remove">
 <xdb:xquery
@@ -532,6 +538,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 <exec executable="curl">
     <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
 </exec>
+
 </target>
 
 <target name="theme">
