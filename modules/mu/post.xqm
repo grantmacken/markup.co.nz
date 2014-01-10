@@ -139,8 +139,6 @@ templates:process( $content, $model )
 };
 
 
-
-
 declare
 function post:entry($node as node(), $model as map(*)) {
 let $content :=
