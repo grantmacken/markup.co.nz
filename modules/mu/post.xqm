@@ -120,6 +120,15 @@ return
 };
 
 declare
+function post:permalink($node as node(), $model as map(*)) {
+ let $permalink := 'http://' || $model('site-domain') || substring-before($model('request-path'), '.html')
+ return
+ <p>permalink : <a class="u-url" href="{$permalink}">{$permalink}</a></p>
+};
+
+
+
+declare
 function post:content($node as node(), $model as map(*)) {
 let $content :=
    <div class="e-content">
@@ -128,6 +137,8 @@ let $content :=
    return
 templates:process( $content, $model )
 };
+
+
 
 
 declare
@@ -161,6 +172,3 @@ let $content :=
 return
 templates:process( $content, $model )
 };
-
-
-
