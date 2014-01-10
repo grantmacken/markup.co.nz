@@ -69,16 +69,13 @@ article[role='main']{
 
 header[role='banner']{
   @include layout-block;
-  // background-color: tint( $page-background, 70% );
+  background-color: tint( $page-background, 70% );
 }
 
-article{
-  @include layout-block;
+article.h-entry{
     background-color: tint( $page-background, 70% );
-    @include between(1,3) {
     padding-right: gutter-span($grid: 3 );
     padding-left: gutter-span($grid: 3 );
-    }
 }
 
 section[role='main']{
