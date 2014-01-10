@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta xmlns="http://exist-db.org/xquery/repo">
   <description>mu project</description>
-  <author>grant</author>
+  <author>Grant MacKenzie</author>
   <website>http://markup.co.nz</website>
   <status>alpha</status>
   <license>GNU-LGPL</license>
