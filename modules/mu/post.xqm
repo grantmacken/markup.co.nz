@@ -96,6 +96,39 @@ h-entry properties, inside an element with class h-entry:
 
 :)
 
+declare
+function post:name($node as node(), $model as map(*)) {
+<h1 class="p-name">{$model('page-title')}</h1>
+};
+
+declare
+function post:author($node as node(), $model as map(*)) {
+<a class="p-author h-card"  href="http://{$model("site-domain")}" >{$model("page-author")}</a>
+};
+
+
+declare
+function post:summary($node as node(), $model as map(*)) {
+<p class="p-summary">{$model("page-summary")}</p>
+};
+
+declare
+function post:published($node as node(), $model as map(*)) {
+ let $formatedDateTime := format-dateTime(xs:dateTime($model("page-published")), " [FNn], [D1o] [MNn] [Y]", "en", (), ())
+return
+<time class="dt-published" datetime="{$model("page-published")}">{$formatedDateTime}</time>
+};
+
+declare
+function post:content($node as node(), $model as map(*)) {
+let $content :=
+   <div class="e-content">
+     { $model('page-content')/*/node() }
+   </div>
+   return
+templates:process( $content, $model )
+};
+
 
 declare
 function post:entry($node as node(), $model as map(*)) {
@@ -106,12 +139,13 @@ let $content :=
    </div>
 
 <hr/>
-   <a rel="author" class="p-author h-card" href="/">$model('page-author')</a>
+<p data-template="page:authored-by"/>
+<p data-template="page:permalink-url"/>
+<hr/>
  </article>
 return
 templates:process( $content, $model )
 };
-
 
 
 declare
@@ -129,9 +163,4 @@ templates:process( $content, $model )
 };
 
 
-declare
-function post:author($node as node(), $model as map(*)) {
-<p>By <span property="author" typeof="Person">
-<span property="name">{$model("page-author")}</span>
-</span></p>
-};
+

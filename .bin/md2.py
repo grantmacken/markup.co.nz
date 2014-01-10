@@ -7,7 +7,6 @@ import time
 import datetime
 import re
 
-
 try:
     from lxml import etree as  ET
     #print("running with lxml.etree")
@@ -119,22 +118,41 @@ def indent(elem, level=0):
 
 eEntry = ET.Element("entry", nsmap=NSMAP)
 
-L = ['title','subtitle','summary' ]
+#Elements of <entry>
+#http://atomenabled.org/developers/syndication/#requiredEntryElements
+# todo: add categories
+
+L = [ 'title', 'author' ,  'published' , 'id' ,'summary', 'categories']
 for item in L:
     try:
-        new_element = metadata[item]
-        addElement( item, metadata[item] )
+        new_element = item
+        if new_element == 'author':
+            eAuthor = ET.SubElement(eEntry, new_element)
+            eAuthorName =  ET.SubElement(eAuthor, 'name').text = metadata[item]
+        elif new_element == 'categories':
+            lCategories = metadata[item].split()
+            for lCat in lCategories:
+                eCategory = ET.SubElement(eEntry, 'category')
+                eCategory.attrib["term"] = metadata[item]
+        else:
+            addElement( item, metadata[item] )
     except KeyError:
             new_title = ''
             pass
 
 
+# add a title if not in meta
+
 myTitle = eEntry.find('title')
 if myTitle is None:
     addElement( 'title', titleText.replace('-', ' ') )
 
+# add updated from time modified if not in meta
 
 ET.SubElement(eEntry, 'updated').text  = modDate
+
+# add permalink
+
 linkAlt = ET.SubElement(eEntry, 'link')
 linkAlt.attrib["rel"] = "alternate"
 linkAlt.attrib["type"] = "text/html"

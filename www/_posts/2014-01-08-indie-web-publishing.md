@@ -17,7 +17,6 @@ Test with
 Styled the h-card Div, add h-card.scss with simple styling. TODO: Well it's a
 start!
 
-
 OK
 
 <hr/>
@@ -31,3 +30,4 @@ Posts/notes are marked up with [h-entry](http://microformats.org/wiki/h-entry)
 
 Test with
 [validate-h-entry](http://indiewebify.me/validate-h-entry/?url=http%3A%2F%2Fmarkup.co.nz)
+

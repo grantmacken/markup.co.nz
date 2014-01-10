@@ -35,18 +35,35 @@ return
 templates:process( $content, $model )
 };
 
+(: indieweb sem markup as h-entry :)
+
 declare
 function page:article-content($node as node(), $model as map(*)) {
 templates:process( $model('page-content')/*/node(), $model )
 };
 
+(:
+indieweb sem markup
+as h-entry - 'author' of the posted entry
+
+:)
 
 declare
-function page:author($node as node(), $model as map(*)) {
-<p>By <span property="author" typeof="Person">
-<span property="name">{$model("page-author")}</span>
+function page:authored-by($node as node(), $model as map(*)) {
+<p>Authored by <span property="author" typeof="Person">
+<a rel="author"
+   class="p-author h-card"
+   property="name"
+   href="http://{$model('site-domain')}"
+   >{$model("page-author")}</a>
 </span></p>
 };
+
+declare
+function page:permalink-url($node as node(), $model as map(*)) {
+<p>Permalink: <a class="u-url" href="http://{concat($model('site-domain'), $model('request-path'))}">{$model('data-item')}</a></p>
+};
+
 
 
 declare function page:model-info($node as node(), $model as map(*)) {
