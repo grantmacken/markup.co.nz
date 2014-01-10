@@ -455,6 +455,11 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     </propertyfile>
 </target>
 
+
+<target name="deploy-local">
+    <antcall target="xar-build-upload" />
+</target>
+
 <target name="deploy-remote" depends="condition-hostRomote, set-hostRomote" >
 <echo> DEPLOY TO REMOTE HOST: ${host.remote}</echo>
     <condition property="reachable.remotelhost8080">
