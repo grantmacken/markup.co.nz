@@ -44,12 +44,12 @@ let $listItems :=
 
 let $blogItem :=
  if( $model('data-isMainFeed') ) then
-    <li><strong>blog</strong></li>
+    <li><strong>archive</strong></li>
  else(
       if( $model('data-isPost') ) then
-      <li class="at-location"><a href="/archive">blog</a></li>
+      <li class="at-location"><a href="/archive">archive</a></li>
       else(
-      <li><a href="/archive">blog</a></li>
+      <li><a href="/archive">archive</a></li>
        )
   )
 
