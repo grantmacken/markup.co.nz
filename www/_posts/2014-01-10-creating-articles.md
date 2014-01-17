@@ -37,7 +37,7 @@ title: Creating Articles
 author: Grant MacKenzie
 published: 2014-01-10T11:06:55
 id: tag:markup.co.nz,2014-01-10:article:creating-articles
-summary: the difference between Pages and Posts and the Types of Posts
+summary: Creating article posts in our Komodo workspace
 categories: indieweb
 ---
 ```
