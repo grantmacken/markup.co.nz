@@ -44,6 +44,7 @@ post is displayed in full at it's permalink page. The article summaries with
 links are displayed on 'index pages' like 'a recent articles page' or
 'articles category page'.
 
+Test:  [validate-h-entry](http://indiewebify.me/validate-h-entry/?url=http%3A%2F%2Fmarkup.co.nz%2Farchive%2F2013%2F11%2F13%2Fpages-posts-and-post-types)
 
 **Notes**. An [note](http://indiewebcamp.com/note) post does not have 'title' and consists of short piece of
 plain text.

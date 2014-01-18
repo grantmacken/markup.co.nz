@@ -47,6 +47,7 @@ entry* and [post](http://indiewebcamp.com/posts) it our exist-dbs` domain data a
 <br/> ```/data/archive/[year]/[month]/[day]/[file-name]``` and can be viewed at
 its permalink ```/archive/[year]/[month]/[day]/[file-name]```
 
+Test:  [validate-h-entry](http://indiewebify.me/validate-h-entry/?url=http%3A%2F%2Fmarkup.co.nz%2Farchive%2F2013%2F11%2F13%2Fpages-posts-and-post-types)
 
 
 Note: every 'type' of post will get archived in a similar manner.

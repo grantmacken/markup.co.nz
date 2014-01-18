@@ -14,5 +14,21 @@ Under my templates folder I create a h-card include. The root element will
 contains the microfomat classname h-card. Under the root element are flat marked
 up data *properties* which provide profile and or contact info for the card.
 
-These properties will be generated maybe from the build.properties file but at
-the mo are hard coded in the template .
+These properties will be generated maybe from the build.properties file or
+alternativly impported from a silo profile like twitter.
+
+but at
+the mo are hard coded in the template.
+
+
+Test: [Validate-h-card](http://indiewebify.me/validate-h-card/?url=http%3A%2F%2Fmarkup.co.nz)
+
+
+Links to other profiles.
+-----------------------
+
+
+References
+----------
+
+[h-card](http://microformats.org/wiki/h-card) ant microformats wiki
