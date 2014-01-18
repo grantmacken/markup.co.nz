@@ -25,9 +25,8 @@ $bpXXLarge: 1920;
 
 // Define breakpoints in a Slicer list
 //$slicer-breakpoints: 0 $bpXXSmall $bpXSmall $bpSmall $bpMedium $bpLarge $bpXLarge $bpXXLarge;
-//$slicer-breakpoints: 0 400px 768px 800px 980px 1050px 1280px 1920px;
-
-// Slice numbers:    | 1 | 2 | 3 | 4 | 5 | 6| 7 | 8
+//$slicer-breakpoints: 0  400px 768px 800px 980px 1050px 1280px 1920px;
+// Slice numbers:    | 1 | 2  |  3  |  4   | 5  |  6   |  7   |  8
 $breakpoint-no-query-wrappers:  true;
 $slicer-anti-overlap-corrections: 1px, -0.1em, -0.1rem;
 

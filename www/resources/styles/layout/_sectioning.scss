@@ -30,11 +30,11 @@ color: $page-text;
 font-family: $base-font-family;
 font-size: $base-font-size;
 background-color:  $page-background;
-//@include background-grid;
+@include background-grid;
 
 }
 
-//secrion gridless
+//section gridless
 /*section{
 
   }*/
@@ -42,13 +42,13 @@ background-color:  $page-background;
 
 header[role='banner'],
 footer[role="contentinfo"],
-nav[role='navigation'],
-article[role='main']{
+article[role='main'],
+#nav-pages{
   background-color: tint( $page-background, 50% );
   //@include layout-block;
   @include at(5) {
     @include grid-span(10, 2);
-    clear: both;
+   clear: both;
     }
 
    @include at(4) {
@@ -71,12 +71,12 @@ header[role='banner']{
   @include layout-block;
   background-color: tint( $page-background, 70% );
 }
-
+/*
 article.h-entry{
     background-color: tint( $page-background, 70% );
     padding-right: gutter-span($grid: 3 );
     padding-left: gutter-span($grid: 3 );
-}
+}*/
 
 section[role='main']{
   @include at(5) {
