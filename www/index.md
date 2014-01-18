@@ -27,7 +27,7 @@ Some mu generator prototype 'themes' I am working on.
 
  2. indieweb theme: basic + allow 'posts' Follows blog pattern:
   archived date stamped posts, with top summaries, tag and category view pages
-  and an about page. This site is an outcome of this theme.
+  and an about page.  This site is an outcome of this theme.
 
 Projects I am mucking about with.
 
