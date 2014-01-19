@@ -40,6 +40,8 @@ function data-map:loadModel($node as node(), $model as map(*)) {
 
     let $request-path := request:get-parameter('exist-path','_contentStamp')
     let $request-resource := request:get-parameter('exist-resource','contentStamp')
+    let $request-remote-addr :=  request:get-remote-addr()
+
 
 (:
 a 'collection' is going to be either a 'data/pages' subfolder or a
@@ -213,6 +215,7 @@ a 'data-item' is going to be a resource without an extension
        'site-domain' := $site-domain,
        'request-path' := $request-path,
        'request-resource' := $request-resource,
+       'request-remote-addr' := $request-remote-addr,
        'app-root' := $app-root,
        'app-data' := $app-data,
        'data-pages-path' := $data-pages-path,

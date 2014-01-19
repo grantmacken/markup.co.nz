@@ -18,13 +18,20 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
 
 declare
-function post:feed($node as node(), $model as map(*)) {
+function post:articles-feed($node as node(), $model as map(*)) {
 
  let $getPageUpdated :=  function($item){
    let $updated :=  xs:date( $item/atom:updated/string() )
-   let $formated := format-date($updated , "[D1o] [MNn] [Y]", "en", (), ())
+   let $formated := format-date($updated , "[D1o]  [MNn] [Y]", "en", (), ())
    return
     $formated
+  }
+
+  let $getPagePublished :=  function($item){
+   let $published :=  xs:dateTime( $item/atom:published/string() )
+   let $published-formated := format-date($published , "[D1o] of [MNn] [Y]", "en", (), ())
+   return
+    $published-formated
   }
 
  let $getAuthor :=  function(){
@@ -41,24 +48,21 @@ function post:feed($node as node(), $model as map(*)) {
 
 return
 <section id="main" role="main">
-<ul>
+<h1>Last 20 articles</h1>
 {
- for $item  at $i in collection($model('data-posts-path'))//atom:entry
+ for $item  at $i in collection($model('data-posts-path'))//atom:entry[atom:id[contains(.,':article:')] ]
    where $i lt 20
-   order by $item/atom:updated descending
+   order by $item/atom:published descending
    return
-   <li>
-
    <article  class="h-entry">
    <h2 class="p-name">{$item/atom:title/string()}</h2>
    <div class="e-content">
      {$item/atom:content/*/node()}
    </div>
-   <p>permalink: <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a></p>
+   <p>First published on the {$getPagePublished($item)} and updated {$getPageUpdated($item)}</p>
+   <p>Archived at permalink: <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a></p>
  </article>
-   </li>
   }
-</ul>
 </section>
 };
 

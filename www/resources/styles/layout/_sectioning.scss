@@ -30,7 +30,7 @@ color: $page-text;
 font-family: $base-font-family;
 font-size: $base-font-size;
 background-color:  $page-background;
-@include background-grid;
+//@include background-grid;
 
 }
 
@@ -43,6 +43,7 @@ background-color:  $page-background;
 header[role='banner'],
 footer[role="contentinfo"],
 article[role='main'],
+section[role='main'],
 #nav-pages{
   background-color: tint( $page-background, 50% );
   //@include layout-block;
@@ -71,14 +72,14 @@ header[role='banner']{
   @include layout-block;
   background-color: tint( $page-background, 70% );
 }
-/*
+
 article.h-entry{
     background-color: tint( $page-background, 70% );
     padding-right: gutter-span($grid: 3 );
     padding-left: gutter-span($grid: 3 );
-}*/
+}
 
-section[role='main']{
+section[role='xmain']{
   @include at(5) {
     @include grid-span(7,2);
     clear: both;
