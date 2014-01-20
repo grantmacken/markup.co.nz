@@ -25,9 +25,9 @@ Some mu generator prototype 'themes' I am working on.
 
  1. basic theme: Generate hierarchical pages.
 
- 2. blog theme: basic + allow 'posts' Follows blog pattern:
+ 2. indieweb theme: basic + allow 'posts' Follows blog pattern:
   archived date stamped posts, with top summaries, tag and category view pages
-  and an about page. This site is an outcome of this theme.
+  and an about page.  This site is an outcome of this theme.
 
 Projects I am mucking about with.
 

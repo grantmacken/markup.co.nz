@@ -40,6 +40,8 @@ function data-map:loadModel($node as node(), $model as map(*)) {
 
     let $request-path := request:get-parameter('exist-path','_contentStamp')
     let $request-resource := request:get-parameter('exist-resource','contentStamp')
+    let $request-remote-addr :=  request:get-remote-addr()
+
 
 (:
 a 'collection' is going to be either a 'data/pages' subfolder or a
@@ -100,7 +102,7 @@ a 'data-item' is going to be a resource without an extension
     let $homePath :=  $data-pages-path  ||  '/' || 'home' ||  '/index.xml'
     let $page-isIndex := $data-item  eq 'index'
     let $page-isHome :=  $data-collection-path   eq 'home'
-    let $page-author := $config:repo-descriptor/repo:author/text()
+
 
     let $docAvailable := doc-available($contentPath)
 
@@ -132,8 +134,23 @@ a 'data-item' is going to be a resource without an extension
       )
      }
 
+   let $get-page-author :=  function(){
+   let $authorName :=
+    if( empty($docEntry//atom:author/atom:name/string())) then  (
+        $config:repo-descriptor/repo:author/text()
+    )
+    else(
+        $docEntry//atom:author/atom:name/string()
+    )
+  return $authorName
+  }
+
+
 (:~
 : FEATURE:
+: Feeds can have subtitles  but don't have summaries
+: Entries can have summaries but don't have subtitles
+: TODO redo with above taken into account
 : We want to look for the subtitle by looking at the {collection}/index page
 : and looking for title attribute for the reference anchor
 :
@@ -154,7 +171,7 @@ a 'data-item' is going to be a resource without an extension
          else('xx')
      return  $subT
     )
-    else if( $data-isMainFeed ) then  ( 'authored by ' ||  $page-author)
+    else if( $data-isMainFeed ) then  ( 'authored by ' || $get-page-author() )
     else(
        $docEntry//atom:subtitle/string()
       )
@@ -164,6 +181,24 @@ a 'data-item' is going to be a resource without an extension
    let $updated :=  $docEntry//atom:updated/string()
    return $updated
   }
+
+   let $get-page-published :=  function(){
+   let $published :=  $docEntry//atom:published/string()
+   return $published
+  }
+
+   let $get-page-id :=  function(){
+   let $id :=  $docEntry//atom:id/string()
+   return $id
+  }
+
+   let $get-page-summary :=  function(){
+   let $summary :=  $docEntry//atom:summary/string()
+   return $summary
+  }
+
+
+
 
   let $session-login :=  session:get-attribute('login')
   let $session-has-login-attr  :=  not(empty(session:get-attribute('login')))
@@ -180,6 +215,7 @@ a 'data-item' is going to be a resource without an extension
        'site-domain' := $site-domain,
        'request-path' := $request-path,
        'request-resource' := $request-resource,
+       'request-remote-addr' := $request-remote-addr,
        'app-root' := $app-root,
        'app-data' := $app-data,
        'data-pages-path' := $data-pages-path,
@@ -199,8 +235,11 @@ a 'data-item' is going to be a resource without an extension
        'page-title' := $get-page-title(),
        'page-subtitle' := $get-page-subtitle(),
        'page-content' := $get-page-content(),
-       'page-author' := $page-author,
+       'page-author' := $get-page-author(),
        'page-updated' :=   $get-page-updated(),
+       'page-published' :=   $get-page-published(),
+       'page-id' :=   $get-page-id(),
+       'page-summary' :=   $get-page-summary(),
        'path-includes' :=   $includesPath
        }
 };

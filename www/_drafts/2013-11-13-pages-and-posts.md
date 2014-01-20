@@ -31,3 +31,4 @@ Reference Links:
 * [blogger: posts-vs-pages](http://www.mybloggerlab.com/2013/02/what-is-the-difference-between-posts-vs-pages-in-blogger.html)
 * [wordpress: post-vs-page](http://en.support.wordpress.com/post-vs-page/)
 * [semiologic: posts-vs-pages](http://www.semiologic.com/resources/blogging/posts-vs-pages/)
+

@@ -8,4 +8,6 @@ build.properties
 .deploy/modules/
 .komodotools/
 .sass-cache/
+.bin/mytweets.py
+sem.version
 Gemfile.lock

@@ -55,9 +55,6 @@ JAVA
 java.version ${java.version}
 java.home: ${java.home}
 
-JENKINS
-env.WORKSPACE: ${env.WORKSPACE}
-env.BUILD_NUMBER: ${env.BUILD_NUMBER}
 
 PROJECT
 project.domain: ${project.domain}
@@ -377,6 +374,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>Build number in version.txt: ${out.project.version}  </echo>
 </target>
 
+
+
 <target name="xar-build-upload" depends="deploy-bumpversion">
     <property name="project.version" value="${out.project.version}" />
     <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
@@ -393,6 +392,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.url: ${repo.url}</echo>
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
+
+    <antcall target="xar-undeploy-remove" />
 
     <antcall target="deployment-folder" />
     <antcall target="eXist-data" />
@@ -454,6 +455,11 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     </propertyfile>
 </target>
 
+
+<target name="deploy-local">
+    <antcall target="xar-build-upload" />
+</target>
+
 <target name="deploy-remote" depends="condition-hostRomote, set-hostRomote" >
 <echo> DEPLOY TO REMOTE HOST: ${host.remote}</echo>
     <condition property="reachable.remotelhost8080">
@@ -467,10 +473,10 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
         <redirector outputproperty="out.project.version"/>
     </exec>
     <echo>Semantic Build number in sem.version: ${out.project.version}  </echo>
-    <echo>Jenkins Workspace: ${env.WORKSPACE}  </echo>
+
     <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
     <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${env.WORKSPACE}/${dir.build}/${project.abbrev}-${project.version}.xar" />
+    <property name="xar-location" value="${dir.build}/${project.abbrev}-${project.version}.xar" />
     <property name="project.url" value="http://${project.domain}" />
     <property name="project.url.browse" value="http://www.${project.domain}" />
     <property name="repo.url" value="http://${host.remote}:8080/exist/apps/public-repo/public/" />
@@ -492,6 +498,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="clear-nginx-cache" />
+
+    <antcall target="browse" />
 </target>
 
 <target name="check-nginx-cache">
@@ -500,19 +508,28 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
   </condition>
  </target>
 
-<target name="clear-nginx-cache" depends="check-nginx-cache" if="has-nginx-cache">
+<target name="clear-nginx-cache">
 <echo>Empty Ngnix cache EVERYTHING in it</echo>
+    <exec executable="ssh">
+        <arg value="featon" />
+        <arg value="cd ${dir.nginx-cache};" />
+        <arg value="rm -R *" />
+    </exec>
 
-  <delete includeemptydirs="true">
+
+<!--  <delete includeemptydirs="true">
     <fileset dir="${dir.nginx-cache}" includes="**/*"/>
   </delete>
+-->
 </target>
 
+<!--
 <target name="local-xar-undeploy-remove">
 <property name="repo.update" value="http://${host.local}:8080/exist/apps/public-repo/modules/update.xql"/>
 <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
 <antcall target="xar-undeploy-remove" />
 </target>
+-->
 
 <target name="xar-undeploy-remove">
 <xdb:xquery
@@ -528,6 +545,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 <exec executable="curl">
     <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
 </exec>
+
 </target>
 
 <target name="theme">

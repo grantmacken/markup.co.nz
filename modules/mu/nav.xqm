@@ -12,7 +12,7 @@ item which tells the visitor the they are at the location.
 
 declare
 function nav:pages($node as node(), $model as map(*)) {
-let $seqCollections := distinct-values(xmldb:get-child-collections( $model('data-pages-path' ))[fn:not(.=('home'))])
+let $seqCollections := distinct-values(xmldb:get-child-collections( $model('data-pages-path' ))[not(.=(('home','_drafts')))])
 let $seqCollectionsCount := count($seqCollections)
 let $listItems :=
     for $menu-item at $i in  $seqCollections
@@ -44,12 +44,12 @@ let $listItems :=
 
 let $blogItem :=
  if( $model('data-isMainFeed') ) then
-    <li><strong>blog</strong></li>
+    <li><strong>archive</strong></li>
  else(
       if( $model('data-isPost') ) then
-      <li class="at-location"><a href="/archive">blog</a></li>
+      <li class="at-location"><a href="/archive">archive</a></li>
       else(
-      <li><a href="/archive">blog</a></li>
+      <li><a href="/archive">archive</a></li>
        )
   )
 

@@ -1,0 +1,73 @@
+
+#nav-pages{
+   li{
+   display: block;
+   float:left;
+    @include at(5) {
+    width: column-span(2, 1, $grid: 10 );
+    margin-right: gutter-span($grid: 10 );
+    }
+
+   @include at(4) {
+    width: column-span(2, 1, $grid: 7 );
+    margin-right: gutter-span($grid: 7 );
+    }
+
+   @include at(3) {
+    width: column-span(2, 1, $grid: 6 );
+    margin-right: gutter-span($grid: 6 );
+    }
+
+    @include between(1, 2) {
+    width: column-span(1, 1, $grid: 3 );
+    margin-right: gutter-span($grid: 3 );
+    }
+    }
+
+   .last{
+    margin-right:0;
+   }
+
+   a, strong, a[href="index"], a:hover{
+   display: block;
+   color: $link-text;
+   text-align: center;
+    }
+
+    a{
+      background-color: $link-normal;
+     border-bottom: solid 3px $link-border-normal;
+     text-decoration: none;
+
+     &:hover {
+           background-color: $link-hover;
+   color: $link-text-hover;
+   border-bottom: solid 8px $link-border-hover;
+   }
+
+     }
+
+   .at-location a{
+      font-weight: 900;
+      background-color: $link-here;
+      padding-left: 5px;
+      border-left: solid 8px $link-border-normal;
+         &:hover {
+      background-color: $link-hover;
+      color: $link-text-hover;
+      border-bottom: solid 8px $link-border-hover;
+      }
+   }
+
+
+
+   strong{
+   font-weight: 900;
+   background-color: $link-here;
+   border-bottom: solid 8px $link-border-normal;
+   }
+
+
+
+
+}

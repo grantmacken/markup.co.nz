@@ -18,13 +18,20 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
 
 declare
-function post:feed($node as node(), $model as map(*)) {
+function post:articles-feed($node as node(), $model as map(*)) {
 
  let $getPageUpdated :=  function($item){
    let $updated :=  xs:date( $item/atom:updated/string() )
-   let $formated := format-date($updated , "[D1o] [MNn] [Y]", "en", (), ())
+   let $formated := format-date($updated , "[D1o]  [MNn] [Y]", "en", (), ())
    return
     $formated
+  }
+
+  let $getPagePublished :=  function($item){
+   let $published :=  xs:dateTime( $item/atom:published/string() )
+   let $published-formated := format-date($published , "[D1o] of [MNn] [Y]", "en", (), ())
+   return
+    $published-formated
   }
 
  let $getAuthor :=  function(){
@@ -41,24 +48,21 @@ function post:feed($node as node(), $model as map(*)) {
 
 return
 <section id="main" role="main">
-<ul>
+<h1>Last 20 articles</h1>
 {
- for $item  at $i in collection($model('data-posts-path'))//atom:entry
+ for $item  at $i in collection($model('data-posts-path'))//atom:entry[atom:id[contains(.,':article:')] ]
    where $i lt 20
-   order by $item/atom:updated descending
+   order by $item/atom:published descending
    return
-   <li>
-
    <article  class="h-entry">
    <h2 class="p-name">{$item/atom:title/string()}</h2>
    <div class="e-content">
      {$item/atom:content/*/node()}
    </div>
-   <p>permalink: <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a></p>
+   <p>First published on the {$getPagePublished($item)} and updated {$getPageUpdated($item)}</p>
+   <p>Archived at permalink: <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a></p>
  </article>
-   </li>
   }
-</ul>
 </section>
 };
 
@@ -96,6 +100,48 @@ h-entry properties, inside an element with class h-entry:
 
 :)
 
+declare
+function post:name($node as node(), $model as map(*)) {
+<h1 class="p-name">{$model('page-title')}</h1>
+};
+
+declare
+function post:author($node as node(), $model as map(*)) {
+<a class="p-author h-card"  href="http://{$model("site-domain")}" >{$model("page-author")}</a>
+};
+
+
+declare
+function post:summary($node as node(), $model as map(*)) {
+<p class="p-summary">{$model("page-summary")}</p>
+};
+
+declare
+function post:published($node as node(), $model as map(*)) {
+ let $formatedDateTime := format-dateTime(xs:dateTime($model("page-published")), " [FNn], [D1o] [MNn] [Y]", "en", (), ())
+return
+<time class="dt-published" datetime="{$model("page-published")}">{$formatedDateTime}</time>
+};
+
+declare
+function post:permalink($node as node(), $model as map(*)) {
+ let $permalink := 'http://' || $model('site-domain') || substring-before($model('request-path'), '.html')
+ return
+ <p>permalink : <a class="u-url" href="{$permalink}">{$permalink}</a></p>
+};
+
+
+
+declare
+function post:content($node as node(), $model as map(*)) {
+let $content :=
+   <div class="e-content">
+     { $model('page-content')/*/node() }
+   </div>
+   return
+templates:process( $content, $model )
+};
+
 
 declare
 function post:entry($node as node(), $model as map(*)) {
@@ -104,11 +150,15 @@ let $content :=
    <div class="e-content">
      { $model('page-content')/*/node() }
    </div>
+
+<hr/>
+<p data-template="page:authored-by"/>
+<p data-template="page:permalink-url"/>
+<hr/>
  </article>
 return
 templates:process( $content, $model )
 };
-
 
 
 declare
@@ -123,12 +173,4 @@ let $content :=
     else ( <article role="main">{ $model('page-content')/*/node() }</article> )
 return
 templates:process( $content, $model )
-};
-
-
-declare
-function post:author($node as node(), $model as map(*)) {
-<p>By <span property="author" typeof="Person">
-<span property="name">{$model("page-author")}</span>
-</span></p>
 };

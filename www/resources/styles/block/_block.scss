@@ -24,9 +24,11 @@ p, pre, label {
 
 
 
-@import "block/navigation";
+@import "block/nav-pages";
 
 @import "block/tables";
 @import "block/lists";
 
 @import "block/code-blocks";
+
+@import "block/h-card";
