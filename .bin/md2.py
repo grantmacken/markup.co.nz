@@ -208,8 +208,7 @@ idNoteMatch = re.compile("^tag:.+:(note):.+$")
 
 myID = eEntry.find('id')
 if myID is None:
-#    todo
-    addElement( 'id', titleText )
+    createXhtmlContent()
 else:
     myIDText = myID.text
     if idArticleMatch.match(myIDText):
