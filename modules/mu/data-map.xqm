@@ -198,6 +198,27 @@ a 'data-item' is going to be a resource without an extension
   }
 
 
+   let $get-post-type :=  function(){
+   let $id :=  $get-page-id()
+   let $post-type :=
+    if( contains( $id ,':note:') ) then ( 'note' )
+    else if ( contains( $id ,':article:') ) then ( 'article' )
+    else('page')
+   return $post-type
+   }
+
+  let $isNote :=  function(){
+    $get-post-type() eq 'note'
+  }
+
+  let $isArticle :=  function(){
+    $get-post-type() eq 'article'
+  }
+
+
+  let $get-link-syndicated-tweet :=  function(){
+     $docEntry//atom:link[starts-with(@href/string() , 'https://twitter.com' )]/@href/string()
+    }
 
 
   let $session-login :=  session:get-attribute('login')
@@ -235,10 +256,14 @@ a 'data-item' is going to be a resource without an extension
        'page-title' := $get-page-title(),
        'page-subtitle' := $get-page-subtitle(),
        'page-content' := $get-page-content(),
+       'page-content-isNote' := $isNote(),
+       'page-content-isArticle' := $isArticle(),
+       'link-syndicated-tweet' := $get-link-syndicated-tweet(),
        'page-author' := $get-page-author(),
        'page-updated' :=   $get-page-updated(),
        'page-published' :=   $get-page-published(),
        'page-id' :=   $get-page-id(),
+       'page-post-type' :=   $get-post-type(),
        'page-summary' :=   $get-page-summary(),
        'path-includes' :=   $includesPath
        }

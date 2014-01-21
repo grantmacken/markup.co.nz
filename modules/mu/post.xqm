@@ -102,7 +102,8 @@ h-entry properties, inside an element with class h-entry:
 
 declare
 function post:name($node as node(), $model as map(*)) {
-<h1 class="p-name">{$model('page-title')}</h1>
+if($model('page-content-isNote')) then ()
+else (<h1 class="p-name">{$model('page-title')}</h1>)
 };
 
 declare
@@ -127,17 +128,36 @@ declare
 function post:permalink($node as node(), $model as map(*)) {
  let $permalink := 'http://' || $model('site-domain') || substring-before($model('request-path'), '.html')
  return
- <p>permalink : <a class="u-url" href="{$permalink}">{$permalink}</a></p>
+ <a class="u-url" href="{$permalink}">permalink</a>
 };
 
+
+(:http://microformats.org/wiki/rel-syndication:)
+
+declare
+function post:syndicated($node as node(), $model as map(*)) {
+  let $tweetlink :=
+    if( empty($model('link-syndicated-tweet'))) then ()
+    else( <a class="u-syndication" href="{$model('link-syndicated-tweet')}">twitter</a>)
+ return
+ <span> page may also be viewed on
+     { ($tweetlink)}
+ </span>
+};
 
 
 declare
 function post:content($node as node(), $model as map(*)) {
 let $content :=
-   <div class="e-content">
-     { $model('page-content')/*/node() }
-   </div>
+ if($model('page-content-isNote')) then (
+  <pre class="e-content">
+      { $model('page-content')/*/node() }
+ </pre> )
+ else (
+ <div class="e-content">
+      { $model('page-content')/*/node() }
+ </div>)
+
    return
 templates:process( $content, $model )
 };
