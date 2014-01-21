@@ -180,20 +180,16 @@ for item in L:
             new_title = ''
             pass
 
-
 # add a title if not in meta
 
 myTitle = eEntry.find('title')
 if myTitle is None:
     addElement( 'title', titleText.replace('-', ' ') )
 
-
 # add updated from time modified if not in meta
 # todo of if not set
 ET.SubElement(eEntry, 'updated').text  = modDate
-
 # add permalink
-
 linkAlt = ET.SubElement(eEntry, 'link')
 linkAlt.attrib["rel"] = "alternate"
 linkAlt.attrib["type"] = "text/html"
@@ -217,8 +213,6 @@ else:
        createTextContent()
     else:
         createXhtmlContent()
-
-
 
 ## return this to ant
 print outfile
