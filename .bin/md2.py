@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import sys
 import os
-import markdown2
-import argparse
 import time
 import datetime
 import re
+import markdown2
+import argparse
+from configobj import ConfigObj
 
 try:
     from lxml import etree as  ET
@@ -13,6 +14,8 @@ try:
 except ImportError:
     print("not running with lxml.etree")
     sys.exit('Error!')
+
+config = ConfigObj('build.properties')
 
 parser = argparse.ArgumentParser(description='Ony one arg')
 parser.add_argument('-i','--input', help='Input file name',required=True)
@@ -22,8 +25,6 @@ ATOM_NAMESPACE = "http://www.w3.org/2005/Atom"
 ATOM = "{%s}" % ATOM_NAMESPACE
 NSMAP = {None : ATOM_NAMESPACE}
 
-# the front matter metadata we will proccess
-L = ['title','subtitle']
 
 #2 types of md entries pages and posts
 # POSTS date driven organised by categories and tags
@@ -96,6 +97,7 @@ source_file_content = open(args.input, 'r').read()
 html = markdown2.markdown(source_file_content , extras=["metadata",
 "code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
 "smarty-pants"])
+
 metadata =  html.metadata
 
 def addElement( key ,  data ):
@@ -116,13 +118,45 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
+def createXhtmlContent( ):
+    eContentDiv =  """
+    <div xmlns="http://www.w3.org/1999/xhtml" >%(content)s</div>
+    """
+    # Fill in the template
+    divTemplate = eContentDiv % dict(
+        content=html
+    )
+    #
+    eContent = ET.Element("content")
+    eContent.set("type", "xhtml")
+    eContent.append(ET.XML(divTemplate))
+    eEntry.append(eContent)
+    indent(eEntry, level=0)
+
+def createTextContent( ):
+    frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
+    pre_content = frontMatterSub.sub('', source_file_content)
+    eContentDiv =  """
+    <pre xmlns="http://www.w3.org/1999/xhtml" >%(content)s</pre>
+    """
+    # Fill in the template
+    divTemplate = eContentDiv % dict(
+        content=pre_content
+    )
+    #
+    eContent = ET.Element("content")
+    eContent.set("type", "text")
+    eContent.append(ET.XML(divTemplate))
+    eEntry.append(eContent)
+    indent(eEntry, level=0)
+
+
 eEntry = ET.Element("entry", nsmap=NSMAP)
 
 #Elements of <entry>
 #http://atomenabled.org/developers/syndication/#requiredEntryElements
-# todo: add categories
 
-L = [ 'title', 'author' ,  'published' , 'id' ,'summary', 'categories']
+L = [ 'title', 'author' ,  'published' , 'id' ,'summary', 'categories' , 'link-tweet-id']
 for item in L:
     try:
         new_element = item
@@ -134,6 +168,12 @@ for item in L:
             for lCat in lCategories:
                 eCategory = ET.SubElement(eEntry, 'category')
                 eCategory.attrib["term"] = metadata[item]
+        elif new_element == 'link-tweet-id':
+            linkTweetHref = 'https://twitter.com/' + config.get('twitter.name') + '/status/' + metadata[item]
+            linkTweet = ET.SubElement(eEntry, 'link')
+            linkTweet.attrib["rel"] = "syndication"
+            linkTweet.attrib["type"] = "text/html"
+            linkTweet.attrib["href"] = linkTweetHref
         else:
             addElement( item, metadata[item] )
     except KeyError:
@@ -147,8 +187,9 @@ myTitle = eEntry.find('title')
 if myTitle is None:
     addElement( 'title', titleText.replace('-', ' ') )
 
-# add updated from time modified if not in meta
 
+# add updated from time modified if not in meta
+# todo of if not set
 ET.SubElement(eEntry, 'updated').text  = modDate
 
 # add permalink
@@ -158,23 +199,30 @@ linkAlt.attrib["rel"] = "alternate"
 linkAlt.attrib["type"] = "text/html"
 linkAlt.attrib["href"] = href
 
-eContentDiv =  """
-    <div xmlns="http://www.w3.org/1999/xhtml" >%(content)s</div>
-"""
-# Fill in the template
-divTemplate = eContentDiv % dict(
-    content=html
-)
+
+# add a id if not in meta
+# find if article or note etc
+idArticleMatch = re.compile("^tag:.+:(article):.+$")
+idNoteMatch = re.compile("^tag:.+:(note):.+$")
 
 
-eContent = ET.Element("content")
-eContent.set("type", "xhtml")
+myID = eEntry.find('id')
+if myID is None:
+#    todo
+    addElement( 'id', titleText )
+else:
+    myIDText = myID.text
+    if idArticleMatch.match(myIDText):
+        createXhtmlContent()
+    elif  idNoteMatch.match(myIDText):
+       createTextContent()
+    else:
+        createXhtmlContent()
 
-eContent.append(ET.XML(divTemplate))
-eEntry.append(eContent)
-indent(eEntry, level=0)
-# return this to ant
+
+
+## return this to ant
 print outfile
-
+#
 tree = ET.ElementTree(eEntry)
 tree.write(outfile)
