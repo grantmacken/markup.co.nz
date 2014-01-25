@@ -5,7 +5,7 @@ declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
 
-if ( tokenize($exist:path, '/')[2] eq '2sm' ) then(
+if ( ends-with($exist:path, "2sm/index.html")) then(
 let $decode :=  function($str){
     let $base := 60
     let $tot := function($n2, $c){xs:integer(($base * $n2) + $c + 1)}
@@ -42,7 +42,7 @@ let $decode :=  function($str){
 }
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-     <redirect url="{'/archive/' || $decode('2sm')  || '.html'}"/>
+     <redirect url="{'http:markup.co.nz' ||  'archive/'|| $decode('2sm')  || '.html'}"/>
     </dispatch>
 )
 else if (ends-with($exist:resource, ".html")) then
