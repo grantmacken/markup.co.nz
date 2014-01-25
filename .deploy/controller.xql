@@ -5,7 +5,7 @@ declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
 
-if (ends-with(ends-with($exist:resource, "2sm.html"))) then(
+if (ends-with($exist:resource, "2sm.html")) then(
 let $decode :=  function($str){
     let $base := 60
     let $tot := function($n2, $c){xs:integer(($base * $n2) + $c + 1)}
