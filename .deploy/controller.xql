@@ -45,8 +45,11 @@ let $decode :=  function($str){
 let $datePath :=  $decode('2sm')
 
 let $colPath :=  concat( $exist:controller , '/data/' , $datePath  )
+let $ids := if( empty(xmldb:xcollection($colPath))) then ('0')
+                   else('1')
 
-let $redirect :=  concat( 'http://markup.co.nz/archive/' , $datePath , '/' , ''  )
+
+let $redirect :=  concat( 'http://markup.co.nz/archive/' , $datePath , '/' , $ids  )
 
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
