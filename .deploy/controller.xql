@@ -4,6 +4,7 @@ declare variable $exist:resource external;
 declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 if (ends-with($exist:path , "2sm/index.html")) then(
 let $decode :=  function($str){
@@ -40,7 +41,14 @@ let $decode :=  function($str){
     (: test     ( $yr , $yrStart,  $dysInYr, $duration, $decodedDate, $formatedDate)     :)
     return ($formatedDate)
 }
-let $redirect :=  concat( 'http://markup.co.nz/archive/' , $decode('2sm') , '.html'   )
+
+let $datePath :=  $decode('2sm')
+
+let $colPath :=  concat( $exist:controller , '/data/' , $datePath  )
+let $childID :=   if( empty(xmldb:xcollection($colPath)) then ('0')
+                  else('1')
+let $redirect :=  concat( 'http://markup.co.nz/archive/' , $datePath , '/' , ''  )
+
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
      <redirect url="{$redirect}"/>
