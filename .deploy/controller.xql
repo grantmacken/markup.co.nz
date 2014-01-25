@@ -5,9 +5,6 @@ declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
 
-let $template-pages := '/templates/pages/'
-let $template-posts := '/templates/posts/'
-
 let $shortURL := '2sm'
 
 let $decode :=  function($str){
@@ -47,18 +44,16 @@ let $decode :=  function($str){
 
 
 if( $shortURL eq '2sm') then (
-  let $colURL :=$exist:controller ||  $template-posts ||  'entry' || '.html'
-  return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
      <redirect url="{$exist:controller ||  'archive/'|| $decode($shortURL)  || '.html'}"/>
     </dispatch>
     )
-else if (ends-with($exist:resource, ".html")) then
+else if (ends-with($exist:resource, ".html")) then (
+  let $template-pages := '/templates/pages/'
+  let $template-posts := '/templates/posts/'
   let $collection :=
     if( matches($exist:path ,'^/index.html$'))then ('home')
     else(tokenize($exist:path, '/')[2])
-
-
   let $colURL :=
     if( matches( $exist:path , '^/archive/index.html$')) then (
         $exist:controller ||  $template-posts ||  'feed' || '.html'
@@ -89,6 +84,7 @@ else if (ends-with($exist:resource, ".html")) then
       <forward url="{$viewURL}" />
     </error-handler>
   </dispatch>
+  )
 else
   <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
     <cache-control cache="yes" />
