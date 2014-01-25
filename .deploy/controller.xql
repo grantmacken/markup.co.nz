@@ -42,7 +42,7 @@ let $decode :=  function($str){
 }
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-     <redirect url="{$exist:controller ||  'archive/'|| $decode('2sm')  || '.html'}"/>
+     <redirect url="{'/archive/'|| $decode('2sm')  || '.html'}"/>
     </dispatch>
 )
 else if (ends-with($exist:resource, ".html")) then
