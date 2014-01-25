@@ -45,8 +45,7 @@ let $decode :=  function($str){
 let $datePath :=  $decode('2sm')
 
 let $colPath :=  concat( $exist:controller , '/data/' , $datePath  )
-let $childID :=   if( empty(xmldb:xcollection($colPath)) then ('0')
-                  else('1')
+
 let $redirect :=  concat( 'http://markup.co.nz/archive/' , $datePath , '/' , ''  )
 
 return
