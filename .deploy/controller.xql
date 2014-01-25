@@ -39,10 +39,13 @@ let $decode :=  function($str){
     let $formatedDate := format-date($decodedDate, "[Y01]/[M01]/[D01]", 'en', (), ())
     (: test     ( $yr , $yrStart,  $dysInYr, $duration, $decodedDate, $formatedDate)     :)
     return ($formatedDate)
+
+let $redirect :=  concat( 'http://markup.co.nz/archive/' , $decode('2sm') , '.html'   )
+
 }
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-     <redirect url="{ '/archive/' || $decode('2sm')  || '.html'}"/>
+     <redirect url="{$redirect}"/>
     </dispatch>
 )
 else if (ends-with($exist:resource, ".html")) then
