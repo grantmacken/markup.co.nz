@@ -31,14 +31,19 @@ Categories become hashtags appended to text.
 Conversly Hashtags in md content context become md front-matter 'categories'
 
 
-**Note char count**:  When calculating 140 char take into account
-'text' + hashtags + backlink ( todo url shorten 22 chars Twitter t.co's URL size) <br/>
-**Text** :  If a note char count doesn't fit twitters 140 chars then
-this will become an **abbr note**. In this case the *summary* is used with a
-link otherwise the summary is not relevant. <br/>
-**Backlink**: If *abbr note* create a ellipsis then a space then $url
-(surrounded with brackets). If *not abbr note* then the backlink is a
-permashortcitation. todo  ```(domain  archive/[year]/[month]/[day]/[file-name] )```
+**Note char count**: When calculating 140 char take into account 'text' +
+hashtags + backlink ( todo url shorten 22 chars Twitter t.co's URL size) <br/>
+**Text** : If a note char count doesn't fit twitters 140 chars then this will
+become an **abbr note**. In this case the *summary* is used with a link
+otherwise the summary is not relevant. <br/> **Backlink**: If *abbr note* create
+a ellipsis then a space then $url. ToDo: in the form of a
+[permashortlink](https://indiewebcamp.com/permashortlinks) ToDo: If *not abbr
+note* then the backlink is a
+[permashortcitation](https://indiewebcamp.com/permashortcitation) . ```(domain
+archive/[year]/[month]/[day]/[file-name] )``` (surrounded with brackets)
+<br/>Note: Not convinced this is the best UX thing to do i.e. for my twitter
+visitors.<br/> Note: ref Url shortening ideas below.
+
 
 The backlink permalink is same as other posts
 ```archive/[year]/[month]/[day]/[file-name]`` and we need to shorten this with a
@@ -113,6 +118,12 @@ md front matter and be used to create a rel-syndication links.
   on such hyperlinks from original posts (inside their h-entrymarkup/object) to
   their syndicated copies'  done
 
+Todo Notes: Url shortening ideas.  Shorten with same [TinWhistle](https://github.com/sivy/TinWhistle)  engine.
+Call perl from python when encoding url
+Call perl from [nginx](http://nginx.org/en/docs/http/ngx_http_perl_module.html) when decoding url
+then rewrite and expanded url proxied to exist
+
+TinWhistle.pm
 
 
 Ref:

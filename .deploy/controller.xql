@@ -4,11 +4,16 @@ declare variable $exist:resource external;
 declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
+
+let $shortURL := '2sm'
+
+
 if (ends-with($exist:resource, ".html")) then
 let $template-pages := '/templates/pages/'
 let $template-posts := '/templates/posts/'
-let $collection := if( matches($exist:path ,'^/index.html$'))then ('home')
-else(tokenize($exist:path, '/')[2])
+let $collection :=
+  if( matches($exist:path ,'^/index.html$'))then ('home')
+  else(tokenize($exist:path, '/')[2])
 
 
 let $colURL :=
@@ -41,6 +46,7 @@ return
     <forward url="{$viewURL}" />
   </error-handler>
 </dispatch>
+)
 else
 <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
   <cache-control cache="yes" />
