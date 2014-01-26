@@ -46,11 +46,14 @@ if (ends-with($exist:path , "2sm1/index.html")) then(
   (: test     ( $yr , $yrStart,  $dysInYr, $duration, $decodedDate, $formatedDate)     :)
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
-  let $ids := if( xmldb:collection-available( $colPath ) ) then (
-                if( exists(xmldb:xcollection($colPath)//id[contains(., '2sm1')] )) then ('exists')
-                else('empty')
-      )
+  let $redirect :=
+    if( xmldb:collection-available( $colPath ) ) then (
+      if( exists(xmldb:xcollection($colPath)//id[contains(., '2sm1')] )) then (
+        xmldb:xcollection($colPath)//*[id[contains(., '2sm1')]]/link[@rel="alternate"]/@href/string()
+        )
       else()
+    )
+    else()
 
   (:
     let $colPath :=  concat( $exist:controller , '/data/archive/' , $datePath  )
@@ -59,7 +62,7 @@ if (ends-with($exist:path , "2sm1/index.html")) then(
   :)
 
 
-  let $redirect :=  concat( 'http://markup.co.nz/archive/' , $formatedDate , '/' , $ids  )
+  (:let $redirect :=  concat( 'http://markup.co.nz/archive/' , $formatedDate , '/' , $ids  ):)
 
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
