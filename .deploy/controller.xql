@@ -6,9 +6,9 @@ declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
 
+declare default element namespace "http://www.w3.org/2005/Atom";
+
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
-declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
-declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
 if (ends-with($exist:path , "2sm1/index.html")) then(
   let $str := string('2sm')
@@ -46,7 +46,7 @@ if (ends-with($exist:path , "2sm1/index.html")) then(
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
   let $ids := if( xmldb:collection-available( $colPath ) ) then (
-                if( exists(xmldb:xcollection($colPath)//atom:id[contains(., '2sm1')] )) then ('exists')
+                if( exists(xmldb:xcollection($colPath)//id[contains(., '2sm1')] )) then ('exists')
                 else('empty')
       )
       else()
