@@ -11,8 +11,12 @@ declare variable $exist:root external;
 
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
-if (ends-with($exist:path , "2sm1/index.html")) then(
-  let $str := string('2sm')
+if (starts-with($exist:path , "/short")) then(
+  let $strID := tokenize($exist:resource, '/')[1]
+  let $str := substring($strID, 1, 3)
+
+  (:let $str := string('2sm'):)
+  let $strID := substring($exist:path, 8, 11)
   let $base := 60
   let $tot := function($n2, $c){xs:integer(($base * $n2) + $c + 1)}
   let $seqDecode :=
@@ -48,22 +52,12 @@ if (ends-with($exist:path , "2sm1/index.html")) then(
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
   let $redirect :=
     if( xmldb:collection-available( $colPath ) ) then (
-      if( exists(xmldb:xcollection($colPath)//id[contains(., '2sm1')] )) then (
-        xmldb:xcollection($colPath)//*[id[contains(., '2sm1')]]/link[@rel="alternate"]/@href/string()
+      if( exists(xmldb:xcollection($colPath)//id[contains(., strID)] )) then (
+        xmldb:xcollection($colPath)//*[id[contains(., strID)]]/link[@rel="alternate"]/@href/string()
         )
       else()
     )
     else()
-
-  (:
-    let $colPath :=  concat( $exist:controller , '/data/archive/' , $datePath  )
-  let $ids := if( empty(xmldb:xcollection($colPath))) then ('0')
-                     else('1')
-  :)
-
-
-  (:let $redirect :=  concat( 'http://markup.co.nz/archive/' , $formatedDate , '/' , $ids  ):)
-
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
      <redirect url="{$redirect}"/>
