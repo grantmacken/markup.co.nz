@@ -328,11 +328,7 @@ project.description: ${project.description}
 
 
 
-<delete includeemptydirs="true">
-    <fileset dir="${dir.deploy}/modules" defaultexcludes="false">
-       <include name="**/*" />
-    </fileset>
-</delete>
+<delete dir="${dir.deploy}/templates"/>
 
 </echoxml>
 
