@@ -7,13 +7,14 @@ declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
 
-
-
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
-if (matches($exist:path ,'^/[0-9A-HJ-NP-Z_a-km-z]{1,3}[0-9]{1,2}\.html$')) then(
-  let $strID := tokenize($exist:resource, '/')[1]
-  let $str := substring($strID, 1, 3)
+if (matches($exist:path ,'^/[0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2}\.html$')) then(
+  let $strID := replace($exist:path, "^/([0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2})\.html$'", "$1")
+  let $strB60 := replace($exist:path, "^/([0-9A-HJ-NP-Z_a-km-z]{3})[0-9]{1,2}\.html$'", "$1")
+  (:replace($exist:path, "^/([0-9A-HJ-NP-Z_a-km-z]{1,3})[0-9]{1,2}\.html$'", "$b"):)
+  (:let $strID := tokenize($exist:resource, '/')[1]:)
+  (:let $str := substring($strID, 1, 3):)
   (:let $base := 60:)
   (:let $tot := function($n2, $c){xs:integer(($base * $n2) + $c + 1)}:)
   (:let $seqDecode :=:)
@@ -61,7 +62,7 @@ if (matches($exist:path ,'^/[0-9A-HJ-NP-Z_a-km-z]{1,3}[0-9]{1,2}\.html$')) then(
     else( $fallback )
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-     <redirect url="{$redirect}"/>
+     <redirect url="{$fallback}"/>
     </dispatch>
 )
 else if (ends-with($exist:resource, ".html")) then
