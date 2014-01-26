@@ -60,7 +60,7 @@ if (matches($exist:path ,'^/[0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2}\.html$')) then(
     else( $fallback )
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-     <redirect url="{$fallback}"/>
+     <redirect url="{$redirect}"/>
     </dispatch>
 )
 else if (ends-with($exist:resource, ".html")) then
