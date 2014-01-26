@@ -6,7 +6,9 @@ declare variable $exist:prefix external;
 declare variable $exist:root external;
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
-if (ends-with($exist:path , "2sm/index.html")) then(
+
+
+if (ends-with($exist:path , "2sm1/index.html")) then(
 let $decode :=  function($str){
     let $base := 60
     let $tot := function($n2, $c){xs:integer(($base * $n2) + $c + 1)}
@@ -44,7 +46,7 @@ let $decode :=  function($str){
 
 let $datePath :=  $decode('2sm')
 
-let $colPath :=  concat( $exist:controller , '/data/' , $datePath  )
+let $colPath :=  concat( $exist:controller , '/data/archive/' , $datePath  )
 let $ids := if( empty(xmldb:xcollection($colPath))) then ('0')
                    else('1')
 

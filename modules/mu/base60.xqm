@@ -9,7 +9,7 @@ import module namespace xmldb="http://exist-db.org/xquery/xmldb";
  : @version 0.01 :
 :)
 
-declare function base60:encode($str){
+declare function base60:encode($n){
 let $seq1 := (0 to 9)
 let $seq2 := map(function($x) { codepoints-to-string($x) }, string-to-codepoints('A') to string-to-codepoints('H'))
 let $seq3 := map(function($x) { codepoints-to-string($x) }, string-to-codepoints('J') to string-to-codepoints('N'))
