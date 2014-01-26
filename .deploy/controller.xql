@@ -11,7 +11,7 @@ declare variable $exist:root external;
 
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
-if (matches($exist:path ,'^[0-9A-HJ-NP-Z_a-km-z][0-9A-HJ-NP-Z_a-km-z][0-9A-HJ-NP-Z_a-km-z][0-9]+.html$') then(
+if (matches($exist:path ,'^[0-9A-HJ-NP-Z_a-km-z][0-9A-HJ-NP-Z_a-km-z][0-9A-HJ-NP-Z_a-km-z][0-9]+.html$')) then(
   let $strID := tokenize($exist:resource, '/')[1]
   let $str := substring($strID, 1, 3)
   (:let $base := 60:)
