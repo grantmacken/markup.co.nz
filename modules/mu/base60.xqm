@@ -1,4 +1,5 @@
-xquery version "3.0"; module namespace base60="http://markup.co.nz/#base60";
+xquery version "3.0";
+module namespace base60="http://markup.co.nz/#base60";
 
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
@@ -31,10 +32,7 @@ let $nextN := function($n){
 
 let $seqNth := ( xs:integer($nextN($nextN($n))), xs:integer($nextN($n)) , xs:integer($n) )
 
-let $encode := string-join(map(function($n){$seqChars[xs:integer($getRemainder($n))]}, $seqNth),'')
+return
 
-return  $encode
-}
-
-
+string-join(map(function($n){$seqChars[xs:integer($getRemainder($n))]}, $seqNth),'')
 };
