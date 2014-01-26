@@ -11,12 +11,12 @@
     <property name="dir.build" value=".build"/>
     <property name="dir.deploy" value=".deploy"/>
     <property name="dir.www" value="www"/>
-    <property name="dir.data" value="${dir.deploy}/data"/>
+    <property name="dir.deploy.data" value="${dir.deploy}/data"/>
     <property name="dir.deploy.modules" value="${dir.deploy}/modules"/>
     <property name="dir.deploy.templates" value="${dir.deploy}/templates"/>
     <property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>
-    <property name="dir.categories" value="${dir.data}/categories"/>
-    <property name="dir.pages" value="${dir.data}/pages"/>
+    <property name="dir.categories" value="${dir.deploy.data}/categories"/>
+    <property name="dir.pages" value="${dir.deploy.data}/pages"/>
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
 
 
@@ -248,8 +248,8 @@ project.description: ${project.description}
 
 
 <target name="proccess-md">
-    <echo>delete ${dir.data} </echo>
-    <delete dir="${dir.data}" />
+    <echo>delete ${dir.deploy.data} </echo>
+    <delete dir="${dir.deploy.data}" />
     <property name="pyFile">.bin/md2.py</property>
      <echo>${pyFile}</echo>
     <apply executable="python" failonerror="false" dir="${project.base}">
@@ -298,9 +298,11 @@ project.description: ${project.description}
 <target name="eXist-data">
     <echo>Everything gets driven locally</echo>
     <antcall target="proccess-md" />
-    <antcall target="proccess-sass" />
+<!--
+<antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
+    -->
 </target>
 
 <target name="eXist-data-remote">
@@ -328,11 +330,7 @@ project.description: ${project.description}
         <finish />
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
-
 </echoxml>
-
-
-
 </target>
 
 
@@ -423,7 +421,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
 
  <!--   <antcall target="xar-undeploy-remove" />-->
- <!--   <antcall target="deployment-folder" />-->
+ <antcall target="deployment-folder" />
+ <antcall target="eXist-data" />
 <!--
 
 
