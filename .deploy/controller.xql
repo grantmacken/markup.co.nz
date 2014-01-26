@@ -50,14 +50,16 @@ if (starts-with($exist:path , "/short")) then(
   (: test     ( $yr , $yrStart,  $dysInYr, $duration, $decodedDate, $formatedDate)     :)
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
+
+  let $fallback :=  'http://' ||  $exist:controller || /
   let $redirect :=
     if( xmldb:collection-available( $colPath ) ) then (
       if( exists(xmldb:xcollection($colPath)//id[contains(., strID)] )) then (
         xmldb:xcollection($colPath)//*[id[contains(., strID)]]/link[@rel="alternate"]/@href/string()
         )
-      else()
+      else( $fallback )
     )
-    else()
+    else( $fallback )
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
      <redirect url="{$redirect}"/>
