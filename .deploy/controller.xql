@@ -43,8 +43,11 @@ if (ends-with($exist:path , "2sm1/index.html")) then(
   (: test     ( $yr , $yrStart,  $dysInYr, $duration, $decodedDate, $formatedDate)     :)
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
-  let $ids := if( xmldb:collection-available( $colPath ) ) then ( $formatedDate  )
-                     else( $formatedDate )
+  let $ids := if( xmldb:collection-available( $colPath ) ) then (
+                if( empty(xmldb:xcollection($colPath))) then ('0')
+                else('1')
+      )
+      else()
 
   (:
     let $colPath :=  concat( $exist:controller , '/data/archive/' , $datePath  )
