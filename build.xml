@@ -327,8 +327,9 @@ project.description: ${project.description}
     </meta>
 
 
-
-<delete dir="${dir.deploy}/templates"/>
+  <delete includeemptydirs="true">
+    <fileset dir="${dir.deploy}/modules" includes="**/*"/>
+  </delete>
 
 </echoxml>
 
@@ -416,7 +417,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.url: ${repo.url}</echo>
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
-    <antcall target="xar-undeploy-remove" />
+ <!--   <antcall target="xar-undeploy-remove" />-->
     <antcall target="deployment-folder" />
 <!--
 
