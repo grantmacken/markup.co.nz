@@ -47,7 +47,7 @@ let $decode :=  function($str){
 let $datePath :=  $decode('2sm')
 
 let $colPath :=  concat( $exist:controller , '/data/archive/' , $datePath  )
-let $ids := if( xmldb:collection-available( $exist:controller) ) then ('yes')
+let $ids := if( xmldb:collection-available( '/' ) ) then ('yes')
                    else('no')
 
 
