@@ -13,6 +13,8 @@
     <property name="dir.www" value="www"/>
     <property name="dir.data" value="${dir.deploy}/data"/>
     <property name="dir.deploy.modules" value="${dir.deploy}/modules"/>
+    <property name="dir.deploy.templates" value="${dir.deploy}/templates"/>
+    <property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>
     <property name="dir.categories" value="${dir.data}/categories"/>
     <property name="dir.pages" value="${dir.data}/pages"/>
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
@@ -416,6 +418,9 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
     <echo>delete ${dir.deploy.modules} </echo>
     <delete dir="${dir.deploy.modules}" />
+    <delete dir="${dir.deploy.templates}" />
+    <delete dir="${dir.deploy.styles}" />
+
 
  <!--   <antcall target="xar-undeploy-remove" />-->
  <!--   <antcall target="deployment-folder" />-->
