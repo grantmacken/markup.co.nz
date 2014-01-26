@@ -51,7 +51,7 @@ if (matches($exist:path ,'^/[0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2}\.html$')) then(
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/2014/01/26' )
 
-  let $fallback :=  'http://' ||  $exist:controller || '/' || 'xxx' ||  '/' || $str  ||  '/' || $strID
+  let $fallback :=  'http://' ||  $exist:controller || '/' || 'xxx' ||  '/' || $strB60  ||  '/' || $strID
   let $redirect :=
     if( xmldb:collection-available( $colPath ) ) then (
       if( exists(xmldb:xcollection($colPath)//id[contains(., $strID)] )) then (
