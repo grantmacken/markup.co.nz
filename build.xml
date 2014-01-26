@@ -325,7 +325,15 @@ project.description: ${project.description}
         <finish />
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
+
+<delete>
+    <dirset dir="${dir.deploy}" includes="modules*" />
+</delete>
+
 </echoxml>
+
+
+
 </target>
 
 
