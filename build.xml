@@ -12,6 +12,7 @@
     <property name="dir.deploy" value=".deploy"/>
     <property name="dir.www" value="www"/>
     <property name="dir.data" value="${dir.deploy}/data"/>
+    <property name="dir.deploy.modules" value="${dir.deploy}/modules"/>
     <property name="dir.categories" value="${dir.data}/categories"/>
     <property name="dir.pages" value="${dir.data}/pages"/>
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
@@ -326,11 +327,6 @@ project.description: ${project.description}
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
 
-
-  <delete includeemptydirs="true">
-    <fileset dir="${dir.deploy}/modules" includes="**/*"/>
-  </delete>
-
 </echoxml>
 
 
@@ -417,8 +413,12 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.url: ${repo.url}</echo>
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
+
+    <echo>delete ${dir.deploy.modules} </echo>
+    <delete dir="${dir.deploy.modules}" />
+
  <!--   <antcall target="xar-undeploy-remove" />-->
-    <antcall target="deployment-folder" />
+ <!--   <antcall target="deployment-folder" />-->
 <!--
 
 
