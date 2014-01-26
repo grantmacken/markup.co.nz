@@ -51,9 +51,11 @@ if (starts-with($exist:path , "/short")) then(
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
 
-  let $str := tokenize($exist:resource, '/')[1]
 
-  let $fallback :=  'http://' ||  $exist:controller || '/' || 'xxx' ||  '/' || $str
+  let $strID := tokenize($exist:resource, '/')[1]
+  let $str := substring($strID, 1, 3)
+
+  let $fallback :=  'http://' ||  $exist:controller || '/' || 'xxx' ||  '/' || $str  ||  '/' || $strID
   let $redirect :=
     if( xmldb:collection-available( $colPath ) ) then (
       if( exists(xmldb:xcollection($colPath)//id[contains(., $strID)] )) then (
