@@ -53,7 +53,7 @@ $exist:controller
 :)
 
 let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/'  )
-let $ids := if( xmldb:collection-available( $colPath ) ) then ( $colPath )
+let $ids := if( xmldb:collection-available( $colPath ) ) then ( $datePath  )
                    else( $datePath )
 
 
