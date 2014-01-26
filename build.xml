@@ -570,6 +570,24 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 </sync>
 </target>
 
+
+<target name="get-short-link">
+<property name="q_repo-list">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+let $seq := repo:list()
+return string-join($seq, ',')
+</property>
+
+<xdb:xquery
+            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_repo-list}" user="${exist.username}"
+            password="${exist.password}"
+            outputproperty="repo-list" />
+<echo>${repo-list}</echo>
+
+</target>
+
 <target name="deploy-info">
 <property name="q_repo-list">
 xquery version "3.0";
