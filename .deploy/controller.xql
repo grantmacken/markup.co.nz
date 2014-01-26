@@ -46,14 +46,14 @@ let $decode :=  function($str){
 
 let $datePath :=  $decode('2sm')
 
-
-let $test := string-join( $exist:root , '/' ,$exist:controller , '/'  ,$exist:prefix )
 (:
+let $test := string-join( $exist:root , '/' , $exist:controller , '/'  , $exist:prefix )
+
 $exist:controller
 :)
 
 let $colPath :=  concat( $exist:controller , '/data/archive/' , $datePath  )
-let $ids := if( xmldb:collection-available( '/db' ) ) then ($test)
+let $ids := if( xmldb:collection-available( '/db' ) ) then ($exist:root)
                    else('no')
 
 
