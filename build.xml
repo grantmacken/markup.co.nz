@@ -277,7 +277,7 @@ project.description: ${project.description}
     <echo>delete ${dir.deploy.templates} </echo>
     <delete dir="${dir.deploy.templates}" />
     <echo>copy our changed working template files to ${dir.deploy}/templates</echo>
-    <copy todir="${dir.deploy}">
+    <copy todir="${dir.deploy.templates}">
         <fileset dir="templates" />
     </copy>
 
