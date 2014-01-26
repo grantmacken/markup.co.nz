@@ -12,11 +12,11 @@ declare variable $exist:root external;
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 if (starts-with($exist:path , "/short")) then(
-  let $strID := tokenize($exist:resource, '/')[1]
-  let $str := substring($strID, 1, 3)
+  (:let $strID := tokenize($exist:resource, '/')[1]:)
+  (:let $str := substring($strID, 1, 3):)
 
-  (:let $str := string('2sm'):)
-  let $strID := substring($exist:path, 8, 11)
+  let $str := string('2sm')
+  let $strID := string('2sm1')
   let $base := 60
   let $tot := function($n2, $c){xs:integer(($base * $n2) + $c + 1)}
   let $seqDecode :=
@@ -54,8 +54,8 @@ if (starts-with($exist:path , "/short")) then(
   let $fallback :=  'http://' ||  $exist:controller || '/' || $strID
   let $redirect :=
     if( xmldb:collection-available( $colPath ) ) then (
-      if( exists(xmldb:xcollection($colPath)//id[contains(., strID)] )) then (
-        xmldb:xcollection($colPath)//*[id[contains(., strID)]]/link[@rel="alternate"]/@href/string()
+      if( exists(xmldb:xcollection($colPath)//id[contains(., $strID)] )) then (
+        xmldb:xcollection($colPath)//*[id[contains(., $strID)]]/link[@rel="alternate"]/@href/string()
         )
       else( $fallback )
     )
