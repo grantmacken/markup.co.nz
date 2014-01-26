@@ -264,7 +264,9 @@ project.description: ${project.description}
 </target>
 
 <target name="proccess-sass">
-    <echo>compile sass and generate a single stylesheet. ${dir.deploy}/resources/styles/style.css. Ref. rb file at root</echo>
+    <echo>delete ${dir.deploy.styles} </echo>
+    <delete dir="${dir.deploy.styles}" />
+    <echo>compile sass and generate a single stylesheet. {dir.deploy.styles}/style.css. Ref. rb file at root</echo>
     <exec executable="compass" failonerror="true">
         <arg value="compile" />
         <redirector outputproperty="md" alwayslog="true" />
@@ -298,8 +300,9 @@ project.description: ${project.description}
 <target name="eXist-data">
     <echo>Everything gets driven locally</echo>
     <antcall target="proccess-md" />
+    <antcall target="proccess-sass" />
 <!--
-<antcall target="proccess-sass" />
+<
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
     -->
@@ -414,10 +417,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
-    <echo>delete ${dir.deploy.modules} </echo>
-    <delete dir="${dir.deploy.modules}" />
-    <delete dir="${dir.deploy.templates}" />
-    <delete dir="${dir.deploy.styles}" />
+
 
 
  <!--   <antcall target="xar-undeploy-remove" />-->
