@@ -53,7 +53,7 @@ if (ends-with($exist:path , "2sm1/index.html")) then(
   :)
 
 
-  let $redirect :=  concat( 'http://markup.co.nz/archive/' , $datePath , '/' , $ids  )
+  let $redirect :=  concat( 'http://markup.co.nz/archive/' , $formatedDate , '/' , $ids  )
 
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
