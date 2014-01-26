@@ -15,6 +15,8 @@
     <property name="dir.deploy.modules" value="${dir.deploy}/modules"/>
     <property name="dir.deploy.templates" value="${dir.deploy}/templates"/>
     <property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>
+    <property name="dir.deploy.scripts" value="${dir.deploy}/resources/scripts"/>
+    <property name="dir.deploy.images" value="${dir.deploy}/resources/images"/>
     <property name="dir.categories" value="${dir.deploy.data}/categories"/>
     <property name="dir.pages" value="${dir.deploy.data}/pages"/>
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
@@ -290,11 +292,11 @@ project.description: ${project.description}
 
 <target name="proccess-imagesAndScripts">
     <echo>TODO: optimise images then copy to ${dir.deploy}/resources/images</echo>
-    <copy todir="${dir.deploy}/resources/images" includeemptydirs="true">
+    <copy todir="${dir.deploy.images}" includeemptydirs="true">
         <fileset dir="www/resources/images" />
     </copy>
-    <echo>TODO: lint and minify js then copy to ${dir.deploy}/resources/scripts</echo>
-    <copy todir="${dir.deploy}/resources/scripts" includeemptydirs="true">
+    <echo>TODO: lint and minify js then copy to ${dir.deploy.scripts}</echo>
+    <copy todir="${dir.deploy.scripts}" includeemptydirs="true">
         <fileset dir="www/resources/scripts" />
     </copy>
 </target>
@@ -305,12 +307,7 @@ project.description: ${project.description}
     <antcall target="proccess-md" />
     <antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
-
-<!--
-<
-    <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
-    -->
 </target>
 
 <target name="eXist-data-remote">
