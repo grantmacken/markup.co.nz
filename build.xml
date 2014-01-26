@@ -369,9 +369,9 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
         <arg value="-a" />
         <arg value="-m" />
         <arg value="bump" />
-        <redirector outputproperty="out.git.status"/>
+        <redirector outputproperty="out.git.commit"/>
     </exec>
-   <echo>${out.git.status}</echo>
+   <echo>${out.git.commit}</echo>
 
     <exec executable="git" failonerror="true">
         <arg value="status" />
