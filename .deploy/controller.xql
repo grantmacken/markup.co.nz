@@ -14,7 +14,6 @@ import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 if (starts-with($exist:path , "/short")) then(
   let $strID := tokenize($exist:resource, '/')[1]
   let $str := substring($strID, 1, 3)
-
   let $base := 60
   let $tot := function($n2, $c){xs:integer(($base * $n2) + $c + 1)}
   let $seqDecode :=
@@ -49,7 +48,7 @@ if (starts-with($exist:path , "/short")) then(
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
 
-  let $fallback :=  'http://' ||  $exist:controller || '/' || 'xxx' ||  '/' || $str  ||  '/' || $strID
+  let $fallback :=  'http://' ||  $exist:controller || '/' || 'xxx' ||  '/' || $str  ||  '/' || $strID   '/' || $formatedDate
   let $redirect :=
     if( xmldb:collection-available( $colPath ) ) then (
       if( exists(xmldb:xcollection($colPath)//id[contains(., $strID)] )) then (
