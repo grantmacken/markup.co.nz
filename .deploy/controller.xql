@@ -39,7 +39,7 @@ if (ends-with($exist:path , "2sm1/index.html")) then(
   let $dysInYr := substring($decoded, 3, 6)
   let $duration := xs:dayTimeDuration("P" || string(xs:integer($dysInYr)- 1)  || "D")
   let $decodedDate := xs:date($yrStart + $duration)
-  let $formatedDate := format-date($decodedDate, "[Y01]/[M01]/[D01]", 'en', (), ())
+  let $formatedDate := format-date($decodedDate, "[Y0001]/[M01]/[D01]", 'en', (), ())
   (: test     ( $yr , $yrStart,  $dysInYr, $duration, $decodedDate, $formatedDate)     :)
 
   let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/'  )
