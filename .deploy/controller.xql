@@ -52,8 +52,8 @@ let $test := string-join( $exist:root , '/' , $exist:controller , '/'  , $exist:
 $exist:controller
 :)
 
-let $colPath :=  concat( $exist:controller , '/data/archive/' , $datePath  )
-let $ids := if( xmldb:collection-available( '/db' ) ) then ($exist:root)
+let $colPath :=  concat( $exist:root , '/' $exist:controller , '/data/archive/' , $datePath  )
+let $ids := if( xmldb:collection-available( $exist:root ) ) then ($exist:prefix)
                    else('no')
 
 
