@@ -60,7 +60,7 @@ if (starts-with($exist:path , "/short")) then(
     else( $fallback )
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-     <redirect url="{$fallback}"/>
+     <redirect url="{$redirect}"/>
     </dispatch>
 )
 else if (ends-with($exist:resource, ".html")) then
