@@ -1,12 +1,13 @@
 xquery version "3.0";
 
+declare default element namespace "http://www.w3.org/2005/Atom";
 declare variable $exist:path external;
 declare variable $exist:resource external;
 declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
 
-declare default element namespace "http://www.w3.org/2005/Atom";
+
 
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
