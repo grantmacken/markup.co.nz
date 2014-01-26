@@ -326,8 +326,12 @@ project.description: ${project.description}
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
 
-<delete>
-    <dirset dir="${dir.deploy}" includes="modules*" />
+
+
+<delete includeemptydirs="true">
+    <fileset dir="${dir.deploy}/modules" defaultexcludes="false">
+       <include name="**/*" />
+    </fileset>
 </delete>
 
 </echoxml>
