@@ -1,5 +1,4 @@
 xquery version "3.0";
-import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 declare variable $exist:path external;
 declare variable $exist:resource external;
@@ -7,6 +6,7 @@ declare variable $exist:controller external;
 declare variable $exist:prefix external;
 declare variable $exist:root external;
 
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
 declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
