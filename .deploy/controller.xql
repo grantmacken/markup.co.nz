@@ -10,8 +10,8 @@ declare variable $exist:root external;
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 if (matches($exist:path ,'^/[0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2}\.html$')) then(
-  let $strID := replace($exist:path, "^/([0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2})\.html$'", "$1")
-  let $strB60 := replace($exist:path, "^/([0-9A-HJ-NP-Z_a-km-z]{3})[0-9]{1,2}\.html$'", "$1")
+  let $strID := replace($exist:path, '^/([0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2})\.html$', '$1')
+  let $strB60 := replace($exist:path, '^/([0-9A-HJ-NP-Z_a-km-z]{3})[0-9]{1,2}\.html$', '$1')
   (:replace($exist:path, "^/([0-9A-HJ-NP-Z_a-km-z]{1,3})[0-9]{1,2}\.html$'", "$b"):)
   (:let $strID := tokenize($exist:resource, '/')[1]:)
   (:let $str := substring($strID, 1, 3):)
