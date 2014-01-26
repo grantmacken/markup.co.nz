@@ -274,15 +274,17 @@ project.description: ${project.description}
 </target>
 
 <target name="proccess-templatesAndModules">
+    <echo>delete ${dir.deploy.templates} </echo>
+    <delete dir="${dir.deploy.templates}" />
     <echo>copy our changed working template files to ${dir.deploy}/templates</echo>
-    <copy todir="${dir.deploy}/templates">
+    <copy todir="${dir.deploy}">
         <fileset dir="templates" />
     </copy>
 
-    <echo>copy our changed working modules files to ${dir.deploy}/modules</echo>
+<!--    <echo>copy our changed working modules files to ${dir.deploy}/modules</echo>
     <copy todir="${dir.deploy}/modules">
         <fileset dir="modules" />
-    </copy>
+    </copy>-->
 </target>
 
 <target name="proccess-imagesAndScripts">
@@ -301,6 +303,8 @@ project.description: ${project.description}
     <echo>Everything gets driven locally</echo>
     <antcall target="proccess-md" />
     <antcall target="proccess-sass" />
+    <antcall target="proccess-templatesAndModules" />
+
 <!--
 <
     <antcall target="proccess-templatesAndModules" />
