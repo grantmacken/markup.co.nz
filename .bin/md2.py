@@ -93,11 +93,20 @@ except OSError:
         raise
 
 
+#MARKDOWN
+
+#link_patterns = [
+#    # Match a wiki page link LikeThis.
+#    (re.compile(r"\s#([A-Za-z]+)\s"), r"/markup.co.nz/tags/\1")
+#]
+#html = markdown2.markdown(source_file_content , extras=["link-patterns","metadata",
+#"code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
+#"smarty-pants"],link_patterns=link_patterns)
+
 source_file_content = open(args.input, 'r').read()
 html = markdown2.markdown(source_file_content , extras=["metadata",
 "code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
 "smarty-pants"])
-
 metadata =  html.metadata
 
 def addElement( key ,  data ):

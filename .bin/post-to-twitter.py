@@ -31,6 +31,7 @@ html = markdown2.markdown(source_file_content , extras=["metadata",
 "code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
 "smarty-pants"])
 metadata =  html.metadata
+print metadata
 
 print metadata['id']
 #tag:markup.co.nz,2014-01-22:note:102623
@@ -48,16 +49,7 @@ if match:
     print 'id identifier: ' + identifierString
 else:
     print 'no dateString'
-#
-#l = dateString.split('-')
-#l.append(str(identifierString))
-#uHash = "".join(l)
-#print int(uHash)
-#shortLink = encode(int(uHash))
-#d = decode(shortLink)
-#print shortLink, d
-#
-#print 'url shortened to ' + shortLink
+
 print 'Get the text to post'
 
 frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
@@ -82,12 +74,13 @@ for lCat in lCategories:
         status_content += lCat
 
 print 'number of chars so  far: ' + str(len(status_content))
+
 #
-status_content +=  ' ('
-status_content +=  config.get('project.domain')
-status_content +=  ' '
-status_content +=  identifierString
-status_content +=  ')'
+#status_content +=  ' ('
+#status_content +=  config.get('project.domain')
+#status_content +=  ' '
+#status_content +=  identifierString
+#status_content +=  ')'
 #
 print 'number of chars so far: ' + str(len(status_content))
 print status_content
@@ -101,7 +94,6 @@ if lHashMatch:
             metadata['categories'] += ' '
             metadata['categories'] += iHashMatch
 #
-
 APP_KEY = config.get('twitter.app.key')
 APP_SECRET = config.get('twitter.app.secret')
 
@@ -112,40 +104,25 @@ twitter = Twython(APP_KEY, APP_SECRET,
                   OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 jsonResult = twitter.update_status(status=status_content)
+jsonResultID = jsonResult['id']
 
-print jsonResult
+catLine = 'categories: ' + metadata['categories']
+
+try:
+    metaDataLinkTweetID = metadata['link-tweet-id']
+except KeyError, e:
+    print 'I got a KeyError - reason "%s"' % str(e)
+    catLine += '\n'
+    catLine += 'link-tweet-id: '
+    catLine += str(jsonResultID)
+except:
+    print 'I got another exception, but I should re-raise'
+    sys.exit('Error!')
+    raise
+
 
 for line in fileinput.input(args.input , inplace=1):
     if line.startswith('categories:'):
-        print 'categories: ' + metadata['categories']
-        if metadata['link-tweet-id'] is None:
-            print 'link-tweet-id: ' + str(jsonResult['id']),
+        print catLine
     else:
         print line,
-
-print 'number of chars: ' + str(len(status_content))
-print status_content
-
-
-#if metadata['link-tweet-id'] is None:
-#    print 'link-tweet-id: ' + str(jsonResult['id']),
-
-#
-#APP_KEY = config.get('twitter.app.key')
-#APP_SECRET = config.get('twitter.app.secret')
-#
-#OAUTH_TOKEN = config.get('twitter.oauth.token')
-#OAUTH_TOKEN_SECRET = config.get('twitter.oauth.token_secret')
-#
-#twitter = Twython(APP_KEY, APP_SECRET,
-#                  OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-#
-#jsonResult = twitter.update_status(status=status_content)
-#
-#for line in fileinput.input(args.input , inplace=1):
-#    if line.startswith('categories:'):
-#        print 'categories: ' + metadata['categories']
-#        if metadata['link-tweet-id'] is None:
-#            print 'link-tweet-id: ' + str(jsonResult['id']),
-#    else:
-#        print line,

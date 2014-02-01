@@ -54,26 +54,44 @@ try:
     print b60Encoded
 
     sAntCall2 = ''
-    sAntCall2 += "ant collection-available -q -Dymd='"
+    sAntCall2 += "ant collection-available -q -Dymd="
     sAntCall2 +=  year
     sAntCall2 += '/'
     sAntCall2 +=  month
     sAntCall2 += '/'
     sAntCall2 +=  day
-    sAntCall2 +=  "'"
     print sAntCall2
     out2 = subprocess.check_output([sAntCall2,"debug"],shell=True)
+    print out2
     outFirstLine2 = str(out2).splitlines()[0].strip()
     isCollection  =   distutils.util.strtobool(outFirstLine2.split(' ')[1])
     #print
     itemCount = 0
     if isCollection:
-       print 'If we have a collection find out how many items'
+        print 'If we have a collection find out how many items'
+        sAntCall3 = ''
+        sAntCall3 += "ant child-resources-count -q -Dymd="
+        sAntCall3   +=  year
+        sAntCall3 += '/'
+        sAntCall3 +=  month
+        sAntCall3 += '/'
+        sAntCall3 +=  day
+        print sAntCall3
+        out3 = subprocess.check_output([sAntCall3,"debug"],shell=True)
+        print out3
+        outFirstLine3 = str(out3).splitlines()[0].strip()
+        collectionCount  =   outFirstLine3.split(' ')[1].strip()
+        print 'found ' + str(collectionCount) + ' items in collection'
+        itemCount =  int(collectionCount) + 1
+
     else:
         print 'We do NOT have a collection itemCount will be 1'
-        itemCount += 1
+        itemCount = 1
+
+    print str(itemCount) + ' items now in collection'
+#
     print itemCount
-    tagUriIdentifier = b60Encoded
+    tagUriIdentifier = str(b60Encoded)
     tagUriIdentifier += str(itemCount)
     print tagUriIdentifier
     sTitle  = 'title: ' + args.input.replace('-', ' ')   + '\n'
@@ -86,9 +104,9 @@ try:
                            day + '-' +  args.input + '.md' )
 except ValueError:
     raise
-
-print outFile
-
+#
+#print outFile
+#
 try:
     if not os.path.exists(outFile):
         f = open(outFile, 'w')

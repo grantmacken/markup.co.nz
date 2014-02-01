@@ -687,7 +687,7 @@ return $seq[contains(., '${project.domain}')]</property>
 xquery version "3.0";
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
-xmldb:collection-available("/apps/${project.domain}/data/archive/$ydm")
+xmldb:collection-available("/apps/${project.domain}/data/archive/${ymd}")
 </property>
 <xdb:xquery
             uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
@@ -700,19 +700,19 @@ xmldb:collection-available("/apps/${project.domain}/data/archive/$ydm")
 
 
 <!--  Count Child Resources xmldb:get-child-resources  -->
-<target name="childResourcesCount" >
-<property name="q_collection-available">
+<target name="child-resources-count" >
+<property name="q_child-resources-count">
 xquery version "3.0";
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
-count(xmldb:get-child-resources("/apps/${project.domain}/data/archive/$ydm"))
+count(xmldb:get-child-resources("/apps/${project.domain}/data/archive/${ymd}"))
 </property>
 <xdb:xquery
             uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
-            query="${q_collection-available}" user="${exist.username}"
+            query="${q_child-resources-count}" user="${exist.username}"
             password="${exist.password}"
-            outputproperty="isAvailable" />
-<echo>${isAvailable}</echo>
+            outputproperty="resourcesCount" />
+<echo>${resourcesCount}</echo>
 </target>
 
 </project>

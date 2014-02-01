@@ -16,7 +16,7 @@ h2, h3, h4, h5, h6 {
 	font-weight: $header-font-weight;
 }
 
-p, pre, label {
+div, p, pre, label {
 	@include adjust-font-size-to(16px);
 	margin: 0 0 rhythm(2, 16px) 0;
 	// 2 lines below, based on font size
