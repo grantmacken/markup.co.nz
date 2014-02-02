@@ -63,7 +63,9 @@ transformation of the texts 'linkable things' to a
 node with hyperlinks is done via a xquery regex functions.
 
 Autolinked Linkable Things List
-* URLS
+* URLS<br/>
+```let $pattern := '(https?://[\da-z\.-]+\.[a-z\.]{2,6}[\da-z/-]+)'```<br/>
+```let $replacement := '<a href="$1">$1</a>'```
 * #hashtags<br/>
 ```let $pattern := "(^|\s)((#)([A-Za-z]+[A-Za-z0-9_]{1,15}))(\s|$)"```<br/>
 ```let $replacement := '<span>$1$3<a href="/tag/$4">$4</a>$5</span>'```

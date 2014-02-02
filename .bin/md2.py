@@ -95,14 +95,6 @@ except OSError:
 
 #MARKDOWN
 
-#link_patterns = [
-#    # Match a wiki page link LikeThis.
-#    (re.compile(r"\s#([A-Za-z]+)\s"), r"/markup.co.nz/tags/\1")
-#]
-#html = markdown2.markdown(source_file_content , extras=["link-patterns","metadata",
-#"code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
-#"smarty-pants"],link_patterns=link_patterns)
-
 source_file_content = open(args.input, 'r').read()
 html = markdown2.markdown(source_file_content , extras=["metadata",
 "code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
@@ -144,19 +136,23 @@ def createXhtmlContent( ):
 
 def createTextContent( ):
     frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
-    pre_content = frontMatterSub.sub('', source_file_content)
-    eContentDiv =  """
-    <pre xmlns="http://www.w3.org/1999/xhtml" >%(content)s</pre>
-    """
-    # Fill in the template
-    divTemplate = eContentDiv % dict(
-        content=pre_content
-    )
+    #pre_content = frontMatterSub.sub('', source_file_content)
+    #eContentDiv =  """
+    #<pre xmlns="http://www.w3.org/1999/xhtml" >%(content)s</pre>
+    #"""
+    ## Fill in the template
+    #divTemplate = eContentDiv % dict(
+    #    content=pre_content
+    #)
     #
-    eContent = ET.Element("content")
-    eContent.set("type", "text")
-    eContent.append(ET.XML(divTemplate))
-    eEntry.append(eContent)
+    eContent = ET.SubElement(eEntry, 'content')
+    eContent.attrib["type"] = 'text'
+    eContent.text = frontMatterSub.sub('', source_file_content)
+    #ET.SubElement(eEntry, key).text = data
+    #eContent = ET.Element("content")
+    #eContent.set("type", "text")
+    #eContent.append(ET.XML(divTemplate))
+    #eEntry.append(eContent)
     indent(eEntry, level=0)
 
 
