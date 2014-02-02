@@ -385,7 +385,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     We use bumpversion patch ref. .bumpversion.cfg
     which alters semversion.txt and our pac
     -->
-    <exec executable="git" failonerror="true">
+    <exec executable="git" failonerror="false">
         <arg value="commit" />
         <arg value="-a" />
         <arg value="-m" />
