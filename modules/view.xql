@@ -6,6 +6,7 @@ import module namespace config="http://exist-db.org/xquery/apps/config" at "conf
 import module namespace data-map="http://markup.co.nz/#data-map" at "mu/data-map.xqm";
 import module namespace page="http://markup.co.nz/#page" at "mu/page.xqm";
 import module namespace post="http://markup.co.nz/#post" at "mu/post.xqm";
+import module namespace note="http://markup.co.nz/#note" at "mu/note.xqm";
 import module namespace header="http://markup.co.nz/#header" at "mu/header.xqm";
 import module namespace nav="http://markup.co.nz/#nav" at "mu/nav.xqm";
 import module namespace tag="http://markup.co.nz/#tag" at "mu/tag.xqm";

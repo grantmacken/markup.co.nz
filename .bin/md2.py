@@ -176,7 +176,7 @@ for item in L:
             lCategories = metadata[item].split()
             for lCat in lCategories:
                 eCategory = ET.SubElement(eEntry, 'category')
-                eCategory.attrib["term"] = metadata[item]
+                eCategory.attrib["term"] = lCat
         elif new_element == 'link-tweet-id':
             linkTweetHref = 'https://twitter.com/' + config.get('twitter.name') + '/status/' + metadata[item]
             linkTweet = ET.SubElement(eEntry, 'link')
