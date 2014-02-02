@@ -47,7 +47,7 @@ function tag:notes($node as node(), $model as map(*)) {
 
 return
 <section id="main" role="main">
-<h1>Notes</h1>
+<h1>'{$model('data-item')}' tagged notes </h1>
 {
  for $item  at $i in collection($model('data-posts-path'))//atom:entry[atom:id[contains(.,':note:')] ]
    where $item//atom:category[./@term = $model('data-item') ]
@@ -56,7 +56,7 @@ return
    <article  class="h-entry">
    <h2 class="p-name">{$item/atom:title/string()}</h2>
    {
-  let $input := note:trim($item/atom:content/*/text())
+  let $input := note:trim($item/atom:content/text())
    let $inLines := note:seqLines($input)
    let $outNodes := map(function($line) {
      let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/></div>'

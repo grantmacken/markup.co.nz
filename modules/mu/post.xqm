@@ -149,7 +149,7 @@ function post:content($node as node(), $model as map(*)) {
 
 let $content :=
  if($model('page-content-isNote')) then (
-   let $input := note:trim($model('page-content')/*/text())
+   let $input := note:trim($model('page-content')/text())
    let $inLines := note:seqLines($input)
    let $outNodes := map(function($line) {
      let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/></div>'
