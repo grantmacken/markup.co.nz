@@ -5,6 +5,7 @@ import module namespace templates="http://exist-db.org/xquery/templates" ;
 import module namespace util="http://exist-db.org/xquery/util";
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 import module namespace config="http://exist-db.org/xquery/apps/config"  at "../../modules/config.xqm";
+import module namespace note="http://markup.co.nz/#note" at "note.xqm";
 
 declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
 declare namespace  atom =  "http://www.w3.org/2005/Atom";
@@ -144,61 +145,21 @@ function post:syndicated($node as node(), $model as map(*)) {
 declare
 function post:content($node as node(), $model as map(*)) {
 (:                                                     :)
-let $trim := function($arg){
-replace(replace($arg,'\s+$',''),'^\s+','')
-}
-
-let  $urlToken := function( $input ){
-  let $flags := 's'
-  let $pattern := "(https?://[\da-z\.-]+\.[a-z\.]{2,6}[\da-z/-]+)"
-  let $replacement := '<a href="$1">$1</a>'
-  return  replace($input, $pattern , $replacement, $flags )
-}
-
-
-let  $hashTag := function( $input ){
-  let $flags := ''
-  let $pattern := "(^|\s)((#)([A-Za-z]+[A-Za-z0-9_]{1,15}))(\s|$)"
-  let $replacement := '<span>$1$3<a href="/tag/$4">$4</a>$5</span>'
-  return  replace($input, $pattern , $replacement, $flags )
-}
-
-(:TODO:)
-let  $atPerson := function( $input ){
-  let $flags := 's'
-  let $pattern := "(^|\s)@([A-Za-z]+[A-Za-z0-9_]{1,15})"
-  let $replacement := '<a href="/tags/$2">  $2 </a>'
-  return  replace($input, $pattern , $replacement, $flags )
-}
-
 
 
 let $content :=
  if($model('page-content-isNote')) then (
-   let $flags := 's'
-   let $input := $trim($model('page-content')/*/text())
-   let $pattern := "(\n)"
-   let $seqLines := tokenize($input, $pattern)
-   let $lines := map(function($line) {
-     let $replaced := '<div>' || $hashTag($urlToken($line)) || '<br/></div>'
+   let $input := note:trim($model('page-content')/*/text())
+   let $inLines := note:seqLines($input)
+   let $outNodes := map(function($line) {
+     let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/></div>'
      let $l := util:parse($replaced )
      return
      ( $l/*/node())
-    }, $seqLines)
-
-   (: <div class="e-content">:)
-   (:     { $matchHash }:)
-   (:     <hr/>:)
-   (:     {$noteContent}:)
-   (:     <hr/>:)
-   (:     REPLACED:)
-   (:     <hr/>:)
-   (:     {$lines}:)
-   (:</div>                         :)
-
+    }, $inLines)
   return
     <div class="e-content">
-        {$lines}
+        {$outNodes}
    </div>
  )
  else (
