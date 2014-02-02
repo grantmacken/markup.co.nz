@@ -16,7 +16,6 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 :
 :)
 
-
 declare
 function note:seqLines($input) {
  let $flags := ''
