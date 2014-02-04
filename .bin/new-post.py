@@ -20,14 +20,30 @@ parser.add_argument('-i','--input', help='Input file name',required=True)
 parser.add_argument('-p','--post_type', help='Post Type',required=True)
 args = parser.parse_args()
 
+args.input = str(args.input.strip())
+args.post_type = str(args.post_type.strip())
 
-match=re.search(r'(article|note)', args.post_type)
+
+match=re.match(r'^(article|note)$', args.post_type)
 if match:
-    postType = args.post_type
+    print 'OK: matched article or note'
 else:
    # return this to ant
    print 'FAIL. Post type must be (article or note)'
    sys.exit('Error!')
+
+
+match=re.search(r'(\s)', args.input)
+if match:
+    args.input = re.sub(r'(\s)', '-', args.input)
+    print 'Adjusted Input File Name' + args.input
+
+
+print 'ARGUMENTS'
+print 'args.input: ' + args.input
+print 'args.post_type: ' + str(args.post_type)
+
+
 
 try:
     atime = time.localtime()
@@ -99,13 +115,13 @@ try:
                  second + '\n'
     sAuthor = 'author: ' +  config.get('project.author') + '\n'
     sID =  'id: tag:' +  config.get('project.domain') + ',' + sDate + ':' + \
-        postType +':' + tagUriIdentifier +'\n'
+        args.post_type +':' + tagUriIdentifier +'\n'
     outFile = os.path.join( 'www' ,'_posts' , year + '-' + month + '-' + \
                            day + '-' +  args.input + '.md' )
 except ValueError:
     raise
 #
-#print outFile
+print outFile
 #
 try:
     if not os.path.exists(outFile):
@@ -128,3 +144,5 @@ except OSError:
     else:
         # There was an error on creation, so make sure we know about it
         raise
+
+sys.exit('FIN!')

@@ -6,10 +6,19 @@ import datetime
 import re
 import markdown2
 import argparse
+import pygments
+import pygments.formatters
+
 from configobj import ConfigObj
 
 try:
     from lxml import etree as  ET
+    from lxml.html import tostring, fromstring, html5parser
+    from pygments import highlight
+    from pygments.formatters import HtmlFormatter
+    from pygments.lexers import guess_lexer, get_lexer_by_name
+    from pygments.filters import VisibleWhitespaceFilter
+
     #print("running with lxml.etree")
 except ImportError:
     print("not running with lxml.etree")
@@ -20,6 +29,7 @@ config = ConfigObj('build.properties')
 parser = argparse.ArgumentParser(description='Ony one arg')
 parser.add_argument('-i','--input', help='Input file name',required=True)
 args = parser.parse_args()
+
 
 ATOM_NAMESPACE = "http://www.w3.org/2005/Atom"
 ATOM = "{%s}" % ATOM_NAMESPACE
@@ -97,7 +107,7 @@ except OSError:
 
 source_file_content = open(args.input, 'r').read()
 html = markdown2.markdown(source_file_content , extras=["metadata",
-"code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
+"code-friendly", "cuddled-lists", "header-ids" ,
 "smarty-pants"])
 metadata =  html.metadata
 
@@ -119,44 +129,72 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
+def flatten(elem, include_tail=0):
+    text = elem.text or ""
+    for e in elem:
+        text += flatten(e, 1)
+    if include_tail and elem.tail: text += elem.tail
+    return text
+
 def createXhtmlContent( ):
-    eContentDiv =  """
-    <div xmlns="http://www.w3.org/1999/xhtml" >%(content)s</div>
-    """
-    # Fill in the template
-    divTemplate = eContentDiv % dict(
-        content=html
-    )
-    #
+    indent(eEntry, level=0)
     eContent = ET.Element("content")
     eContent.set("type", "xhtml")
-    eContent.append(ET.XML(divTemplate))
+    eDiv = fromstring( '<div xmlns="http://www.w3.org/1999/xhtml" >' + html + '</div>', parser=parser)
+    # test
+    #http://modular.math.washington.edu/home/wstein/www/home/shumow/winspkg/Pygments-1.0/docs/build/index.html
+    # https://djangosnippets.org/snippets/1213/
+    # https://djangosnippets.org/snippets/119/
+    # http://iboris.com/page/add-source-code-syntax-highlighting-your-django-content-pygments.html
+    #linenos='table'
+    # lineseparator="<br/>"
+    # cssclass='codehilite'
+    #
+
+    formatter = HtmlFormatter(lineseparator="<br/>",cssclass='highlight', linenos='inline')
+    #http://modular.math.washington.edu/home/wstein/www/home/shumow/winspkg/Pygments-1.0/docs/build/formatters.html
+
+    for element in eDiv.iter("pre"):
+        language = ''
+        mdPre = ''
+        element.text = flatten(element); del element[:]
+        match=re.search(r'^(\w+)\s', element.text)
+        if match:
+            language +=  match.group(1)
+
+        try:
+            lexer = get_lexer_by_name(language, tabsize="1", stripnl=True, encoding='UTF-8')
+            mdPre += re.sub(r'^\w+', '', element.text)
+        except ValueError, e:
+            try:
+                # Guess a lexer by the contents of the block.
+                mdPre += element.text
+                lexer = guess_lexer(mdPre)
+            except ValueError, e:
+                # Just make it plain text.
+                language = 'text'
+                mdPre += element.text
+                lexer = get_lexer_by_name(language, tabsize="1", stripnl=True, encoding='UTF-8')
+
+        lexer.add_filter(VisibleWhitespaceFilter(spaces=True, newlines=True, tabs=True, wstokentype=True ))
+        pygmented = fromstring(highlight(mdPre, lexer, formatter))
+        element.getparent().replace(element, pygmented)
+
+
+    eContent.append(eDiv)
     eEntry.append(eContent)
-    indent(eEntry, level=0)
+    #indent(eEntry, level=0)
 
 def createTextContent( ):
     frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
-    #pre_content = frontMatterSub.sub('', source_file_content)
-    #eContentDiv =  """
-    #<pre xmlns="http://www.w3.org/1999/xhtml" >%(content)s</pre>
-    #"""
-    ## Fill in the template
-    #divTemplate = eContentDiv % dict(
-    #    content=pre_content
-    #)
-    #
     eContent = ET.SubElement(eEntry, 'content')
     eContent.attrib["type"] = 'text'
     eContent.text = frontMatterSub.sub('', source_file_content)
-    #ET.SubElement(eEntry, key).text = data
-    #eContent = ET.Element("content")
-    #eContent.set("type", "text")
-    #eContent.append(ET.XML(divTemplate))
-    #eEntry.append(eContent)
     indent(eEntry, level=0)
 
-
+parser = ET.HTMLParser()
 eEntry = ET.Element("entry", nsmap=NSMAP)
+eEntry.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
 
 #Elements of <entry>
 #http://atomenabled.org/developers/syndication/#requiredEntryElements
@@ -206,7 +244,6 @@ linkAlt.attrib["href"] = href
 idArticleMatch = re.compile("^tag:.+:(article):.+$")
 idNoteMatch = re.compile("^tag:.+:(note):.+$")
 
-
 myID = eEntry.find('id')
 if myID is None:
     createXhtmlContent()
@@ -223,4 +260,6 @@ else:
 print outfile
 #
 tree = ET.ElementTree(eEntry)
+tree.write('test.xml')
 tree.write(outfile)
+# http://lxml.de/html5parser.html
