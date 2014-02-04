@@ -43,21 +43,15 @@ if (matches($exist:path ,'^/[0-9A-HJ-NP-Z_a-km-z]{3}[0-9]{1,2}\.html$')) then(
   let $duration := xs:dayTimeDuration("P" || string(xs:integer($dysInYr)- 1)  || "D")
   let $decodedDate := xs:date($yrStart + $duration)
   let $formatedDate := format-date($decodedDate, "[Y0001]/[M01]/[D01]", 'en', (), ())
-  (:(: test     ( $yr , $yrStart,  $dysInYr, $duration, $decodedDate, $formatedDate)     :):)
-  (::)
-  (:let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate ):)
-
-  let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/2014/01/26' )
-
-  let $fallback :=  'http://' ||  $exist:controller || '/' || 'xxx' ||  '/' || $strB60  ||  '/' || $strID ||   '/' || $formatedDate
+  let $colPath :=  concat( $exist:root  , $exist:controller , '/data/archive/' , $formatedDate )
   let $redirect :=
     if( xmldb:collection-available( $colPath ) ) then (
       if( exists(xmldb:xcollection($colPath)//id[contains(., $strID)] )) then (
         xmldb:xcollection($colPath)//*[id[contains(., $strID)]]/link[@rel="alternate"]/@href/string()
         )
-      else( $fallback )
+      else( 'http://' ||  $exist:controller || '/' || 'collection-not-available' ||  '/' || $strB60  ||  '/' || $strID ||   '/' || $formatedDate )
     )
-    else( $fallback )
+    else( 'http://' ||  $exist:controller || '/' || 'id-not-found' ||  '/' || $strB60  ||  '/' || $strID ||   '/' || $formatedDate )
 return
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
      <redirect url="{$redirect}"/>
