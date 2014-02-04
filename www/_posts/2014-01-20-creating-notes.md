@@ -98,8 +98,9 @@ under git control so not in public domain. So all usernames password etc can go
 into the build.properties file.
 
 4. We call the following python script passing the md file as input. It will
-strip the front-matter out and post remaining content text to twitter.
+strip the front-matter out and post remaining content text to twitter
 
+        python
         import argparse
         import re
         import fileinput
