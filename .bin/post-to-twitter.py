@@ -1,16 +1,29 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import re
 import sys
 import datetime
 import math
-
+import codecs
 import argparse
 import fileinput
 import markdown2
 
 from configobj import ConfigObj
 from twython import Twython
+
+def setCategories( statusContent ):
+    lHashMatch=re.findall('#([\w]+)', statusContent)
+    lCategories = metadata['categories'].split()
+    for lCat in lCategories:
+        if lCat in lHashMatch:
+            print 'Category in text'
+            print lCat
+        else:
+            print 'No category in text so will append  to text #' + lCat
+            statusContent += ' #'
+            statusContent += lCat
+    return statusContent
 
 config = ConfigObj('build.properties')
 
@@ -27,18 +40,14 @@ else:
    sys.exit('Error!')
 
 source_file_content = open(args.input, 'r').read()
-html = markdown2.markdown(source_file_content , extras=["metadata",
-"code-friendly", "cuddled-lists", "fenced-code-blocks", "header-ids" ,
-"smarty-pants"])
+html = markdown2.markdown(source_file_content , extras=["metadata"])
 metadata =  html.metadata
 print metadata
 
 print metadata['id']
-#tag:markup.co.nz,2014-01-22:note:102623
 idNoteMatch = re.compile("^tag:.+:(note):.+$")
-idDateMatch = re.compile("^tag:.+,(\d{4}-\d{2}-\d{2}):(note):(.+)$")
+idDateMatch = re.compile("^tag:.+,(\d{4}-\d{2}-\d{2}):(note|article):(.+)$")
 match = idDateMatch.match(metadata['id'])
-#match=re.search(r'"^tag:.+,(\d{4}-\d{2}-\d{2}):.+$"', metadata['id'])
 if match:
     print 'match found'
     dateString = match.group(1)
@@ -49,31 +58,55 @@ if match:
     print 'id identifier: ' + identifierString
 else:
     print 'no dateString'
+    sys.exit('ERROR!')
+
 
 print 'Get the text to post'
+print '--------------------'
 
 frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
 status_content = frontMatterSub.sub('', source_file_content).strip()
-
+status_content = setCategories(status_content)
 print status_content
-#
-# a list if #hashtags in status_content
-lHashMatch=re.findall('#([\w]+)', status_content)
-
-# a list if categories in front-matter
-lCategories = metadata['categories'].split()
-lnewCatergories = []
-
-for lCat in lCategories:
-    if lCat in lHashMatch:
-        print 'Category in text'
-        print lCat
-    else:
-        print 'No category in text so will append  to text #' + lCat
-        status_content += ' #'
-        status_content += lCat
-
+print '--------------------'
 print 'number of chars so  far: ' + str(len(status_content))
+
+
+if len(status_content) > 140:
+    isAbbrevNote = True
+    print ( postTypeString + " will now be abbreviated note ")
+    print ( " abbreviated note will use summary")
+    try:
+        status_content = metadata['summary']
+        if ( len(status_content) == 0 ):
+            print  str(len(status_content))
+            print 'add summary'
+            sys.exit('ERROR!')
+        else:
+            print 'OK'
+            #ELLIPSIS = u'\u2026'
+            ELLIPSIS = '...'
+            status_content = setCategories(status_content)
+            status_content += ELLIPSIS
+            status_content += ' '
+            status_content += config.get('project.domain')
+            status_content += '/'
+            status_content += identifierString
+            print status_content
+    except KeyError, e:
+        print 'I got a KeyError - reason "%s"' % str(e)
+        sys.exit('Error!')
+    except:
+        print 'I got another exception, but I should re-raise'
+        sys.exit('Error!')
+        raise
+else:
+    isAbbrevNote = False
+    print ("The absolute value of",n,"is",n)
+
+sys.exit('FIN!')
+
+
 
 #
 #status_content +=  ' ('

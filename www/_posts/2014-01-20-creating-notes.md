@@ -34,7 +34,7 @@ hashtags + backlink ( todo url shorten 22 chars Twitter t.co's URL size) <br/>
 *Text* : If a note char count doesn't fit twitters 140 chars then this will
 become an **abbr note**. In this case the *summary* is used with a link
 otherwise the summary is not relevant. <br/> *Backlink*: <br/>If *abbr note*
-create a ellipsis then a space then $url. in the form of a
+create a ellipsis ...  then a space then $url. in the form of a
 [permashortlink](https://indiewebcamp.com/permashortlinks) Note: my shortlinks
 are 17 chars ```markup.co.nz/2sm1``` until I get a short
  ccTLDs domain. The backlink
@@ -100,29 +100,32 @@ into the build.properties file.
 4. We call the following python script passing the md file as input. It will
 strip the front-matter out and post remaining content text to twitter
 
-        python
-        import argparse
-        import re
-        import fileinput
-        from configobj import ConfigObj
-        from twython import Twython
+Post to Twitter via Twython with Python
+--------------------------------------
 
-        config = ConfigObj('build.properties')
-        parser = argparse.ArgumentParser(description='Ony one arg')
-        parser.add_argument('-i','--input', help='Input file name',required=True)
-        args = parser.parse_args()
-        print args.input
-        source_file_content = open(args.input, 'r').read()
-        frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
-        status_content = frontMatterSub.sub('', source_file_content).strip()
+    python
+    import argparse
+    import re
+    import fileinput
+    from configobj import ConfigObj
+    from twython import Twython
 
-        APP_KEY = config.get('twitter.app.key')
-        APP_SECRET = config.get('twitter.app.secret')
-        OAUTH_TOKEN = config.get('twitter.oauth.token')
-        OAUTH_TOKEN_SECRET = config.get('twitter.oauth.token_secret')
-        twitter = Twython(APP_KEY, APP_SECRET,
-                          OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-        jsonResult = twitter.update_status(status=status_content)
+    config = ConfigObj('build.properties')
+    parser = argparse.ArgumentParser(description='Ony one arg')
+    parser.add_argument('-i','--input', help='Input file name',required=True)
+    args = parser.parse_args()
+    print args.input
+    source_file_content = open(args.input, 'r').read()
+    frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
+    status_content = frontMatterSub.sub('', source_file_content).strip()
+
+    APP_KEY = config.get('twitter.app.key')
+    APP_SECRET = config.get('twitter.app.secret')
+    OAUTH_TOKEN = config.get('twitter.oauth.token')
+    OAUTH_TOKEN_SECRET = config.get('twitter.oauth.token_secret')
+    twitter = Twython(APP_KEY, APP_SECRET,
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+    jsonResult = twitter.update_status(status=status_content)
 
 From here we can grab the return id from the json response. Will add this to the
 md front matter and be used to create a rel-syndication links.
