@@ -26,7 +26,7 @@ whitespace is collapsed.
 Pygments and xquery 3
 -----------------------
 
-The xquery language lexer does not recognise xquery 3 tokens.
+The pygments xquery language lexer does not recognise xquery 3 tokens.
 ref: git hub issue [XQuery 3.0](https://github.com/spig/pygments-xquery-lexer/issues/1)
 
 Github also uses Python Pygments <br/>

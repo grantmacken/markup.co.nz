@@ -259,6 +259,32 @@ project.description: ${project.description}
 
 </target>
 
+<target name="remote-store-post" unless="has.md2Failed"  if="is.mdPost">
+
+<echo>outfile:  ${outfile}</echo>
+ <exec executable="/bin/sh">
+       <arg value="-c"/>
+       <arg line="&quot; echo ${outfile} | sed 's:^\.deploy\/data\/\(.*\)\/.*$:\1:' &quot;" />
+       <redirector outputproperty="bash.out.collection" />
+   </exec>
+
+<echo>bash.out.collection:  ${bash.out.collection}</echo>
+
+<property name="exist.remote.uri">xmldb:exist://${host.remote}:8080/exist/xmlrpc/db/apps/${project.domain}/data/${bash.out.collection}</property>
+  <echo>EXIST.REMOTE.URI:  ${exist.remote.uri} </echo>
+  <xdb:store
+        uri="${exist.remote.uri}"
+        createcollection="true"
+        srcfile="${outfile}"
+        user="${exist.username}"
+        password="${exist.password}"
+/>
+
+
+</target>
+
+
+
 
 <target name="proccess-md">
     <echo>delete ${dir.deploy.data} </echo>

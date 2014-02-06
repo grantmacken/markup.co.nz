@@ -102,31 +102,10 @@ if len(status_content) > 140:
         raise
 else:
     isAbbrevNote = False
-    print ("The absolute value of",n,"is",n)
 
-sys.exit('FIN!')
-
-
-
-#
-#status_content +=  ' ('
-#status_content +=  config.get('project.domain')
-#status_content +=  ' '
-#status_content +=  identifierString
-#status_content +=  ')'
-#
 print 'number of chars so far: ' + str(len(status_content))
 print status_content
-##
-if lHashMatch:
-    for iHashMatch in lHashMatch:
-        if iHashMatch in lCategories:
-            print 'the HashTag in text IS in front matter categories'
-        else:
-            print 'the HashTag in text NOT front matter categories'
-            metadata['categories'] += ' '
-            metadata['categories'] += iHashMatch
-#
+
 APP_KEY = config.get('twitter.app.key')
 APP_SECRET = config.get('twitter.app.secret')
 
@@ -138,6 +117,18 @@ twitter = Twython(APP_KEY, APP_SECRET,
 
 jsonResult = twitter.update_status(status=status_content)
 jsonResultID = jsonResult['id']
+
+
+
+lHashMatch=re.findall('#([\w]+)', status_content)
+if lHashMatch:
+    for iHashMatch in lHashMatch:
+        if iHashMatch in lCategories:
+            print 'the HashTag in text IS in front matter categories'
+        else:
+            print 'the HashTag in text NOT front matter categories'
+            metadata['categories'] += ' '
+            metadata['categories'] += iHashMatch
 
 catLine = 'categories: ' + metadata['categories']
 
@@ -159,3 +150,12 @@ for line in fileinput.input(args.input , inplace=1):
         print catLine
     else:
         print line,
+
+
+#
+#status_content +=  ' ('
+#status_content +=  config.get('project.domain')
+#status_content +=  ' '
+#status_content +=  identifierString
+#status_content +=  ')'
+#

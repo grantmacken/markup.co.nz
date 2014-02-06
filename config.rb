@@ -2,6 +2,7 @@ require 'singularitygs'
 require 'breakpoint'
 require 'color-schemer'
 require 'breakpoint-slicer'
+require 'omg-text'
 
 http_path = "/"
 css_dir = ".deploy/resources/styles"

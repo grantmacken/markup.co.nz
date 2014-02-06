@@ -1,3 +1,7 @@
+
+@import "omg-text";
+
+
 /*
  * $slicer-breakpoints: 0 400px 600px 800px 1050px;
  * Slice numbers:    | 1 | 2 | 3 | 4 | 5
@@ -29,10 +33,10 @@ header[role="banner"]{
     //@include layout-block;
       h1{
        // if this is a good pattern create as a reusable mixin
-       color: $title-text;
-       text-shadow: -1px 0 0 $title-text-shadow, 1px 1px 0 $title-text-shadow,
-        2px -1px 0 $title-text-shadow, 3px 0 0 $title-text-shadow;
-
+      color: tint($secondary, 70%);
+      /*@include omg-text($title-text-shadow, 135, 5, flat);*/
+      /*@include omg-text($title-text-shadow, 135, 5, shaded, 5);*/
+      @include omg-offset(135, tint($secondary, 40%), 3, $secondary, 5);
         @include at(5) {
          letter-spacing: 30px;
          }
