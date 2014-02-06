@@ -25,7 +25,6 @@ function note:seqLines($input) {
 };
 
 
-
 declare
 function note:trim($input) {
   let $flags := 'm'
