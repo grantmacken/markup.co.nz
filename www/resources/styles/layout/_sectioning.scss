@@ -79,28 +79,7 @@ article.h-entry{
     padding-left: gutter-span($grid: 3 );
 }
 
-section[role='xmain']{
-  @include at(5) {
-    @include grid-span(7,2);
-    clear: both;
-    }
 
-  @include at(4) {
-    @include grid-span(5, 2);
-    clear: both;
-    }
-
-  @include at(3) {
-    @include grid-span(4);
-    clear: both;
-
-    }
-
-    @include between(1,2) {
-    @include grid-span(3);
-    clear: both;
-    }
-}
 
 aside{
   @include at(5) {

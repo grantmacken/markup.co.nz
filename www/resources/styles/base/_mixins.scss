@@ -1,13 +1,13 @@
 // ADD YOUR OWN MIXINS AND HELPERS HERE
 // DESCRIBE WHAT EACH DOES AND HOW TO USE THEM
-
+//$page-background
 @mixin layout-block {
     @include border-radius(12px);
-    @include box-shadow(0 0 40px set-alpha( $tertiary, .5) inset);
+    @include box-shadow(0 0 40px $page-background inset);
     @include transition(margin .5s);
    // @include box-shadow(0 0 40px rgba(255,248,193, .5) inset);
     //set-alpha($color, $alpha)
-    border: 5px solid set-alpha($primary, .5);
+    border: 5px solid $page-background;
     //border: 5px solid rgba(230,243,195, .5);
 	//background-color: rgb(background-color: rgb(51, 94, 149));
   }
@@ -140,6 +140,3 @@
     .gi { color: $solarized-green } /* General.inserted */
     .gd { color: $solarized-red } /* General.deleted */
 }
-
-
-

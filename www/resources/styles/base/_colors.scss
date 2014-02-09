@@ -105,7 +105,7 @@ $quadrary: cs-quadrary();
 //page
 
 $page-text: shade($secondary, 50%);
-$page-background: set-alpha( $tertiary, .5);
+$page-background: set-alpha( $tertiary, .3);
 
 // titles headings
 $title-text:           tint($secondary, 40%);
