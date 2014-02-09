@@ -260,6 +260,6 @@ else:
 print outfile
 #
 tree = ET.ElementTree(eEntry)
-tree.write('test.xml')
+#tree.write('test.xml')
 tree.write(outfile)
 # http://lxml.de/html5parser.html
