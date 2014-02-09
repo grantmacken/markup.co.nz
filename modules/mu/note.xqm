@@ -19,9 +19,9 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 declare
 function note:seqLines($input) {
  let $flags := ''
- let $pattern := "(\n)"
+ let $pattern := '\n\r?'
  let $seqLines := tokenize($input, $pattern)
- return  tokenize($input, $pattern)
+return $seqLines
 };
 
 

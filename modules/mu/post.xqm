@@ -7,8 +7,9 @@ import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 import module namespace config="http://exist-db.org/xquery/apps/config"  at "../../modules/config.xqm";
 import module namespace note="http://markup.co.nz/#note" at "note.xqm";
 
-declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
-declare namespace  atom =  "http://www.w3.org/2005/Atom";
+declare namespace  xhtml = "http://www.w3.org/1999/xhtml";
+declare namespace  atom = "http://www.w3.org/2005/Atom";
+declare namespace  xlink = "http://www.w3.org/1999/xlink";
 
 (:~
 : Post
@@ -16,6 +17,142 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 : @version 0.01
 :
 :)
+
+
+
+declare
+function post:getUpdated($item) {
+ let $updated :=  xs:date( $item/atom:updated/string() )
+ let $formated := format-date($updated , "[D1o]  [MNn] [Y]", "en", (), ())
+ return
+ $formated
+};
+
+
+declare
+function post:getPublished($item) {
+   let $published :=  xs:dateTime( $item/atom:published/string() )
+   let $published-formated := format-date($published , "[D1o] of [MNn] [Y]", "en", (), ())
+   return
+    $published-formated
+};
+
+declare
+function post:getTitle($item) {
+switch (post:getPostType($item))
+   case "note" return ()
+   default return   <h2 class="p-name">{$item/atom:title/string()}</h2>
+};
+
+declare
+function post:getPermalink($item) {
+ <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a>
+};
+
+declare
+function post:getSummary($item) {
+ $item/atom:summary/string()
+};
+
+
+declare
+function post:getPostType($item) {
+ let $flags := ''
+ let $input := $item/atom:id/string()
+ let $pattern := "(:)"
+ let $seqIdentifier := tokenize($input, $pattern)
+ return  $seqIdentifier[3]
+};
+
+(:
+   Content displayed depends upon post-type
+
+note | article
+
+:)
+
+declare
+function post:getSomeArticleBlockElements($item) {
+ let $n := $item/atom:content/*/*
+ let $nodesWithText  :=    ($n[./text()])
+ let $seqCount  :=    count($nodesWithText)
+ return
+     if ( $seqCount gt 5 ) then (
+                                 $nodesWithText[1, 2, 3, 4 , 5 ] ,
+                                 <span>... continue to read  {post:getPermalink($item)} </span> )
+     else( $nodesWithText )
+};
+
+
+declare
+function post:getNote($text) {
+   let $input := note:trim($text)
+   let $inLines := note:seqLines($input)
+   let $outNodes := map(function($line) {
+     let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/>' || '</div>'
+     let $l := util:parse($replaced )
+     return
+     ( $l/*/node())
+    }, $inLines)
+  return
+        $outNodes
+};
+
+
+
+declare
+function post:getContent($item) {
+let $r := switch (post:getPostType($item))
+   case "note" return  post:getNote($item/atom:content/text())
+   default return
+   ($item/atom:summary/string(),
+   <hr/> ,
+    post:getSomeArticleBlockElements($item )
+   )
+ return $r
+};
+
+
+declare
+function post:getIcon($item) {
+let $r := switch (post:getPostType($item))
+   case "note" return
+   <div class="iconmelon">
+    <svg viewBox="0 0 32 32">
+     <use xlink:href="#todo-list"></use>
+    </svg>
+   </div>
+   default return
+   <div class="iconmelon">
+    <svg viewBox="0 0 32 32">
+     <use xlink:href="#document"></use>
+    </svg>
+   </div>
+ return $r
+};
+
+
+
+
+declare
+function post:main-feed($node as node(), $model as map(*)) {
+<section id="main" role="main">
+{
+ for $item  at $i in collection($model('data-posts-path'))//atom:entry
+   where $i lt 20
+   order by $item/atom:published descending
+   return
+   <article  class="h-entry h-as-{post:getPostType($item)}">
+   {post:getIcon($item)}
+   {post:getTitle($item)}
+   <div class="e-content">
+    {post:getContent($item)}
+   </div>
+   <p>{post:getPostType($item) } first published on the { post:getPublished( $item ) } and updated { post:getUpdated( $item )}</p>
+ </article>
+  }
+</section>
+};
 
 
 declare
@@ -34,6 +171,9 @@ function post:articles-feed($node as node(), $model as map(*)) {
    return
     $published-formated
   }
+
+
+
 
  let $getAuthor :=  function(){
    $model('page-author')
@@ -152,7 +292,7 @@ let $content :=
    let $input := note:trim($model('page-content')/text())
    let $inLines := note:seqLines($input)
    let $outNodes := map(function($line) {
-     let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/></div>'
+     let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/>' || '</div>'
      let $l := util:parse($replaced )
      return
      ( $l/*/node())
