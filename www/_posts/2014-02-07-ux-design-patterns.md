@@ -7,32 +7,6 @@ summary:
 categories:
 ---
 
-Its time to look at how the site is fitting together.
-
-Notes and Articles are a **type of** Post.
-All 'Posts' archived in a date stamped way.
-Posts are stored as Atom entries.
-A Post note is stored as 'plain text' in an atom *content* container.
-A Post article is stored as an xhtml div in an atom *content* container
-
-As Atom **entries** they
-
-* Must have Titles. Athough a notes title may be semanically irrelevant
-* Must have Published and Updated date stamps
-* Must have an id. Ours is in the form of a [TagURI](http://www.taguri.org/) The
-  id  for this entry<br/>
-```id: tag:markup.co.nz,2014-02-07:article:2sy1```
-the last part of the taguri contains 2 specific identifiers ```:article:2sy1```
-where the first identifier represent the kind of post, article or note etc
-* May be categorized (tagged)
-* May have summaries.
-* May have link relationship items. e.g.
-
-So there we have it. This is the data we have to work with to create our UX HTML
-views. This data naturally is stored in exist-dbs data archive collection
-```/data/archive/``` in a date stamped collection hierachy ```[year]/[month]```
-
-
 The Home Page
 -------------
 
@@ -44,8 +18,8 @@ At the moment
 chonological order
 2. **post listings**:  these will not be seperated out by post-type i.e. articles vs
 notes vs images but clumped together in one listing. ( TODO )
-3. Article will be shortened
-
+3. Article will be shortened to 5 block elements
+4. Titles are stored as lowercase  but are transformed via css ```text-transform: capitalize``
 
 
 

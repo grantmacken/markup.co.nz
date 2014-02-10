@@ -73,11 +73,6 @@ header[role='banner']{
   background-color: tint( $page-background, 70% );
 }
 
-article.h-entry{
-    background-color: tint( $page-background, 70% );
-    padding-right: gutter-span($grid: 3 );
-    padding-left: gutter-span($grid: 3 );
-}
 
 
 

@@ -2,3 +2,16 @@
 // http://microformats.org/wiki/h-entry
 //https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use
 //http://css-tricks.com/using-svg/
+
+.h-entry{
+    background-color: tint( $page-background, 70% );
+    padding-right: gutter-span($grid: 3 );
+    padding-left: gutter-span($grid: 3 );
+    padding-top: 1em;
+    padding-bottom: 1em;
+    @include trailer(3);
+}
+
+.p-name{
+   text-transform: capitalize
+}

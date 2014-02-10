@@ -20,7 +20,10 @@ parser.add_argument('-i','--input', help='Input file name',required=True)
 parser.add_argument('-p','--post_type', help='Post Type',required=True)
 args = parser.parse_args()
 
+#normalise string
 args.input = str(args.input.strip())
+args.input = args.input.lower()
+
 args.post_type = str(args.post_type.strip())
 
 
