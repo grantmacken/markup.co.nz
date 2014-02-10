@@ -12,9 +12,8 @@ import markdown2
 from configobj import ConfigObj
 from twython import Twython
 
-def setCategories( statusContent ):
+def setCategories( statusContent , lCategories):
     lHashMatch=re.findall('#([\w]+)', statusContent)
-    lCategories = metadata['categories'].split()
     for lCat in lCategories:
         if lCat in lHashMatch:
             print 'Category in text'
@@ -61,16 +60,23 @@ else:
     sys.exit('ERROR!')
 
 
-print 'Get the text to post'
-print '--------------------'
-
-frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
-status_content = frontMatterSub.sub('', source_file_content).strip()
-status_content = setCategories(status_content)
-print status_content
-print '--------------------'
-print 'number of chars so  far: ' + str(len(status_content))
-
+try:
+    print 'Get the text to post'
+    print '--------------------'
+    frontMatterSub = re.compile("-{3}[\s\S]+-{3}", re.M)
+    status_content = frontMatterSub.sub('', source_file_content).strip()
+    lCategories = metadata['categories'].split()
+    status_content = setCategories(status_content, lCategories)
+    print status_content
+    print '--------------------'
+    print 'number of chars so  far: ' + str(len(status_content))
+except KeyError, e:
+        print 'I got a KeyError - reason "%s"' % str(e)
+        sys.exit('Error!')
+except:
+    print "Unexpected error:", sys.exc_info()[0]
+    sys.exit('Error!')
+    raise
 
 if len(status_content) > 140:
     isAbbrevNote = True
@@ -86,7 +92,7 @@ if len(status_content) > 140:
             print 'OK'
             #ELLIPSIS = u'\u2026'
             ELLIPSIS = '...'
-            status_content = setCategories(status_content)
+            status_content = setCategories(status_content, lCategories)
             status_content += ELLIPSIS
             status_content += ' '
             status_content += config.get('project.domain')
@@ -118,8 +124,9 @@ twitter = Twython(APP_KEY, APP_SECRET,
 jsonResult = twitter.update_status(status=status_content)
 jsonResultID = jsonResult['id']
 
-
-
+# For every hashtag
+# if the HashTag is NOT front matter categories'
+# then add to metadata['categories']
 lHashMatch=re.findall('#([\w]+)', status_content)
 if lHashMatch:
     for iHashMatch in lHashMatch:
@@ -135,12 +142,13 @@ catLine = 'categories: ' + metadata['categories']
 try:
     metaDataLinkTweetID = metadata['link-tweet-id']
 except KeyError, e:
-    print 'I got a KeyError - reason "%s"' % str(e)
+    print 'OK: a KeyError here means we have no meta link-tweet-id'
+    print 'so we will add it to catline'
     catLine += '\n'
     catLine += 'link-tweet-id: '
     catLine += str(jsonResultID)
 except:
-    print 'I got another exception, but I should re-raise'
+    print 'Opps. should not happen'
     sys.exit('Error!')
     raise
 
