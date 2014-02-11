@@ -80,9 +80,9 @@ let $authorName :=
     )
 
 return
-<div class="card-as-author">
+<div class="h-card p-author card-as-author">
    <img class="u-photo" src="/resources/images/me.png" alt="{$authorName}" width="48" height="48"/>
-   <p>authored by <br/><a rel="author" class="h-card p-author" href="/cards/me">{$authorName}</a></p>
+   <p>authored by <br/><a rel="author" href="/cards/me">{$authorName}</a></p>
 </div>
 };
 
