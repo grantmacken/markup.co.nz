@@ -214,10 +214,14 @@ function post:main-feed($node as node(), $model as map(*)) {
 };
 
 
+(:
+
+
+:)
+
 declare
 function post:tagged-with-feed($node as node(), $model as map(*)) {
- for $item  at $i in collection($model('data-posts-path'))//atom:entry[atom:id[contains(.,':note:')] ]
-   where $item//atom:category[./@term = $model('data-item') ]
+ for $item  at $i in collection($model('data-posts-path'))//atom:entry[atom:category[./@term = $model('data-item') ]]
    order by $item/atom:published descending
    return
    <article  class="h-entry h-as-{post:getPostType($item)}">
@@ -232,7 +236,6 @@ function post:tagged-with-feed($node as node(), $model as map(*)) {
     post:getDivSyndicated ($item)
                       )}
  </article>
-
 };
 
 
