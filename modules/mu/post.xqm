@@ -40,7 +40,7 @@ function  post:getDivPublishDates($item) {
 
 (: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
-(:  POSSE ENTRY Links   :)
+(: ENTRY POSSE  Links   :)
 
 declare
 function  post:getDivSyndicated($item) {
@@ -61,6 +61,30 @@ function  post:getDivSyndicated($item) {
 };
 
 
+(: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
+
+(:  ENTRY authorship card
+    http://indiewebcamp.com/authorship
+<a rel="author" class="p-author h-card" href="">Your Name</a>
+
+:)
+
+declare
+function  post:getDivAuthorshipCard($item){
+let $authorName :=
+    if( empty($item/atom:author/atom:name/string())) then  (
+        $config:repo-descriptor/repo:author/text()
+    )
+    else(
+        $item/atom:author/atom:name/string()
+    )
+
+return
+<div class="h-card minicard authorcard">
+   <img class="u-photo" src="/resources/images/me.png" alt="{$authorName}" width="48" height="48"/>
+   <p>authored by <br/><a rel="author" class="p-author" href="/cards/me">{$authorName}</a></p>
+</div>
+};
 
 (: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
@@ -207,6 +231,8 @@ function post:main-feed($node as node(), $model as map(*)) {
     post:getDivPublishDates($item),
     post:getCategories($item),
     post:getDivSyndicated ($item)
+
+
                       )}
  </article>
   }
@@ -352,14 +378,18 @@ function post:permalink($node as node(), $model as map(*)) {
  <a class="u-url" href="{$permalink}">permalink</a>
 };
 
+
+declare
+function post:author($node as node(), $model as map(*)) {
+ post:getDivAuthorshipCard($model('doc-entry')/node())
+};
+
 (:http://microformats.org/wiki/rel-syndication:)
 
 declare
 function post:syndicated($node as node(), $model as map(*)) {
   post:getDivSyndicated($model('doc-entry')/node())
-
 };
-
 
 
 declare
@@ -374,7 +404,6 @@ function post:categories($node as node(), $model as map(*)) {
 
 declare
 function post:entry-content($node as node(), $model as map(*)) {
-(:                                                     :)
 let $content :=
  (<div class="e-content">
       {post:getFullContent($model('doc-entry')/node()) }
