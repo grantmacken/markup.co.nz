@@ -127,6 +127,7 @@ a 'data-item' is going to be a resource without an extension
          else( $data-item )
         )
         else if( $data-isMainFeed ) then  ( $site-title  || ' blog' )
+        else if( $data-isTag ) then  ( 'posts tagged with '  || $data-item )
         else( '[ page-title ]'  )
        )
        else(
