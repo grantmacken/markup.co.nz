@@ -10,6 +10,12 @@
     padding-top: 1em;
     padding-bottom: 1em;
     @include trailer(3);
+
+   footer{
+      	@include adjust-font-size-to(12px);
+	margin: 0 0 rhythm(2, 14px) 0
+      }
+
 }
 
 .p-name{

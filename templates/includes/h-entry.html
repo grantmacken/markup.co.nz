@@ -1,21 +1,20 @@
 <article role="main" class="h-entry">
-      <h1 class="p-name" data-template="post:name" >Microformats are amazing</h1>
+   <h1 class="p-name" data-template="post:name">Microformats are amazing</h1>
+   <p data-template="post:summary" class="p-summary">In which I extoll the virtues of using microformats.</p>
 
-  <p data-template="post:summary"  class="p-summary">In which I extoll the virtues of using microformats.</p>
+   <div data-template="post:entry-content" class="e-content">
+      <p>Blah blah blah</p>
+   </div>
 
-  <div data-template="post:content" class="e-content">
-    <p>Blah blah blah</p>
-  </div>
+   <footer role="contentinfo">
 
-<footer>
-<p>
-   Authored by <a data-template="post:author" class="p-author h-card" href="http://example.com">W. Developer</a>
-   and first published on <br/><time data-template="post:published"  class="dt-published" datetime="2013-06-13 12:00:00">13<sup>th</sup> June 2013</time>
-   <br/>
-<a data-template="post:permalink" class="u-url" href="…">…</a>ed <span  data-template="post:syndicated"> and also syndicated to <a data-template="post:syndicated" class="u-url" href="…">…</a></span>
-  </p>
+      <div data-template="post:author"  class="h-card minicard">
+         <img class="u-photo" src="/resources/images/me.png" alt="page-author" width="48" height="48"/>
+         <p>authored by <br/><a class="p-name u-url" href="/about/me" rel="author">page-author</a></p>
+      </div>
 
-
-</footer>
-
+      <div data-template="post:published" />
+      <div data-template="post:categories"/>
+      <div data-template="post:syndicated"/>
+   </footer>
 </article>

@@ -216,7 +216,7 @@ else:
         status_content += identifierString
         print status_content
 
-        if ( len(status_content) > 14 ):
+        if ( len(status_content) > 140 ):
             print 'number of characters: ' + str(len(status_content))
             print 'Oh No GREATER THAN the Twitter 140 Character limit!'
             sys.exit('ERROR!')

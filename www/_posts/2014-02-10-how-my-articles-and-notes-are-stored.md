@@ -4,7 +4,8 @@ author: Grant MacKenzie
 published: 2014-02-10T13:54:52
 id: tag:markup.co.nz,2014-02-10:article:2t13
 summary: Its time to look at how the site is fitting together
-categories: exist-db
+categories: existdb
+link-tweet-id: 432703062356938752
 ---
 
 Notes and Articles are a **type of** Post.
@@ -29,3 +30,5 @@ where the first identifier represent the kind of post, article or note etc
 So there we have it. This is the data we have to work with to create our UX HTML
 views. This data naturally is stored in the exist-db data archive collection
 ```/data/archive/``` in a date stamped collection hierarchy ```[year]/[month]```
+
+

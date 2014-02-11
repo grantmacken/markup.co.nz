@@ -18,24 +18,51 @@ declare namespace  xlink = "http://www.w3.org/1999/xlink";
 :
 :)
 
+(: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
+
+(:  ENTRY Publish and Updated Dates :)
 
 
 declare
-function post:getUpdated($item) {
- let $updated :=  xs:date( $item/atom:updated/string() )
- let $formated := format-date($updated , "[D1o]  [MNn] [Y]", "en", (), ())
+function  post:getDivPublishDates($item) {
+ let $updated :=  xs:date( $item/atom:updated/string())
+ let $updatedFormated := format-date($updated , "[D1o]  [MNn] [Y]", "en", (), ())
+ let $published :=  xs:dateTime( $item/atom:published/string() )
+ let $publishedFormated := format-date($published , "[D1o] of [MNn] [Y]", "en", (), ())
+ let $publishedTime := <time class="dt-published" datetime="{$published}">{$publishedFormated}</time>
+ let $updatedTime := <time class="dt-updated" datetime="{$updated}">{$updatedFormated}</time>
  return
- $formated
+   <div>
+    {post:getPermalink($item)}
+    first published on the { $publishedTime } and updated { $updatedTime }
+   </div>
 };
 
+(: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
+
+(:  POSSE ENTRY Links   :)
 
 declare
-function post:getPublished($item) {
-   let $published :=  xs:dateTime( $item/atom:published/string() )
-   let $published-formated := format-date($published , "[D1o] of [MNn] [Y]", "en", (), ())
-   return
-    $published-formated
+function  post:getDivSyndicated($item) {
+ let $twitterLink :=   $item/atom:link[starts-with(@href/string() , 'https://twitter.com' )]/@href/string()
+ return
+   if( empty($twitterLink)) then ()
+   else(<div>
+     <svg viewBox="0 0 32 32" class="im">
+     <use xlink:href="#link"></use>
+    </svg>
+        also posted on <a class="u-syndication" href="{$twitterLink}">
+   <svg viewBox="0 0 32 32" class="im">
+     <use xlink:href="#twitter-chicken"></use>
+    </svg>
+    twitter
+    </a>
+    </div>)
 };
+
+
+
+(: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
 declare
 function post:getTitle($item) {
@@ -46,7 +73,12 @@ switch (post:getPostType($item))
 
 declare
 function post:getPermalink($item) {
- <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a>
+    <a class="u-url"
+    href="{$item/atom:link[@rel="alternate"]/@href/string()}"
+    title="{$item/atom:title/string()}">
+    <svg viewBox="0 0 32 32" class="im">
+     <use xlink:href="#calendar"></use>
+    </svg>{post:getPostType($item)}</a>
 };
 
 declare
@@ -66,9 +98,7 @@ function post:getPostType($item) {
 
 (:
    Content displayed depends upon post-type
-
 note | article
-
 :)
 
 declare
@@ -82,7 +112,6 @@ function post:getSomeArticleBlockElements($item) {
                                  <span>... continue to read  {post:getPermalink($item)} </span> )
      else( $nodesWithText )
 };
-
 
 declare
 function post:getNote($text) {
@@ -99,15 +128,25 @@ function post:getNote($text) {
 };
 
 
-
 declare
-function post:getContent($item) {
+function post:getAbbevContent($item) {
 let $r := switch (post:getPostType($item))
    case "note" return  post:getNote($item/atom:content/text())
    default return
    ($item/atom:summary/string(),
    <hr/> ,
     post:getSomeArticleBlockElements($item )
+   )
+ return $r
+};
+
+
+declare
+function post:getFullContent($item) {
+let $r := switch (post:getPostType($item))
+   case "note" return  post:getNote($item/atom:content/text())
+   default return (
+    $item/atom:content/node()
    )
  return $r
 };
@@ -132,6 +171,22 @@ let $r := switch (post:getPostType($item))
 };
 
 
+declare
+function post:getCategories($item) {
+ if (empty($item/atom:category/@term/string())) then ()
+ else(
+   <div>
+    <svg viewBox="0 0 32 32" class="im">
+     <use xlink:href="#tag1"></use>
+    </svg> tagged
+      {
+       map(function($term) {
+       (' - ', <a class="p-category" href="/tag/{$term}" title="items tagged as {$term}">{$term}</a>)
+      }, $item/atom:category/@term/string())
+    }
+ </div>
+ )
+};
 
 
 declare
@@ -146,13 +201,41 @@ function post:main-feed($node as node(), $model as map(*)) {
    {post:getIcon($item)}
    {post:getTitle($item)}
    <div class="e-content">
-    {post:getContent($item)}
+    {post:getAbbevContent($item)}
    </div>
-   <p>{post:getPostType($item) } first published on the { post:getPublished( $item ) } and updated { post:getUpdated( $item )}</p>
+   {(
+    post:getDivPublishDates($item),
+    post:getCategories($item),
+    post:getDivSyndicated ($item)
+                      )}
  </article>
   }
 </section>
 };
+
+
+declare
+function post:tagged-with-feed($node as node(), $model as map(*)) {
+ for $item  at $i in collection($model('data-posts-path'))//atom:entry[atom:id[contains(.,':note:')] ]
+   where $item//atom:category[./@term = $model('data-item') ]
+   order by $item/atom:published descending
+   return
+   <article  class="h-entry h-as-{post:getPostType($item)}">
+   {post:getIcon($item)}
+   {post:getTitle($item)}
+   <div class="e-content">
+    {post:getAbbevContent($item)}
+   </div>
+   {(
+    post:getDivPublishDates($item),
+    post:getCategories($item),
+    post:getDivSyndicated ($item)
+                      )}
+ </article>
+
+};
+
+
 
 
 declare
@@ -171,9 +254,6 @@ function post:articles-feed($node as node(), $model as map(*)) {
    return
     $published-formated
   }
-
-
-
 
  let $getAuthor :=  function(){
    $model('page-author')
@@ -249,7 +329,10 @@ else (<h1 class="p-name">{$model('page-title')}</h1>)
 
 declare
 function post:author($node as node(), $model as map(*)) {
-<a class="p-author h-card"  href="http://{$model("site-domain")}" >{$model("page-author")}</a>
+<div class="h-card minicard">
+   <img class="u-photo" src="/resources/images/me.png" alt="{$model("page-author")}" width="48" height="48"/>
+   <p>authored by <br/><a class="p-name u-url" href="/about/me" rel="author">{$model("page-author")}</a></p>
+</div>
 };
 
 
@@ -258,12 +341,6 @@ function post:summary($node as node(), $model as map(*)) {
 <p class="p-summary">{$model("page-summary")}</p>
 };
 
-declare
-function post:published($node as node(), $model as map(*)) {
- let $formatedDateTime := format-dateTime(xs:dateTime($model("page-published")), " [FNn], [D1o] [MNn] [Y]", "en", (), ())
-return
-<time class="dt-published" datetime="{$model("page-published")}">{$formatedDateTime}</time>
-};
 
 declare
 function post:permalink($node as node(), $model as map(*)) {
@@ -272,74 +349,68 @@ function post:permalink($node as node(), $model as map(*)) {
  <a class="u-url" href="{$permalink}">permalink</a>
 };
 
-
 (:http://microformats.org/wiki/rel-syndication:)
 
 declare
 function post:syndicated($node as node(), $model as map(*)) {
-   if( empty($model('link-syndicated-tweet'))) then ()
-   else(<span>  page may also be viewed on <a class="u-syndication" href="{$model('link-syndicated-tweet')}">twitter</a>  </span>)
+  post:getDivSyndicated($model('doc-entry')/node())
+
 };
 
 
+
 declare
-function post:content($node as node(), $model as map(*)) {
+function post:published($node as node(), $model as map(*)) {
+post:getDivPublishDates($model('doc-entry')/node())
+};
+
+declare
+function post:categories($node as node(), $model as map(*)) {
+ post:getCategories($model('doc-entry')/node())
+};
+
+declare
+function post:entry-content($node as node(), $model as map(*)) {
 (:                                                     :)
-
-
 let $content :=
- if($model('page-content-isNote')) then (
-   let $input := note:trim($model('page-content')/text())
-   let $inLines := note:seqLines($input)
-   let $outNodes := map(function($line) {
-     let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/>' || '</div>'
-     let $l := util:parse($replaced )
-     return
-     ( $l/*/node())
-    }, $inLines)
-  return
-    <div class="e-content">
-        {$outNodes}
-   </div>
- )
- else (
- <div class="e-content">
-      { $model('page-content')/*/node() }
+ (<div class="e-content">
+      {post:getFullContent($model('doc-entry')/node()) }
  </div>)
-
    return
 templates:process( $content, $model )
 };
 
-
-declare
-function post:entry($node as node(), $model as map(*)) {
-let $content :=
- <article role="main" class="h-entry">
-   <div class="e-content">
-     { $model('page-content')/*/node() }
-   </div>
-
-<hr/>
-<p data-template="page:authored-by"/>
-<p data-template="page:permalink-url"/>
-<hr/>
- </article>
-return
-templates:process( $content, $model )
-};
-
-
-declare
-function post:head-title($node as node(), $model as map(*)) {
-<title>{ $model('page-title') }</title>
-};
-
-declare
-function post:article($node as node(), $model as map(*)) {
-let $content :=
-    if( $model('page-isHome') ) then ( <article id="home-page-article" role="main">{ $model('page-content')/*/node() }</article> )
-    else ( <article role="main">{ $model('page-content')/*/node() }</article> )
-return
-templates:process( $content, $model )
-};
+(::)
+(:declare:)
+(:function post:entry($node as node(), $model as map(*)) {:)
+(:let $content :=:)
+(: <article role="main" class="h-entry">:)
+(::)
+(:   <div class="e-content"> xx:)
+(:    {post:getAbbevContent($item)}:)
+(:   </div>:)
+(::)
+(::)
+(:<hr/>:)
+(:<p data-template="page:authored-by"/>:)
+(:<p data-template="page:permalink-url"/>:)
+(:<hr/>:)
+(: </article>:)
+(:return:)
+(:templates:process( $content, $model ):)
+(:};:)
+(::)
+(::)
+(:declare:)
+(:function post:head-title($node as node(), $model as map(*)) {:)
+(:<title>{ $model('page-title') }</title>:)
+(:};:)
+(::)
+(:declare:)
+(:function post:article($node as node(), $model as map(*)) {:)
+(:let $content :=:)
+(:    if( $model('page-isHome') ) then ( <article id="home-page-article" role="main">{ $model('page-content')/*/node() }</article> ):)
+(:    else ( <article role="main">{ $model('page-content')/*/node() }</article> ):)
+(:return:)
+(:templates:process( $content, $model ):)
+(:};:)

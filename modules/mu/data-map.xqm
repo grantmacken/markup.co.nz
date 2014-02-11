@@ -228,6 +228,7 @@ a 'data-item' is going to be a resource without an extension
 
  return
        map {
+       'doc-entry' := $docEntry,
        'session-login' := $session-login,
        'session-current-user' := $session-current-user,
        'session-has-login-attr' := $session-has-login-attr,

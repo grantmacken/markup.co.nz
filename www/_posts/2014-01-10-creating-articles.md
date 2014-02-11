@@ -31,16 +31,15 @@ The 'front matter' contains the following ``key: values``
 
 The 'front matter' for this page looks like this.
 
-```
----
-title: Creating Articles
-author: Grant MacKenzie
-published: 2014-01-10T11:06:55
-id: tag:markup.co.nz,2014-01-10:article:creating-articles
-summary: Creating article posts in our Komodo workspace
-categories: indieweb
----
-```
+    ---
+    title: Creating Articles
+    author: Grant MacKenzie
+    published: 2014-01-10T11:06:55
+    id: tag:markup.co.nz,2014-01-10:article:creating-articles
+    summary: Creating article posts in our Komodo workspace
+    categories: indieweb
+    ---
+
 
 After creating some *markdown content* , saving the md 'article' will generate an an *atom
 entry* and [post](http://indiewebcamp.com/posts) it our exist-dbs` domain data archive

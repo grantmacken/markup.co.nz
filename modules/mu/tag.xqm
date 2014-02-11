@@ -11,6 +11,9 @@ declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
 declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
 (:~
+
+TODO NOTE THIS IS REDUNDANT DELETE
+
 : Page
 :
 : @author Grant MacKenzie

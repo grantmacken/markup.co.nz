@@ -11,12 +11,23 @@ p, div {
 }
 
 
+
+/* Twitter Image Sizing
+128
+73
+48
+24
+*/
+
+
+
 //icons
 // file:///home/grant/Downloads/iconmelon-cc1e3f2fd0bf9151bdfbb4b708ffbb6e/index.html
 //https://gist.github.com/sol0mka/7397561
+//http://tympanus.net/codrops/2013/11/27/svg-icons-ftw/
 
 .iconmelon,
-.im {
+{
    position: relative;
    width: 32px;
    height: 32px;
@@ -25,9 +36,17 @@ p, div {
    margin-bottom: 1em;
    display: block;
    fill: $quadrary;
-   stroke: #ccc;
    float: left;
 }
+
+.im {
+   width: 1em;
+   height: 1em;
+   fill: $quadrary;
+   display: inline-block;
+   margin-right: .5em;
+}
+
 
 .iconmelon:after,
 .im:after {
