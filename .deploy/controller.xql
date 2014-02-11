@@ -66,7 +66,7 @@ else(tokenize($exist:path, '/')[2])
 
 let $colURL :=
   if( matches( $exist:path , '^/archive/index.html$')) then (
-      $exist:controller ||  $template-posts ||  'feed' || '.html'
+      $exist:controller ||  $template-posts ||  'archive' || '.html'
       )
   else if( contains( $exist:path , 'archive/' )) then (
      $exist:controller ||  $template-posts ||  'entry' || '.html'

@@ -213,6 +213,13 @@ function post:getCategories($item) {
 };
 
 
+
+
+
+(: ~~~~~     FEEDs      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
+
+(: main-feed  Main feed how on home page :)
+
 declare
 function post:main-feed($node as node(), $model as map(*)) {
 <section id="main" role="main">
@@ -231,18 +238,18 @@ function post:main-feed($node as node(), $model as map(*)) {
     post:getDivPublishDates($item),
     post:getCategories($item),
     post:getDivSyndicated ($item)
-
-
                       )}
  </article>
   }
 </section>
 };
 
+(: ~~~  TAGS  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
-(:
-
-
+(:~
+ : tagged-with-feed
+ : uri Template /tag/{tagName}  where  {tagName} == $model('data-item')
+ : generate a list of article that have been tagged with name
 :)
 
 declare
@@ -265,90 +272,117 @@ function post:tagged-with-feed($node as node(), $model as map(*)) {
 };
 
 
-
-
-declare
-function post:articles-feed($node as node(), $model as map(*)) {
-
- let $getPageUpdated :=  function($item){
-   let $updated :=  xs:date( $item/atom:updated/string() )
-   let $formated := format-date($updated , "[D1o]  [MNn] [Y]", "en", (), ())
-   return
-    $formated
-  }
-
-  let $getPagePublished :=  function($item){
-   let $published :=  xs:dateTime( $item/atom:published/string() )
-   let $published-formated := format-date($published , "[D1o] of [MNn] [Y]", "en", (), ())
-   return
-    $published-formated
-  }
-
- let $getAuthor :=  function(){
-   $model('page-author')
-  }
-
- let $getPermalink :=  function($item){
-  $item/atom:link[@rel='alternate']/@href/string()
-  }
-
- let $getTitle :=  function($item){
-   $item/atom:title/string()
-  }
-
-return
-<section id="main" role="main">
-<h1>Last 20 articles</h1>
-{
- for $item  at $i in collection($model('data-posts-path'))//atom:entry[atom:id[contains(.,':article:')] ]
-   where $i lt 20
-   order by $item/atom:published descending
-   return
-   <article  class="h-entry">
-   <h2 class="p-name">{$item/atom:title/string()}</h2>
-   <div class="e-content">
-     {$item/atom:content/*/node()}
-   </div>
-   <p>First published on the {$getPagePublished($item)} and updated {$getPageUpdated($item)}</p>
-   <p>Archived at permalink: <a class="u-url" href="{$item/atom:link[@rel="alternate"]/@href/string()}">{$item/atom:title/string()}</a></p>
- </article>
-  }
-</section>
-};
-
-
+(: ~~~  CARDS  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
 (:
+  uri Template /card/{cardName} where  {cardName} == $model('data-item')
+  template 'card.html'
+
+http://microformats.org/wiki/h-card
+
+Properties
+h-card properties, inside an element with class h-card:
+    p-name - The full/formatted name of the person or organisation
+    p-honorific-prefix - e.g. Mrs., Mr. or Dr.
+    p-given-name - given (often first) name
+    p-additional-name - other/middle name
+    p-family-name - family (often last) name
+    p-sort-string - string to sort by
+    p-honorific-suffix - e.g. Ph.D, Esq.
+    p-nickname - nickname/alias/handle
+    u-email - email address
+    u-logo
+    u-photo
+    u-url - home page
+    u-uid - unique identifier
+    p-category - category/tag
+    p-adr - postal address, optionally embed an h-adr
+    Main article: h-adr
+    p-post-office-box
+    p-extended-address
+    p-street-address - street number + name
+    p-locality - city/town/village
+    p-region - state/county/province
+    p-postal-code - postal code, e.g. US ZIP
+    p-country-name - country name
+    p-label
+    p-geo or u-geo, optionally embed an h-geo
+    p-latitude - decimal latitude
+    p-longitude - decimal longitude
+    p-altitude - decimal altitude
+    p-tel - telephone number
+    p-note - additional notes
+    dt-bday - birth date
+    u-key - cryptographic public key e.g. SSH or GPG
+    p-org - affiliated organization, optionally embed an h-card
+    p-job-title - job title, previously 'title' in hCard, disambiguated.
+    p-role - description of role
+    u-impp per RFC 4770, new in vCard4 (RFC6350)
+    p-sex - biological sex, new in vCard4 (RFC6350)
+    p-gender-identity - gender identity, new in vCard4 (RFC6350)
+    dt-anniversary
+
+  function calls below
+
+  h-card on home-page rel me
+
+:)
+
+(: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
+
+declare
+function post:card($node as node(), $model as map(*)) {
+ if( $model('data-item')  eq  'me') then(
+    (: representative  h-card on home-page 'rel me'
+    doc($model('path-includes') || '/' || 'h-card.html')/node()
+     :)
+
+    doc('http://markup.co.nz')//xhtml:footer/*[@class='h-card']
+ )
+ else()
+};
+
+(: ~~~ POST ENTRY ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
+
+(:
+  Every Post Entry
+  uri Template /archive/{year}/{month}/{name}
+  template 'entry.html'
+
  http://microformats.org/wiki/h-entry
 
 
-h-entry properties, inside an element with class h-entry:
-
-    p-name - entry name/title
-    p-summary - short entry summary
-    e-content - full content of the entry
-    dt-published - when the entry was published
-    dt-updated - when the entry was updated
-    p-author - who wrote the entry, optionally embedded h-card(s)
-    p-category - entry categories/tags
-    u-url - entry permalink URL
-    u-uid - unique entry ID
-    p-location - location the entry was posted from, optionally embed h-card, h-adr, or h-geo
-
+ h-entry properties, inside an element with class h-entry:
+     p-name - entry name/title
+     p-summary - short entry summary
+     e-content - full content of the entry
+     dt-published - when the entry was published
+     dt-updated - when the entry was updated
+     p-author - who wrote the entry, optionally embedded h-card(s)
+     p-category - entry categories/tags
+     u-url - entry permalink URL
+     u-uid - unique entry ID
+     p-location - location the entry was posted from, optionally embed h-card, h-adr, or h-geo
 
 
-<article class="h-entry">
-  <h1 class="p-name">Microformats are amazing</h1>
-  <p>Published by <a class="p-author h-card">W. Developer</a>
-     on <time class="dt-published" datetime="2013-06-13 12:00:00">13<sup>th</sup> June 2013</time>
-  </p>
-  <p class="p-summary">In which I extoll the virtues of using microformats.</p>
-  <div class="e-content">
-    <p>Blah blah blah</p>
-  </div>
-</article>
+ example
+  <article class="h-entry">
+    <h1 class="p-name">Microformats are amazing</h1>
+    <p>Published by <a class="p-author h-card">W. Developer</a>
+       on <time class="dt-published" datetime="2013-06-13 12:00:00">13<sup>th</sup> June 2013</time>
+    </p>
+    <p class="p-summary">In which I extoll the virtues of using microformats.</p>
+    <div class="e-content">
+      <p>Blah blah blah</p>
+    </div>
+  </article>
 
+
+
+  function calls below
 :)
+
+(: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
 declare
 function post:name($node as node(), $model as map(*)) {
@@ -412,37 +446,8 @@ let $content :=
 templates:process( $content, $model )
 };
 
-(::)
-(:declare:)
-(:function post:entry($node as node(), $model as map(*)) {:)
-(:let $content :=:)
-(: <article role="main" class="h-entry">:)
-(::)
-(:   <div class="e-content"> xx:)
-(:    {post:getAbbevContent($item)}:)
-(:   </div>:)
-(::)
-(::)
-(:<hr/>:)
-(:<p data-template="page:authored-by"/>:)
-(:<p data-template="page:permalink-url"/>:)
-(:<hr/>:)
-(: </article>:)
-(:return:)
-(:templates:process( $content, $model ):)
-(:};:)
-(::)
-(::)
-(:declare:)
-(:function post:head-title($node as node(), $model as map(*)) {:)
-(:<title>{ $model('page-title') }</title>:)
-(:};:)
-(::)
-(:declare:)
-(:function post:article($node as node(), $model as map(*)) {:)
-(:let $content :=:)
-(:    if( $model('page-isHome') ) then ( <article id="home-page-article" role="main">{ $model('page-content')/*/node() }</article> ):)
-(:    else ( <article role="main">{ $model('page-content')/*/node() }</article> ):)
-(:return:)
-(:templates:process( $content, $model ):)
-(:};:)
+
+(:
+
+
+:)
