@@ -30,5 +30,3 @@ where the first identifier represent the kind of post, article or note etc
 So there we have it. This is the data we have to work with to create our UX HTML
 views. This data naturally is stored in the exist-db data archive collection
 ```/data/archive/``` in a date stamped collection hierarchy ```[year]/[month]```
-
-
