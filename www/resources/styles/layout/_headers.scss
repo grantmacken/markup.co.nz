@@ -32,7 +32,8 @@ header[role="banner"]{
    //min-height: 180px;
     //@include layout-block;
       h1{
-       // if this is a good pattern create as a reusable mixin
+      @include adjust-font-size-to(32px);
+      margin: rhythm(1, 32px) auto rhythm(1, 32px) 1em;
       color: tint($secondary, 70%);
       /*@include omg-text($title-text-shadow, 135, 5, flat);*/
       /*@include omg-text($title-text-shadow, 135, 5, shaded, 5);*/

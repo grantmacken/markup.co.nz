@@ -1,17 +1,27 @@
 //code-block
 
 
-
-h1 {
-   @include adjust-font-size-to(32px);
-   margin-top : rhythm(2, 32px);// 2 lines below, based on font size
-   margin-left : 1em ;
-   font-weight: $header-font-weight ;
+h1 , h2, h3, h4, h5, h6 {
+   font-weight: $header-font-weight;
 }
 
-h2, h3, h4, h5, h6 {
-	@include adjust-font-size-to(25px);
-	margin: rhythm(4, 25px) 0 rhythm(2, 25px) 0;
+
+h1 {
+   @include adjust-font-size-to(24px);
+   margin: rhythm(1, 24px) 1em rhythm(1, 24px) -1em;
+}
+
+
+
+h2 {
+   @include adjust-font-size-to(20px);
+   margin: rhythm(1, 20px) 1em rhythm(1, 20px) 1em;
+}
+
+
+h3, h4, h5, h6 {
+	@include adjust-font-size-to(18px);
+	margin: rhythm(4, 18px) 0 rhythm(2, 18px) 0;
 	// 4 lines above / 2 lines below, based on font size
 	font-weight: $header-font-weight;
 }

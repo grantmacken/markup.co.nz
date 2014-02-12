@@ -39,38 +39,32 @@ notes vs images but clumped together in one listing. ( TODO )
 Archives
 --------
 
-Short Posts Listing
+**Role:** To help user (includes me) find Post Notes Article
+
+### Types of Listings
+
+The archive page will be consisting of shortened *'post listings'* organised by
+
+* date Yearly/monthly Archives
+* categories ( organised tags )
+* highlights (liked/favourited )
+
+### Listings contain
+
+* Title the article
+* Short Summaary
+* Publication date
+* Call out to action (read more)
 
 
-Yearly/monthly Archives
-
-Categories Highlights
+### Search
 
 
-Search
+Yet to do
 
+TODO
 
+Ref:
 
-
-http://www.sitepoint.com/beautiful-web-site-archives/
-http://www.mintblogger.com/2009/02/how-to-create-high-performing-blog.html
-
-
-
-Notes List
------------
-
-
-
-Articles List
--------------
-
-    Title the article
-    Short description
-    Publication date
-    Call out to action (read more, continue reading, see more, etc.)
-
-
-http://ui-patterns.com/blog/Design-considerations-for-article-lists
-http://www.webdesigndev.com/web-development/layout-examples-of-how-blogs-list-their-posts
-http://uxdesign.smashingmagazine.com/2013/05/03/infinite-scrolling-get-bottom/
+<http://www.sitepoint.com/beautiful-web-site-archives/> <br/>
+<http://www.mintblogger.com/2009/02/how-to-create-high-performing-blog.html>
