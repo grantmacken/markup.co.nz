@@ -424,8 +424,8 @@ declare function local:mkcol($collection, $path) {
     local:mkcol-recursive($collection, tokenize($path, "/"))
 };
 
-(: store the collection configuration
-local:mkcol("/db/system/config", $target),:)
+(: store the collection configuration:)
+local:mkcol("/db/system/config", $target),
 local:mkcol(concat("/system/config", $target), "data")
 </echo>
 
