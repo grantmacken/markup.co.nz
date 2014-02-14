@@ -368,7 +368,7 @@ project.description: ${project.description}
         <copyright>true</copyright>
         <type>application</type>
         <target>${project.domain}</target>
-        <prepare />
+        <prepare>pre-install.xql</prepare>
         <finish />
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
@@ -384,6 +384,7 @@ project.description: ${project.description}
 </collection>
 </echoxml>
 
+
 <echoxml file="${dir.deploy}/data.xconf" append="false" namespacepolicy="elementsOnly">
 <collection xmlns="http://exist-db.org/collection-config/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <triggers>
@@ -391,6 +392,42 @@ project.description: ${project.description}
     </triggers>
 </collection>
 </echoxml>
+
+
+<echo file="${dir.deploy}/pre-install.xql">
+xquery version "1.0";
+
+import module namespace xdb="http://exist-db.org/xquery/xmldb";
+
+(: The following external variables are set by the repo:deploy function :)
+
+(: file path pointing to the exist installation directory :)
+declare variable $home external;
+(: path to the directory containing the unpacked .xar package :)
+declare variable $dir external;
+(: the target collection into which the app is deployed :)
+declare variable $target external;
+
+declare function local:mkcol-recursive($collection, $components) {
+    if (exists($components)) then
+        let $newColl := concat($collection, "/", $components[1])
+        return (
+            xdb:create-collection($collection, $components[1]),
+            local:mkcol-recursive($newColl, subsequence($components, 2))
+        )
+    else
+        ()
+};
+
+(: Helper function to recursively create a collection hierarchy. :)
+declare function local:mkcol($collection, $path) {
+    local:mkcol-recursive($collection, tokenize($path, "/"))
+};
+
+(: store the collection configuration
+local:mkcol("/db/system/config", $target),:)
+local:mkcol(concat("/system/config", $target), "data")
+</echo>
 
 </target>
 
