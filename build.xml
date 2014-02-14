@@ -426,7 +426,7 @@ declare function local:mkcol($collection, $path) {
 
 (: store the collection configuration:)
 local:mkcol("/db/system/config", $target),
-local:mkcol(concat("/system/config", $target), "data")
+local:mkcol(concat("/system/config", $target), "data/archive")
 </echo>
 
 </target>
