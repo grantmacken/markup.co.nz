@@ -11,3 +11,6 @@ build.properties
 .bin/mytweets.py
 sem.version
 Gemfile.lock
+.deploy/archive.xconf
+.deploy/data.xconf
+.deploy/repo.xml
