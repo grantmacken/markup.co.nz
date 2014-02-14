@@ -374,6 +374,7 @@ project.description: ${project.description}
     </meta>
 </echoxml>
 
+
 <echoxml file="${dir.deploy}/archive.xconf" append="false" namespacepolicy="elementsOnly">
 <collection xmlns="http://exist-db.org/collection-config/1.0">
     <triggers>
@@ -426,7 +427,9 @@ declare function local:mkcol($collection, $path) {
 
 (: store the collection configuration:)
 local:mkcol("/db/system/config", $target),
-local:mkcol(concat("/system/config", $target), "data/archive")
+local:mkcol(concat("/system/config", $target), "data/archive"),
+xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
+xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf"),
 </echo>
 
 </target>
