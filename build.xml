@@ -429,7 +429,7 @@ declare function local:mkcol($collection, $path) {
 local:mkcol("/db/system/config", $target),
 local:mkcol(concat("/system/config", $target), "data/archive"),
 xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
-xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf"),
+xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf")
 </echo>
 
 </target>
