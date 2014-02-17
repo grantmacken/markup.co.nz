@@ -251,19 +251,6 @@ project.description: ${project.description}
         password="${exist.password}"
     />
 
-
-<!--
-<property name="exist.remote.uri">xmldb:exist://${host.remote}:8080/exist/xmlrpc/db/apps/${project.domain}/data/${bash.out.collection}</property>
-  <echo>EXIST.REOMOTE.URI:  ${exist.remote.uri} </echo>
-  <xdb:store
-        uri="${exist.remote.uri}"
-        createcollection="true"
-        srcfile="${outfile}"
-        user="${exist.username}"
-        password="${exist.password}"
-/>
-  -->
-
 </target>
 
 <target name="remote-store-post" unless="has.md2Failed"  if="is.mdPost">
@@ -353,7 +340,7 @@ project.description: ${project.description}
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
 
-   <echoxml file="${${dir.deploy.data}}/hosts.xml" append="false" namespacepolicy="elementsOnly">
+   <echoxml file="${dir.deploy.data}/hosts.xml" append="false" namespacepolicy="elementsOnly">
         <hosts>
             <local>${host.local}</local>
             <remote>${host.remote}</remote>
@@ -375,8 +362,6 @@ project.description: ${project.description}
 
 <target name="local-deployment-folder">
 <echo>The repo: update repo just in case changes made to properties file</echo>
-
-
 
 <echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
     <meta xmlns="http://exist-db.org/xquery/repo">
