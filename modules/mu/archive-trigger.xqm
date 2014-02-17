@@ -10,11 +10,48 @@ import module namespace util = "http://exist-db.org/xquery/util";
 import module namespace xmldb = "http://exist-db.org/xquery/xmldb";
 import module namespace http = "http://expath.org/ns/http-client";
 
-(:http://localhost:8080/exist/apps/doc/triggers.xml:)
-
+(:
+  http://localhost:8080/exist/apps/doc/triggers.xml
+  https://www.ibm.com/developerworks/library/x-expath/
+:)
 
 declare function trigger:update-remote( $uri as xs:anyURI ) {
-util:eval-async(xs:anyURI('local-to-remote.xq'))
+let $priority := 'info'
+let $message1 := 'mu:update ' || $uri
+let $base := substring-before($uri , '/archive/')
+let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
+let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
+let $username := $permissions/@user/string()
+let $password := $permissions/@password/string()
+let $priority := 'info'
+let $local := 'http://localhost:8080'
+let $rest := '/exist/rest'
+let $urlLocal := $local || $rest || $base || '/uri.xml'
+let $message1 := 'mu:update ' || $urlLocal
+let $reqPut :=
+    <http:request href="{ $urlLocal }"
+                  method="put"
+                  username="{ $username }"
+                  password="{ $password }"
+                  auth-method="basic"
+                  send-authorization="true"
+                  status-only="true"
+                  timeout="2">
+       <http:header name = "Connection" value = "close"/>
+       <http:body media-type="application/xml"/>
+    </http:request>
+
+let $link := <link href="{$uri}" />
+let $put := http:send-request( $reqPut , (), $link)
+let $message := concat($put/@status/string(), ': ' ,$put/@message/string())
+let $log := (util:log($priority,$link), util:log($priority, $message))
+let $eval := util:eval-async(xs:anyURI('local-to-remote.xq'))
+
+(:
+works util:eval(xs:anyURI('xmldb:exist:///db/apps/markup.co.nz/modules/mu/local-to-remote.xq'))
+:)
+
+return ()
 };
 
 

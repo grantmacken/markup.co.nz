@@ -1,6 +1,5 @@
 xquery version "3.0";
 
-
 declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
 declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
@@ -9,21 +8,21 @@ import module namespace system = "http://exist-db.org/xquery/system";
 import module namespace util = "http://exist-db.org/xquery/util";
 import module namespace xmldb = "http://exist-db.org/xquery/xmldb";
 import module namespace http = "http://expath.org/ns/http-client";
+import module namespace request="http://exist-db.org/xquery/request";
+import module namespace session = "http://exist-db.org/xquery/session";
 
-(:http://localhost:8080/exist/apps/doc/triggers.xml:)
-
-let $uri := '/db/apps/markup.co.nz/data/archive/2014/02/15/082225.xml'
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
 let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
 let  $username := $permissions/@user/string()
 let  $password := $permissions/@password/string()
-let  $priority := 'info'
+
+let $uri := doc(concat($app-root, "/data/uri.xml"))//@href/string()
 let  $local := 'http://localhost:8080'
 let  $remote := 'http://120.138.18.126:8080'
 let  $rest := '/exist/rest'
 let  $urlLocal := $local || $rest || $uri
 let  $urlRemote := $remote || $rest || $uri
-let  $message := 'mu:update ' || $urlLocal
+
 let $reqGet := <http:request href="{ $urlLocal }"
 method="get"
 username="{ $username }"
@@ -63,8 +62,10 @@ timeout="4"
 value = "close"/>
 </http:request>
 
-(:TEST  $username, $password, $urlLocal, http:send-request($reqGet) ,  http:send-request($reqGetRemote) :)
+(:TEST  $username, $password, $urlLocal,  http:send-request($reqGetRemote) :)
 
 let $inDoc := http:send-request($reqGet)[2]
+let $outDoc := http:send-request( $reqPut , (), $inDoc)
 
-return http:send-request( $reqPut , (), $inDoc)
+
+return (http:send-request($reqGetRemote))
