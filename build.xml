@@ -352,19 +352,22 @@ project.description: ${project.description}
     <antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
+
+   <echoxml file="${${dir.deploy.data}}/hosts.xml" append="false" namespacepolicy="elementsOnly">
+        <hosts>
+            <local>${host.local}</local>
+            <remote>${host.remote}</remote>
+        </hosts>
+    </echoxml>
 </target>
 
 <target name="eXist-data-remote">
     <echo>Everything gets driven remotely</echo>
-
-
-
-
-
     <antcall target="proccess-md" />
     <antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
+
 </target>
 
 
@@ -373,12 +376,7 @@ project.description: ${project.description}
 <target name="local-deployment-folder">
 <echo>The repo: update repo just in case changes made to properties file</echo>
 
-<echoxml file="${dir.deploy.data}/host.xml" append="false" namespacepolicy="elementsOnly">
-    <hosts>
-        <local>${host.local}</local>
-        <remote>${host.remote}</remote>
-    </hosts>
-</echoxml>
+
 
 <echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
     <meta xmlns="http://exist-db.org/xquery/repo">
