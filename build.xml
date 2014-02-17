@@ -5,7 +5,6 @@
     xmlns:xdb="http://exist-db.org/ant">
 
     <property file="build.properties" />
-
     <property environment="env"/>
     <property name="project.base" value="${basedir}"/>
     <property name="dir.build" value=".build"/>
@@ -20,7 +19,6 @@
     <property name="dir.categories" value="${dir.deploy.data}/categories"/>
     <property name="dir.pages" value="${dir.deploy.data}/pages"/>
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
-
 
     <property name="browser" value="firefox"/>
     <!-- import eXist-db tasks -->
@@ -44,7 +42,6 @@ repo:undeploy("http://${project.domain}"),
 repo:remove("http://${project.domain}")
 </property>
 
-
 <target name="info">
     <echo>info</echo>
 <echo>
@@ -60,7 +57,6 @@ JAVA
 java.version ${java.version}
 java.home: ${java.home}
 
-
 PROJECT
 project.domain: ${project.domain}
 project.abbrev: ${project.abbrev}
@@ -69,15 +65,11 @@ project.description: ${project.description}
 
 </target>
 
-
 <target name="browse">
     <exec executable="${browser}" spawn="true">
         <arg value="${project.url.browse}" />
     </exec>
 </target>
-
-
-
 
 <target name="store-xqm">
 <echo>${relativePath}</echo>
@@ -94,6 +86,24 @@ project.description: ${project.description}
     permissions="rwxrwxr-x"
 />
 </target>
+
+<target name="store-xq">
+<echo>${relativePath}</echo>
+<echo>${fileName}</echo>
+<property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/${relativePath}</property>
+<property name="srcfile">${relativePath}/${fileName}.xq</property>
+<echo>${exist.uri}</echo>
+<xdb:store
+    uri="${exist.uri}"
+    createcollection="true"
+    srcfile="${srcfile}"
+    user="${exist.username}"
+    password="${exist.password}"
+    permissions="rwxrwxr-x"
+/>
+</target>
+
+
 
 <target name="store-html">
 <echo>${relativePath}</echo>
@@ -356,7 +366,9 @@ project.description: ${project.description}
 </target>
 
 
-<target name="deployment-folder">
+
+
+<target name="local-deployment-folder">
 <echo>The repo: update repo just in case changes made to properties file</echo>
 <echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
     <meta xmlns="http://exist-db.org/xquery/repo">
@@ -431,6 +443,27 @@ local:mkcol(concat("/system/config", $target), "data/archive"),
 xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
 xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf")
 </echo>
+
+</target>
+
+
+<target name="remote-deployment-folder">
+<echo>The repo: update repo just in case changes made to properties file</echo>
+<echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
+    <meta xmlns="http://exist-db.org/xquery/repo">
+        <description>${project.description}</description>
+        <author>${project.author}</author>
+        <website>http://${project.domain}</website>
+        <status>alpha</status>
+        <license>GNU-LGPL</license>
+        <copyright>true</copyright>
+        <type>application</type>
+        <target>${project.domain}</target>
+        <prepare>pre-install.xql</prepare>
+        <finish />
+        <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
+    </meta>
+</echoxml>
 
 </target>
 
@@ -515,9 +548,9 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
-<antcall target="xar-undeploy-remove" />
- <antcall target="deployment-folder" />
- <antcall target="eXist-data" />
+    <antcall target="xar-undeploy-remove" />
+    <antcall target="local-deployment-folder" />
+    <antcall target="eXist-data" />
 
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
@@ -615,7 +648,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
    <antcall target="xar-undeploy-remove" />
 
-    <antcall target="deployment-folder" />
+    <antcall target="remote-deployment-folder" />
+
     <antcall target="eXist-data-remote" />
 
     <antcall target="build-xar" />

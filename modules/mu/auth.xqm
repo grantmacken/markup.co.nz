@@ -150,8 +150,6 @@ let $sessionID  :=  session:get-id()
 
 
 let $collection-uri := string('/db/apps/markup.co.nz')
-(: let $user-id  :=  string('grant') :)
-(: let $password  :=  string('ntere37') :)
 
 let $user-id  :=  $domain
 let $password  :=  $hash
