@@ -14,3 +14,4 @@ Gemfile.lock
 .deploy/archive.xconf
 .deploy/data.xconf
 .deploy/repo.xml
+.deploy/pre-install.xql

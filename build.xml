@@ -145,7 +145,6 @@ project.description: ${project.description}
 
 
 <target name="setHomeConditions">
-
   <fail>
      <condition>
        <not>
@@ -153,8 +152,6 @@ project.description: ${project.description}
        </not>
      </condition>
    </fail>
-
-
 
   <condition property="is.home">
     <equals arg1="${relativePath}" arg2="www" />
