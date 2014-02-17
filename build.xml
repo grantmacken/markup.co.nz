@@ -340,7 +340,9 @@ project.description: ${project.description}
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
 
-   <echoxml file="${dir.deploy.data}/hosts.xml" append="false" namespacepolicy="elementsOnly">
+<!--     namespacepolicy="elementsOnly"> -->
+
+   <echoxml file="${dir.deploy.data}/hosts.xml" append="false">
         <hosts>
             <local>${host.local}</local>
             <remote>${host.remote}</remote>
