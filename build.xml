@@ -309,6 +309,11 @@ project.description: ${project.description}
 <target name="proccess-templatesAndModules">
     <echo>delete ${dir.deploy.templates}</echo>
     <delete dir="${dir.deploy.templates}" />
+
+  <!--  <echo>overwrite templates that contain HARD-CODED data</echo>-->
+
+
+
     <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
     <copy todir="${dir.deploy.templates}">
         <fileset dir="templates" />

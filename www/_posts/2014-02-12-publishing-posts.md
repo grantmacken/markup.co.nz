@@ -3,7 +3,7 @@ title: publishing posts
 author: Grant MacKenzie
 published: 2014-02-12T10:53:32
 id: tag:markup.co.nz,2014-02-12:article:2t31
-summary: After a false start I finally get the 'localhost to remotehost' to work without blocking.
+summary: Publishing updates to remotehost now works without blocking our editing enviroment
 categories: existdb nonblocking komodo async
 ---
 
@@ -12,8 +12,8 @@ From localhost to remote
 
 When I save a Markdown file from Komodo, the files data get stored as an atom
 entry in the localhost existdb server. What I wanted to do is from our localhost
-server, call a function to 'upload' the created or updated document to the remote
-server.
+server, call a function to 'upload' the created or updated document to the
+remote server.
 
 Existdb has event triggers. I set up an event trigger for the archive collection
 that will call ```archive-trigger.xqm```.  which will call my update function

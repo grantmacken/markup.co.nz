@@ -603,6 +603,13 @@ templates:process( $content, $model )
 };
 
 
+declare
+function post:search-host($node as node(), $model as map(*)) {
+<input data-template="post:search-host" type="hidden" name="as_sitesearch" value="{$model('site-domain')}"/>
+};
+
+
+
 (:
 
 
