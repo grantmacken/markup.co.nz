@@ -1,0 +1,45 @@
+
+// Forms ======================================================================
+
+$form-border: $quadrary;
+$form-background: tint($page-background, 80%);
+$form-font-family: $base-font-family;
+
+
+#search{
+
+
+background-color: $form-background;
+  @include at(5) {
+	@include grid-span(4, 8);
+	clear: right;
+	}
+
+   @include at(4) {
+    @include grid-span(7, 2);
+     clear: both;
+    }
+
+   @include at(3) {
+    @include grid-span(6);
+    clear: both;
+    }
+
+    @include between(1,2) {
+    @include grid-span(3);
+    clear: both;
+    }
+
+input[type="text"]{
+    width: column-span(7, 1, $grid: 10 );
+    margin-right: gutter-span($grid: 10 );
+}
+
+input[type="submit"]{
+ width: column-span(3, 1, $grid: 10 );
+ margin-right: 0;
+}
+
+}
+
+
