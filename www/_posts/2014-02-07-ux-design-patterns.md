@@ -12,12 +12,12 @@ The Home Page
 
 The home page will be a  *posts feed* consisting of *'post listings'*.
 
-At the moment
+### At the moment
 
-1. This *activity stream* of my latest Articles and Notes and other 'post items' are in reverse
+1. This *activity stream* of my 20 latest Articles and Notes and other 'post items' are in reverse
 chronological order
 2. **post listings**:  these will not be separated out by post-type i.e. articles vs
-notes vs images but clumped together in one listing. ( TODO )
+notes vs images but clumped together in one listing.
 3. Post Articles will be shortened to 5 block elements with a *call to action* ... continue reading
 4. Post Notes contain 'linkable things' URL,  hashtags TODO: and people
 5. Titles are stored as lowercase  but are transformed via CSS ```text-transform: capitalize``
@@ -25,7 +25,9 @@ notes vs images but clumped together in one listing. ( TODO )
 7. Permalinks and published and update dates are displayed
 8. Also posted on POSSE links are displayed
 
+### Post Listing Issues
 
+1. No need to have  updated  if on same day
 
 * [indiewebcamp - feeds](http://indiewebcamp.com/feeds)
 * [indiewebcamp - Formatting_Content_for_Syndication](http://indiewebcamp.com/syndication_formats#Formatting_Content_for_Syndication)

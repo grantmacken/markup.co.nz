@@ -47,6 +47,15 @@ p, div {
    margin-right: .5em;
 }
 
+.im-medium {
+   width: 1.5em;
+   height: 1.5em;
+   fill: $quadrary;
+   display: inline-block;
+   margin-right: .5em;
+   float: left;
+}
+
 
 .iconmelon:after,
 .im:after {

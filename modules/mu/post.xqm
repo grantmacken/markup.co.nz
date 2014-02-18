@@ -38,6 +38,19 @@ function  post:getDivPublishDates($item) {
    </div>
 };
 
+declare
+function  post:getDivPublishedDate($item) {
+
+ let $published :=  xs:dateTime( $item/atom:published/string() )
+ let $publishedFormated := format-date($published , "[D1o] of [MNn] [Y]", "en", (), ())
+ let $publishedTime := <time class="dt-published" datetime="{$published}">{$publishedFormated}</time>
+ return
+   <div>
+    { ( post:getPermalink2($item),  string(' - ' ) , $publishedTime )}
+   </div>
+};
+
+
 (: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
 (: ENTRY POSSE  Links   :)
@@ -105,9 +118,24 @@ function post:getPermalink($item) {
     </svg>{post:getPostType($item)}</a>
 };
 
+
+declare
+function post:getPermalink2($item) {
+    <a class="u-url"
+    href="{$item/atom:link[@rel="alternate"]/@href/string()}"
+    title="{$item/atom:title/string()}">
+    <svg viewBox="0 0 32 32" class="im-medium">
+     <use xlink:href="#{post:getPostType($item)}"></use>
+    </svg>{post:getPostType($item)}</a>
+};
+
+
 declare
 function post:getSummary($item) {
- $item/atom:summary/string()
+  switch (post:getPostType($item))
+   case "note"
+     return post:getNoteFirstLine($item/atom:content/text())
+   default return $item/atom:summary/string()
 };
 
 
@@ -151,6 +179,17 @@ function post:getNote($text) {
         $outNodes
 };
 
+declare
+function post:getNoteFirstLine($text) {
+   let $input := note:trim($text)
+   let $line := note:seqLines($input)[1]
+   let $replaced := '<div>' || note:hashTag(note:urlToken($line)) || '<br/>' || '</div>'
+
+   return util:parse($replaced )/*/node()
+};
+
+
+
 
 declare
 function post:getAbbevContent($item) {
@@ -177,21 +216,12 @@ let $r := switch (post:getPostType($item))
 
 
 declare
-function post:getIcon($item) {
-let $r := switch (post:getPostType($item))
-   case "note" return
-   <div class="iconmelon">
+function post:getIcon($item, $size) {
+   <div class="{$size}">
     <svg viewBox="0 0 32 32">
-     <use xlink:href="#todo-list"></use>
+     <use xlink:href="#{post:getPostType($item)}"></use>
     </svg>
    </div>
-   default return
-   <div class="iconmelon">
-    <svg viewBox="0 0 32 32">
-     <use xlink:href="#document"></use>
-    </svg>
-   </div>
- return $r
 };
 
 
@@ -232,7 +262,7 @@ function post:main-feed($node as node(), $model as map(*)) {
    where $i lt 20
    return
    <article  class="h-entry h-as-{post:getPostType($item)}">
-   {post:getIcon($item)}
+   {post:getIcon($item, "iconmelon")}
    {post:getTitle($item)}
    <div class="e-content">
     {post:getAbbevContent($item)}
@@ -248,6 +278,128 @@ function post:main-feed($node as node(), $model as map(*)) {
 </section>
 };
 
+(: ~~~~~  ARCHIVE-FEED      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
+
+(: archive-feed   archive page :)
+
+(:~
+ : archive-feed
+ : uri Template /archive   >> archive.html
+ : generate a list of notes
+:)
+
+declare
+function post:archive-feed($node as node(), $model as map(*)) {
+
+let $seq := for $item in collection($model('data-posts-path'))//atom:entry
+             group by $year := year-from-dateTime($item/atom:published[1])
+             order by $year descending
+             return  <div>Year: {$year} has {count($item)} posts
+                 <div>{
+                  for $itm in $item
+                     group by $month := month-from-dateTime($itm/atom:published[1])
+                     order by $month descending
+                  return
+                  <div>Month: {$month} has {count($itm)} posts
+                   {
+                    for $i in $itm
+                    return
+                   <article  class="h-entry h-as-{post:getPostType($i)}">
+                     <div>
+                         {post:getTitle($i)}
+                        </div>
+                        {post:getDivPublishedDate($i)}
+                     <div class="e-summary">
+                      {post:getSummary($i) }
+                     </div>
+                   </article>
+                   }
+
+
+                  </div>
+                  }</div>
+             </div>
+
+
+return
+<section id="main" role="main">
+{$seq}
+</section>
+
+};
+
+
+(:
+
+                                     <article  class="h-entry h-as-{post:getPostType($itm)}">
+                  <div>
+                      {post:getTitle($itm)}
+                     </div>
+                     {post:getDivPublishedDate($itm)}
+                  <div class="e-summary">
+                   {post:getSummary($itm) }
+                  </div>
+                </article>
+
+                  <article  class="h-entry h-as-{post:getPostType($itm)}">
+                  <div>
+                      {post:getTitle($itm)}
+                     </div>
+                     {post:getDivPublishedDate($itm)}
+                  <div class="e-summary">
+                   {post:getSummary($itm) }
+                  </div>
+                </article>
+
+
+
+                <div>
+                    {post:getTitle($item)}
+                   </div>
+                   {post:getDivPublishedDate($item)}
+                <div class="e-summary">
+                 {post:getSummary($item) }
+                </div>
+
+
+
+             let $published := xs:dateTime($item/atom:published)
+             let $year := year-from-dateTime($published)
+
+ let $seq := for $item in collection($model('data-posts-path'))//atom:entry
+             order by xs:dateTime($item/atom:published) descending
+             return $item
+
+ return for $item  at $i in $seq
+    group by year-from-dateTime(xs:dateTime($item/atom:published))
+    order by count($item) descending
+   return
+   <div>Year: {$year} has {count($item)} posts
+     {()
+
+
+
+
+
+     }
+
+   </div>
+
+  }
+</section>
+   <article  class="h-entry h-as-{post:getPostType($item)}">
+   <div>
+       {post:getTitle($item)}
+      </div>
+      {post:getDivPublishedDate($item)}
+   <div class="e-summary">
+    {post:getSummary($item) }
+   </div>
+   {()
+    }
+ </article>
+
+:)
 (: ~~~  TAGS  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
 (:~
@@ -262,7 +414,7 @@ function post:tagged-with-feed($node as node(), $model as map(*)) {
    order by $item/atom:published descending
    return
    <article  class="h-entry h-as-{post:getPostType($item)}">
-   {post:getIcon($item)}
+   {post:getIcon($item, "iconmelon")}
    {post:getTitle($item)}
    <div class="e-content">
     {post:getAbbevContent($item)}
