@@ -46,11 +46,6 @@ let $put := http:send-request( $reqPut , (), $link)
 let $message := concat($put/@status/string(), ': ' ,$put/@message/string())
 let $log := (util:log($priority,$link), util:log($priority, $message))
 let $eval := util:eval-async(xs:anyURI('local-to-remote.xq'))
-
-(:
-works util:eval(xs:anyURI('xmldb:exist:///db/apps/markup.co.nz/modules/mu/local-to-remote.xq'))
-:)
-
 return ()
 };
 

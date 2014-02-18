@@ -3,20 +3,33 @@ title: publishing posts
 author: Grant MacKenzie
 published: 2014-02-12T10:53:32
 id: tag:markup.co.nz,2014-02-12:article:2t31
-summary:
-categories:
+summary: After a false start I finally get the 'localhost to remotehost' to work without blocking.
+categories: existdb nonblocking komodo async
 ---
 
 From localhost to remote
 ------------------------
 
-When I save a Markdown file from komodo this get stored as an atom entry
-in the existdb. This event triggers a call to ```archive-trigger.xqm```.
+When I save a Markdown file from Komodo, the files data get stored as an atom
+entry in the localhost existdb server. What I wanted to do is from our localhost
+server, call a function to 'upload' the created or updated document to the remote
+server.
 
+Existdb has event triggers. I set up an event trigger for the archive collection
+that will call ```archive-trigger.xqm```.  which will call my update function
+```trigger:update-remote($uri)```
 
-What I want to do is from our localhost server, call a function to upload the created or updated document  to the remote server.
+    xquery
+    declare function trigger:after-create-document($uri as xs:anyURI) {
+	trigger:update-remote($uri)
+    };
 
-First I get the ```archive-trigger.xqm``` function to log
+    declare function trigger:after-update-document($uri as xs:anyURI) {
+	trigger:update-remote($uri)
+    };
+
+First I get my ```archive-trigger.xqm``` update function to log so I can see
+whats happening.
 
     xquery
     declare function trigger:update-remote( $uri as xs:anyURI ) {
@@ -35,7 +48,8 @@ Now I can watch what is going on in the terminal as I update Markdown docs
 
     mu:update /db/apps/markup.co.nz/data/archive/2014/02/12/publishing-posts.xml
 
-Existdb has a 'Rest Interface' and a 'http-client module' so we will try to use these
+Existdb has a 'REST Interface' and a [expath](https://www.ibm.com/developerworks/library/x-expath/)
+'http-client module' based on so we will try to use these
 
 
     let $reqGet :=   <http:request href="{ $urlLocal }"
@@ -60,7 +74,7 @@ Existdb has a 'Rest Interface' and a 'http-client module' so we will try to use 
     let $outResult :=  http:send-request($reqPut, (), $inDoc
 
 OK this seems to work now, but the Komodo interface is greying out.
-No we try to figure out whats blocking a quick response..
+What is blocking a quick response? ...
 
 Try to add
 
@@ -69,19 +83,18 @@ Try to add
 * get the put to return status only
 
 
-So I try an  ```util:eval-inline($uri , "$req()")```
-
-Now  try an  ```util:eval-async(("$req($uri)")```
+Try going async ```util:eval-async(("$req($uri)")```
 
 Create gist <https://gist.github.com/grantmacken/8950792>
 
-Later figured out this is not working. Couldn't figure out 'why not'
+Later figured out, this is not working. Couldn't figure out 'why not!'
 
-Try another tack. async with url
-```util:eval-async(xs:anyURI('local-to-remote.xq'))```
-with  'local-to-remote.xq' in same dir  'archive-trigger.xqm'  add an extra step to
-'archive-trigger.xqm' which put link data to the root of the data collection and
-'local-to-remote.xq' reads the link data.
+Try another tack. async with URL
+```util:eval-async(xs:anyURI('local-to-remote.xq'))``` with 'local-to-remote.xq'
+in same collection as 'archive-trigger.xqm'. Add an extra step to
+'archive-trigger.xqm' which PUTs a 'uri.xml' resource containing the 'uri data' to
+the root of the data collection and the get 'local-to-remote.xq' to readback
+this data.
 
     xquery
     let $local := 'http://localhost:8080'
@@ -107,15 +120,18 @@ with  'local-to-remote.xq' in same dir  'archive-trigger.xqm'  add an extra step
     let $put := http:send-request( $reqPut , (), $link)
     let $eval := util:eval-async(xs:anyURI('local-to-remote.xq'))
 
-OK This works. We now have more responsive non-blocking io for the hard work is done by an
-[async call](http://en.wikipedia.org/wiki/Asynchronous_I/O)
-to 'local-to-remote.xq'.
+OK This works. We now have more responsive non-blocking interface. The hard work is
+done by an [async call](http://en.wikipedia.org/wiki/Asynchronous_I/O) to
+'local-to-remote.xq'.
 
-The only thing I have to do now is remove host related
+What I have to do now is remove host related
 ['hard-coded references'](http://en.wikipedia.org/wiki/Hard_coding)
- Our build proccess reads from a properties file which contain our host IPs
+ Our build process reads from a properties file which contains our host IPs
 
     host.local=127.0.0.1
     host.remote=120.138.18.126
 
- so when we deploy we will create a  'hosts.xml' resource write this info to the data collection
+ so when we deploy we now create a  'hosts.xml' resource write this info to the
+ data collection and the 'local-to-remote.xq' will read from this.
+
+ I think, thats it ...  update the gist

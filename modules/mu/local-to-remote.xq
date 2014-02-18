@@ -17,6 +17,9 @@ let  $username := $permissions/@user/string()
 let  $password := $permissions/@password/string()
 
 let $uri := doc(concat($app-root, "/data/uri.xml"))//@href/string()
+let  $local-ip := doc(concat($app-root, "/data/hosts.xml"))//local/string()
+let  $remote-ip := doc(concat($app-root, "/data/hosts.xml"))//remote/string()
+
 let  $local := 'http://localhost:8080'
 let  $remote := 'http://120.138.18.126:8080'
 let  $rest := '/exist/rest'
@@ -34,8 +37,6 @@ timeout="4"
 <http:header name = "Connection"
 value = "close"/>
 </http:request>
-
-
 
 let $reqPut := <http:request href="{ $urlRemote }"
 method="put"
@@ -62,10 +63,7 @@ timeout="4"
 value = "close"/>
 </http:request>
 
-(:TEST  $username, $password, $urlLocal,  http:send-request($reqGetRemote) :)
-
 let $inDoc := http:send-request($reqGet)[2]
 let $outDoc := http:send-request( $reqPut , (), $inDoc)
-
 
 return (http:send-request($reqGetRemote))

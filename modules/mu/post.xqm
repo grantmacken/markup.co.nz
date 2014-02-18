@@ -224,9 +224,12 @@ declare
 function post:main-feed($node as node(), $model as map(*)) {
 <section id="main" role="main">
 {
- for $item  at $i in collection($model('data-posts-path'))//atom:entry
+ let $seq := for $item in collection($model('data-posts-path'))//atom:entry
+             order by xs:dateTime($item/atom:published) descending
+             return $item
+
+ return for $item  at $i in $seq
    where $i lt 20
-   order by $item/atom:published descending
    return
    <article  class="h-entry h-as-{post:getPostType($item)}">
    {post:getIcon($item)}
@@ -238,7 +241,8 @@ function post:main-feed($node as node(), $model as map(*)) {
     post:getDivPublishDates($item),
     post:getCategories($item),
     post:getDivSyndicated ($item)
-                      )}
+                      )
+    }
  </article>
   }
 </section>
