@@ -535,7 +535,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
 <target name="xar-build-upload" depends="deploy-bumpversion">
     <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${dir.project}/${dir.build}/local/${project.abbrev}-${project.version}.xar" />
+    <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
     <property name="project.url" value="http://${project.domain}" />
     <property name="project.url.browse" value="http://${project.domain}" />
     <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
@@ -562,7 +562,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <mkdir dir="${dir.deploy.scripts}"/>
     <mkdir dir="${dir.deploy.images}"/>-->
 
-     <mkdir dir="${dir.project}/${dir.build}/local"/>
+     <mkdir dir="${dir.project}/${dir.build}"/>
 
    <!--<antcall target="xar-undeploy-remove" />-->
 <!--   <antcall target="local-deployment-folder" />
