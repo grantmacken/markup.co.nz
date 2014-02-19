@@ -291,18 +291,28 @@ function post:main-feed($node as node(), $model as map(*)) {
 declare
 function post:archive-feed($node as node(), $model as map(*)) {
 
-let $seq := for $item in collection($model('data-posts-path'))//atom:entry
-             group by $year := year-from-dateTime($item/atom:published[1])
+let $itemCount :=  function( $seq ){
+                            if( count( $seq ) eq 1 )
+                            then(  string(count( $seq )) ||  ' post')
+                            else( string(count( $seq )) ||  ' posts') }
+let $getMonth :=  function( $month ){
+ ('January', 'February', 'March', 'April', 'May', 'June','July', 'August', '
+  September', 'October', 'November', 'December')[$month]
+                           }
+
+let $seqItem := for $item in collection($model('data-posts-path'))//atom:entry
+             group by $year := year-from-dateTime($item/atom:published)
              order by $year descending
-             return  <div>Year: {$year} has {count($item)} posts
+             return  <div><strong>{$year}</strong>: {count($item)} posts
                  <div>{
                   for $itm in $item
-                     group by $month := month-from-dateTime($itm/atom:published[1])
+                     group by $month := month-from-dateTime($itm/atom:published)
                      order by $month descending
                   return
-                  <div>Month: {$month} has {count($itm)} posts
+                  <div>  <strong>{$getMonth($month)}</strong>: {$itemCount($itm)}
                    {
                     for $i in $itm
+                    order by day-from-dateTime($i/atom:published) descending
                     return
                    <article  class="h-entry h-as-{post:getPostType($i)}">
                      <div>
@@ -314,21 +324,24 @@ let $seq := for $item in collection($model('data-posts-path'))//atom:entry
                      </div>
                    </article>
                    }
-
-
                   </div>
                   }</div>
              </div>
-
-
 return
 <section id="main" role="main">
-{$seq}
+{$seqItem}
 </section>
 
 };
 
 
+
+declare
+function post:search-host($node as node(), $model as map(*)) {
+<input data-template="post:search-host" type="hidden" name="as_sitesearch" value="{$model('site-domain')}"/>
+};
+
+(: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 (:
 
                                      <article  class="h-entry h-as-{post:getPostType($itm)}">
@@ -603,10 +616,6 @@ templates:process( $content, $model )
 };
 
 
-declare
-function post:search-host($node as node(), $model as map(*)) {
-<input data-template="post:search-host" type="hidden" name="as_sitesearch" value="{$model('site-domain')}"/>
-};
 
 
 
