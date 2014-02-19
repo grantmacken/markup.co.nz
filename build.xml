@@ -563,19 +563,14 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <mkdir dir="${dir.deploy.images}"/>-->
 
      <mkdir dir="${dir.project}/${dir.build}"/>
-
-   <!--<antcall target="xar-undeploy-remove" />-->
-<!--   <antcall target="local-deployment-folder" />
+   <antcall target="xar-undeploy-remove" />-
+<!--
+   <antcall target="local-deployment-folder" />
    <antcall target="eXist-data-local" />
 -->
     <antcall target="build-xar" />
-
-
-<!--    <antcall target="xar-upload" />
+    <antcall target="xar-upload" />
     <antcall target="browse" />
--->
-
-
 </target>
 
 <target name="condition-hostRomote">
