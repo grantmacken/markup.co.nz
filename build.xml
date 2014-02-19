@@ -367,14 +367,11 @@ project.description: ${project.description}
 
 <target name="local-deployment-folder">
 
-
+<echo>Copy over expath-pkg.xml and controller.xql to root</echo>
    <copy todir="${dir.deploy}" file=".deploy/controller.xql"/>
-
-
-
+   <copy todir="${dir.deploy}" file=".deploy/expath-pkg.xml"/>
 
 <echo>The repo: update repo just in case changes made to properties file</echo>
-
 <echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
     <meta xmlns="http://exist-db.org/xquery/repo">
         <description>${project.description}</description>
