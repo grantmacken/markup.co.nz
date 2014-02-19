@@ -5,7 +5,7 @@ require 'breakpoint-slicer'
 require 'omg-text'
 
 http_path = "/"
-css_dir = ".deploy/resources/styles"
+css_dir = ".deploy/local/resources/styles"
 sass_dir = "www/resources/styles"
 images_dir = ".deploy/local/resources/images"
 javascripts_dir = ".deploy/local/resources/scripts"
