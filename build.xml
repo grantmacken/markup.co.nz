@@ -368,7 +368,7 @@ project.description: ${project.description}
 <target name="local-deployment-folder">
 
 
-   <copy todir="${dir.deploy}" file="${dir.deploy}/controller.xql"/>
+   <copy todir="${dir.deploy}" file=".deploy/controller.xql"/>
 
 
 
