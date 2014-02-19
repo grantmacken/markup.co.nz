@@ -352,9 +352,6 @@ project.description: ${project.description}
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
 
-<!--     namespacepolicy="elementsOnly"> -->
-
-
 </target>
 
 <target name="eXist-data-remote">
@@ -539,7 +536,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
 <target name="xar-build-upload" depends="deploy-bumpversion">
     <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
+    <property name="xar-location" value="${dir.project}/${dir.build}/local/${project.abbrev}-${project.version}.xar" />
     <property name="project.url" value="http://${project.domain}" />
     <property name="project.url.browse" value="http://${project.domain}" />
     <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
@@ -555,7 +552,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>xar-file: ${xar-file}</echo>
 
 
-    <echo>delete ${dir.deploy} </echo>
+<!--    <echo>delete ${dir.deploy} </echo>
     <delete dir="${dir.deploy}/**" />
 
 
@@ -564,16 +561,21 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <mkdir dir="${dir.deploy.modules}"/>
     <mkdir dir="${dir.deploy.styles}"/>
     <mkdir dir="${dir.deploy.scripts}"/>
-    <mkdir dir="${dir.deploy.images}"/>
+    <mkdir dir="${dir.deploy.images}"/>-->
+
+     <mkdir dir="${dir.project}/${dir.build}/local}"/>
 
    <!--<antcall target="xar-undeploy-remove" />-->
-   <antcall target="local-deployment-folder" />
+<!--   <antcall target="local-deployment-folder" />
    <antcall target="eXist-data-local" />
-<!--
-<antcall target="build-xar" />
-<antcall target="xar-upload" />
-<antcall target="browse" />
+
+    <antcall target="build-xar" />-->
+
+
+<!--    <antcall target="xar-upload" />
+    <antcall target="browse" />
 -->
+
 
 </target>
 
