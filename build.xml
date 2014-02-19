@@ -479,27 +479,22 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
         <exec executable="curl">
             <arg line="-T ${xar-location} -u ${exist.username}:${exist.password} ${repo.url}/${xar-file}" />
         </exec>
+
         <exec executable="curl">
             <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}" />
         </exec>
+</target>
 
-    <!--
-     Note: issue#4  exist-db deployment should use sem.version
-     deploy based on project.version
-    -->
-
-<!--<property name="install-and-deploy">
+<target name="xar-install" >
+<property name="install-and-deploy">
 xquery version "3.0";
 import module namespace repo="http://exist-db.org/xquery/repo";
 repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 </property>
--->
-<!--repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
--->
 
-<!--<xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />-->
-
+<xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />
 </target>
+
 
 
 <target name="deploy-bumpversion">
@@ -553,25 +548,24 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
-
-<!--
-   <echo>delete ${dir.deploy} </echo>
+    <echo>delete ${dir.deploy} </echo>
     <delete dir="${dir.deploy}/**" />
     <mkdir dir="${dir.deploy}"/>
     <mkdir dir="${dir.deploy.data}"/>
     <mkdir dir="${dir.deploy.modules}"/>
     <mkdir dir="${dir.deploy.styles}"/>
     <mkdir dir="${dir.deploy.scripts}"/>
-    <mkdir dir="${dir.deploy.images}"/>-->
+    <mkdir dir="${dir.deploy.images}"/>
 
-     <mkdir dir="${dir.project}/${dir.build}"/>
+    <mkdir dir="${dir.project}/${dir.build}"/>
     <antcall target="xar-undeploy-remove" />
-<!--
+
    <antcall target="local-deployment-folder" />
    <antcall target="eXist-data-local" />
--->
+
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
+    <antcall target="xar-install" />
     <antcall target="browse" />
 </target>
 
@@ -671,6 +665,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
+    <antcall target="xar-install" />
     <antcall target="clear-nginx-cache" />
 
     <antcall target="browse" />
