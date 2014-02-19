@@ -7,8 +7,8 @@
     <property file="build.properties" />
     <property environment="env"/>
     <property name="project.base" value="${basedir}"/>
-    <property name="dir.build" value=".build"/>
-    <property name="dir.deploy" value=".deploy"/>
+    <property name="dir.build" value=".build/local"/>
+    <property name="dir.deploy" value=".deploy/local"/>
     <property name="dir.www" value="www"/>
     <property name="dir.deploy.data" value="${dir.deploy}/data"/>
     <property name="dir.deploy.modules" value="${dir.deploy}/modules"/>
@@ -546,13 +546,14 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
-    <antcall target="xar-undeploy-remove" />
+<!--    <antcall target="xar-undeploy-remove" />
     <antcall target="local-deployment-folder" />
     <antcall target="eXist-data" />
 
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="browse" />
+-->
 
 </target>
 
