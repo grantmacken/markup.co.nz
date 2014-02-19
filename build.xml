@@ -546,7 +546,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
 
     <echo>delete ${dir.deploy} </echo>
-    <delete dir="${dir.deploy}" />
+    <delete dir="${dir.deploy}/**" />
 
 
 <!--    <mkdir dir="${dir.deploy}"/>
