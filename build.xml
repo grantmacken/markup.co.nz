@@ -563,7 +563,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <mkdir dir="${dir.deploy.scripts}"/>
     <mkdir dir="${dir.deploy.images}"/>-->
 
-     <mkdir dir="${dir.project}/${dir.build}/local}"/>
+     <mkdir dir="${dir.project}/${dir.build}/local"/>
 
    <!--<antcall target="xar-undeploy-remove" />-->
 <!--   <antcall target="local-deployment-folder" />
