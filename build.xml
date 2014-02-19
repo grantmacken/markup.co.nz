@@ -335,7 +335,7 @@ project.description: ${project.description}
 
     <echo>copy our changed md proccessed files to the data dir}</echo>
     <copy todir="${dir.deploy.data}">
-        <fileset dir=".deploy.data" />
+        <fileset dir=".deploy/data" />
     </copy>
 
     <echo>create hosts.xml in data dir}</echo>
