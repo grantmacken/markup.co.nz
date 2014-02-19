@@ -312,8 +312,6 @@ project.description: ${project.description}
 
   <!--  <echo>overwrite templates that contain HARD-CODED data</echo>-->
 
-
-
     <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
     <copy todir="${dir.deploy.templates}">
         <fileset dir="templates" />
@@ -357,7 +355,7 @@ project.description: ${project.description}
 
 <target name="eXist-data-remote">
     <echo>Everything gets driven remotely</echo>
-    <antcall target="proccess-md" />
+<!-- <antcall target="proccess-md" /> -->
     <antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
@@ -459,7 +457,7 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
         <copyright>true</copyright>
         <type>application</type>
         <target>${project.domain}</target>
-        <prepare>pre-install.xql</prepare>
+        <prepare />
         <finish />
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
