@@ -554,8 +554,8 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 
    <!--<antcall target="xar-undeploy-remove" />-->
    <antcall target="local-deployment-folder" />
-<!--<antcall target="eXist-data" />
-
+    <antcall target="eXist-data" />
+<!--
 <antcall target="build-xar" />
 <antcall target="xar-upload" />
 <antcall target="browse" />
