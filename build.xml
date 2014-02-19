@@ -472,7 +472,6 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
 
 
 <target name="build-xar">
-    <mkdir dir="${dir.build}" />
     <zip destfile="${xar-location}" basedir="${dir.deploy}" whenempty="create" fallbacktoUTF8="true" excludes=".git*" />
 </target>
 
@@ -563,15 +562,13 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <mkdir dir="${dir.deploy.scripts}"/>
     <mkdir dir="${dir.deploy.images}"/>-->
 
-
-     <delete dir="${dir.project}/${dir.build}/local}" />
      <mkdir dir="${dir.project}/${dir.build}/local"/>
 
    <!--<antcall target="xar-undeploy-remove" />-->
 <!--   <antcall target="local-deployment-folder" />
    <antcall target="eXist-data-local" />
-
-    <antcall target="build-xar" />-->
+-->
+    <antcall target="build-xar" />
 
 
 <!--    <antcall target="xar-upload" />
