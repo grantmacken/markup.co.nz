@@ -546,13 +546,14 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
-<!--    <antcall target="xar-undeploy-remove" />
-    <antcall target="local-deployment-folder" />
-    <antcall target="eXist-data" />
 
-    <antcall target="build-xar" />
-    <antcall target="xar-upload" />
-    <antcall target="browse" />
+   <antcall target="xar-undeploy-remove" />
+   <antcall target="local-deployment-folder" />
+<!--<antcall target="eXist-data" />
+
+<antcall target="build-xar" />
+<antcall target="xar-upload" />
+<antcall target="browse" />
 -->
 
 </target>
