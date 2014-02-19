@@ -47,24 +47,22 @@ Archives
 
 The archive page will be consisting of shortened *'post listings'* organised by
 
-* date Yearly/monthly Archives
-* categories ( organised tags )
-* highlights (liked/favourited )
+* date Yearly/monthly Archives  TODO not yet complete but have groupby sorted
+* categories ( organised tags ) TODO
+* highlights (liked/favourited ) TODO
 
 ### Listings contain
 
-* Title the article
-* Short Summaary
-* Publication date
-* Call out to action (read more)
+* Title the article OK
+* Short Summaary    OK
+* Publication date  OK
+* Call out to action (read more) OK
 
 
-### Search
+### Searching This Site
 
+* google site-specific searchability form OK
 
-Yet to do
-
-TODO
 
 Ref:
 
