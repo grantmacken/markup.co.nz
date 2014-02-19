@@ -16,8 +16,8 @@
     <property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>
     <property name="dir.deploy.scripts" value="${dir.deploy}/resources/scripts"/>
     <property name="dir.deploy.images" value="${dir.deploy}/resources/images"/>
-    <property name="dir.categories" value="${dir.deploy.data}/categories"/>
-    <property name="dir.pages" value="${dir.deploy.data}/pages"/>
+
+
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
 
     <property name="browser" value="firefox"/>
@@ -549,7 +549,9 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>xar-file: ${xar-file}</echo>
 
     <echo>delete ${dir.deploy} </echo>
-    <delete dir="${dir.deploy}/**" />
+    <delete dir="${dir.deploy}" >
+        <include name="**/*" />
+    </delete>
     <mkdir dir="${dir.deploy}"/>
     <mkdir dir="${dir.deploy.data}"/>
     <mkdir dir="${dir.deploy.modules}"/>
