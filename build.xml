@@ -281,8 +281,7 @@ project.description: ${project.description}
 
 
 <target name="proccess-md">
-    <echo>delete ${dir.deploy.data} </echo>
-    <delete dir="${dir.deploy.data}" />
+
     <property name="pyFile">.bin/md2.py</property>
      <echo>${pyFile}</echo>
     <apply executable="python" failonerror="false" dir="${project.base}">
@@ -297,8 +296,7 @@ project.description: ${project.description}
 </target>
 
 <target name="proccess-sass">
-    <echo>delete ${dir.deploy.styles} </echo>
-    <delete dir="${dir.deploy.styles}" />
+
     <echo>compile sass and generate a single stylesheet. {dir.deploy.styles}/style.css. Ref. rb file at root</echo>
     <exec executable="compass" failonerror="true">
         <arg value="compile" />
@@ -307,11 +305,7 @@ project.description: ${project.description}
 </target>
 
 <target name="proccess-templatesAndModules">
-    <echo>delete ${dir.deploy.templates}</echo>
-    <delete dir="${dir.deploy.templates}" />
-
   <!--  <echo>overwrite templates that contain HARD-CODED data</echo>-->
-
     <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
     <copy todir="${dir.deploy.templates}">
         <fileset dir="templates" />
@@ -550,16 +544,22 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
-    <mkdir dir="${dir.deploy}"/>
+
+    <echo>delete ${dir.deploy} </echo>
+
+
+
+
+<!--    <mkdir dir="${dir.deploy}"/>
     <mkdir dir="${dir.deploy.data}"/>
     <mkdir dir="${dir.deploy.modules}"/>
     <mkdir dir="${dir.deploy.styles}"/>
     <mkdir dir="${dir.deploy.scripts}"/>
-    <mkdir dir="${dir.deploy.images}"/>
+    <mkdir dir="${dir.deploy.images}"/>-->
 
    <!--<antcall target="xar-undeploy-remove" />-->
-   <antcall target="local-deployment-folder" />
-   <antcall target="eXist-data-local" />
+<!--   <antcall target="local-deployment-folder" />
+   <antcall target="eXist-data-local" />-->
 <!--
 <antcall target="build-xar" />
 <antcall target="xar-upload" />
