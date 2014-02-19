@@ -488,13 +488,16 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
      deploy based on project.version
     -->
 
-<property name="install-and-deploy">
+<!--<property name="install-and-deploy">
 xquery version "3.0";
 import module namespace repo="http://exist-db.org/xquery/repo";
 repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 </property>
+-->
 <!--repo:install-and-deploy("${project.url}", "${project.version}" , "${repo.find}")
---><xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />
+-->
+
+<!--<xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />-->
 
 </target>
 
@@ -551,10 +554,9 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>xar-file: ${xar-file}</echo>
 
 
-<!--    <echo>delete ${dir.deploy} </echo>
+<!--
+   <echo>delete ${dir.deploy} </echo>
     <delete dir="${dir.deploy}/**" />
-
-
     <mkdir dir="${dir.deploy}"/>
     <mkdir dir="${dir.deploy.data}"/>
     <mkdir dir="${dir.deploy.modules}"/>
