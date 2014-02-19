@@ -366,6 +366,13 @@ project.description: ${project.description}
 
 
 <target name="local-deployment-folder">
+
+
+   <copy todir="${dir.deploy}" file="${dir.deploy}/controller.xql"/>
+
+
+
+
 <echo>The repo: update repo just in case changes made to properties file</echo>
 
 <echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
