@@ -336,7 +336,7 @@ project.description: ${project.description}
 </target>
 
 
-<target name="eXist-data">
+<target name="eXist-data-local">
     <echo>Everything gets driven locally</echo>
     <antcall target="proccess-md" />
     <antcall target="proccess-sass" />
@@ -549,12 +549,17 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
     <echo>repo.url: ${repo.url}</echo>
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
-    <mkdir dir="${dir.deploy}"/>
 
+    <mkdir dir="${dir.deploy}"/>
+    <mkdir dir="${dir.deploy.data}"/>
+    <mkdir dir="${dir.deploy.modules}"/>
+    <mkdir dir="${dir.deploy.styles}"/>
+    <mkdir dir="${dir.deploy.scripts}"/>
+    <mkdir dir="${dir.deploy.images}"/>
 
    <!--<antcall target="xar-undeploy-remove" />-->
    <antcall target="local-deployment-folder" />
-    <antcall target="eXist-data" />
+   <antcall target="eXist-data-local" />
 <!--
 <antcall target="build-xar" />
 <antcall target="xar-upload" />
