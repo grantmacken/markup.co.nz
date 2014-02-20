@@ -26,8 +26,6 @@ def setCategories( statusContent , lCategories):
             statusContent += lCat
     return statusContent
 
-
-
 def postToTwitter( statusContent):
     APP_KEY = config.get('twitter.app.key')
     APP_SECRET = config.get('twitter.app.secret')
@@ -40,6 +38,8 @@ def postToTwitter( statusContent):
 
 
 def updateFrontMatter( jsonResultID ):
+    print 'Trying to update front matter using python inplace'
+    print 'TODO Use komodo scintilla instead'
     catLine = 'categories: ' + metadata['categories']
     try:
         metaDataLinkTweetID = metadata['link-tweet-id']
@@ -47,8 +47,9 @@ def updateFrontMatter( jsonResultID ):
         print 'OK: a KeyError here means we have no meta link-tweet-id'
         print 'so we will add it to catline'
         catLine += '\n'
-        catLine += 'link-tweet-id: '
-        catLine += str(jsonResultID)
+        tweetLine = 'link-tweet-id: ' +  str(jsonResultID)
+        print tweetLine
+        catLine += tweetLine
     except:
         print 'Opps. should not happen'
         sys.exit('Error!')

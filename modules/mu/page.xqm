@@ -17,11 +17,31 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 :
 :)
 
+(:~~~~~~~~~~    HEAD     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:)
+
 declare
 function page:head-title($node as node(), $model as map(*)) {
 <title>{ $model('page-title') }</title>
 };
 
+(:
+<link rel="webmention" href="http://{$model('site-domain' || ':8080')}/webmention" />
+oxygen:/exist-db$local%20-%20mu/db/apps/markup.co.nz/modules/mu/webmention.xq
+:)
+declare
+function page:head-link-webebmention($node as node(), $model as map(*)) {
+let  $rest := 'http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/mu/webmention.xq'
+return
+<link rel="webmention" href="{ $rest}" />
+};
+
+declare
+function page:head-meta-author($node as node(), $model as map(*)) {
+ <meta  name="author" content="{$model('page-author')}" />
+};
+
+
+(:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:)
 declare
 function page:article($node as node(), $model as map(*)) {
 let $content :=
