@@ -33,9 +33,13 @@ args = parser.parse_args()
 
 ATOM_NAMESPACE = "http://www.w3.org/2005/Atom"
 ATOM = "{%s}" % ATOM_NAMESPACE
-NSMAP = {None : ATOM_NAMESPACE}
 
+APP_NAMESPACE = "http://www.w3.org/2007/app"
+APP = "{%s}" % APP_NAMESPACE
 
+NSMAP = {None : ATOM_NAMESPACE,  'app' : APP_NAMESPACE }
+
+# http://www.diveintopython3.net/xml.html
 #2 types of md entries pages and posts
 # POSTS date driven organised by categories and tags
 # Pages are static and are not listed by date. Pages do not use tags or categories.
@@ -199,8 +203,10 @@ eEntry.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
 #Elements of <entry>
 #http://atomenabled.org/developers/syndication/#requiredEntryElements
 
-L = [ 'title', 'author' ,  'published' , 'id' ,'summary', 'categories' , 'link-tweet-id']
-for item in L:
+# TODO
+
+#L = [ 'title', 'author' ,  'published' , 'id' ,'summary', 'categories' , 'link-tweet-id',  'draft']
+for item in metadata:
     try:
         new_element = item
         if new_element == 'author':
@@ -217,6 +223,15 @@ for item in L:
             linkTweet.attrib["rel"] = "syndication"
             linkTweet.attrib["type"] = "text/html"
             linkTweet.attrib["href"] = linkTweetHref
+        elif new_element == 'rel-in-reply-to':
+            linkRelReplyTo = ET.SubElement(eEntry, 'link')
+            linkRelReplyTo.attrib["rel"] = "in-reply-to"
+            linkRelReplyTo.attrib["type"] = "text/html"
+            linkRelReplyTo.attrib["href"] = metadata[item]
+        elif new_element == 'draft':
+            elControl = ET.SubElement(eEntry, '{%s}control' % (APP_NAMESPACE))
+            elDraft = ET.SubElement(elControl, "{%s}draft" % (APP_NAMESPACE))
+            elDraft.text = metadata[item]
         else:
             addElement( item, metadata[item] )
     except KeyError:
@@ -240,9 +255,12 @@ linkAlt.attrib["href"] = href
 
 
 # add a id if not in meta
+
+
 # find if article or note etc
 idArticleMatch = re.compile("^tag:.+:(article):.+$")
 idNoteMatch = re.compile("^tag:.+:(note):.+$")
+idCommentMatch = re.compile("^tag:.+:(comment):.+$")
 
 myID = eEntry.find('id')
 if myID is None:
@@ -253,6 +271,8 @@ else:
         createXhtmlContent()
     elif  idNoteMatch.match(myIDText):
        createTextContent()
+    elif  idCommentMatch.match(myIDText):
+       createTextContent()
     else:
         createXhtmlContent()
 
@@ -260,6 +280,7 @@ else:
 print outfile
 #
 tree = ET.ElementTree(eEntry)
-#tree.write('test.xml')
+#test
+tree.write('test.xml')
 tree.write(outfile)
 # http://lxml.de/html5parser.html

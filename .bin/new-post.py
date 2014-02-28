@@ -23,7 +23,6 @@ args = parser.parse_args()
 #normalise string
 args.input = str(args.input.strip())
 args.input = args.input.lower()
-
 args.post_type = str(args.post_type.strip())
 
 
@@ -136,6 +135,7 @@ try:
         f.write(sID)
         f.write('summary: \n')
         f.write('categories: \n')
+        f.write('draft: yes\n')
         f.write('---\n \n')
         f.close()
         cmd = "komodo " + outFile
