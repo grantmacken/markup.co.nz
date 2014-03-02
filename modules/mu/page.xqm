@@ -24,10 +24,10 @@ function page:head-title($node as node(), $model as map(*)) {
 <title>{ $model('page-title') }</title>
 };
 
-(:
-<link rel="webmention" href="http://{$model('site-domain' || ':8080')}/webmention" />
-oxygen:/exist-db$local%20-%20mu/db/apps/markup.co.nz/modules/mu/webmention.xq
-:)
+
+
+
+(:TODO only web mention on posts in archive:)
 declare
 function page:head-link-webebmention($node as node(), $model as map(*)) {
 let  $rest := 'http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/mu/webmention.xq'
@@ -40,6 +40,10 @@ function page:head-meta-author($node as node(), $model as map(*)) {
  <meta  name="author" content="{$model('page-author')}" />
 };
 
+declare
+function page:head-meta-taguri($node as node(), $model as map(*)) {
+<meta  name="taguri" content="{$model('page-id')}" />
+};
 
 (:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:)
 declare

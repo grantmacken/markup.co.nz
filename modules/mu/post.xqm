@@ -104,8 +104,8 @@ return
 declare
 function post:getTitle($item) {
 switch (post:getPostType($item))
-   case "note" return ()
-   default return   <h2 class="p-name">{$item/atom:title/string()}</h2>
+   case "article" return <h2 class="p-name">{$item/atom:title/string()}</h2>
+   default return  ()
 };
 
 declare
@@ -134,6 +134,7 @@ declare
 function post:getSummary($item) {
   switch (post:getPostType($item))
    case "note"
+   case "comment"
      return post:getNoteFirstLine($item/atom:content/text())
    default return $item/atom:summary/string()
 };
@@ -242,9 +243,37 @@ function post:getCategories($item) {
  )
 };
 
+declare
+function post:getReplyToLink($item) {
+<a rel="in-reply-to" href="{$item/atom:link[@rel='in-reply-to']/@href/string()}">{$item/atom:link[@rel='in-reply-to']/@href/string()}</a>
+};
 
+declare
+function post:getReplyContext( $model ) {
+let $item := $model('doc-entry')/node()
+let $href := $item/atom:link[@rel='in-reply-to']/@href/string()
+let $base64flag := true()
+let $alogo := 'md5'
+let $citeFileName :=   util:hash($href, $alogo, $base64flag)
+let $documentUri  :=   $model('data-citations-path') || '/' || $citeFileName || '.xml'
+let $docAvailable  := doc-available($documentUri)
+(:  As a miniumim display permalink of origin URL :)
 
-
+(:
+   <div class="p-in-reply-to h-cite">
+    <p class="p-author h-card">Emily Smith</p>
+    <p class="p-content">Blah blah blah blah</p>
+    <a class="u-url" href="permalink"><time class="dt-published">YYYY-MM-DD</time></a>
+    <p>Accessed on: <time class="dt-accessed">YYYY-MM-DD</time></p>
+   </div>
+:)
+return
+if( $docAvailable ) then ( doc($documentUri )/node() )
+else(<div class="p-in-reply-to">
+{($documentUri, $docAvailable)}
+ In reply to {post:getReplyToLink($item)}
+</div>)
+};
 
 (: ~~~~~     FEEDs      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
@@ -555,8 +584,9 @@ function post:card($node as node(), $model as map(*)) {
 
 declare
 function post:name($node as node(), $model as map(*)) {
-if($model('page-content-isNote')) then ()
-else (<h1 class="p-name">{$model('page-title')}</h1>)
+  switch (post:getPostType( $model('doc-entry')/node() ) )
+   case "article" return  (<h1 class="p-name">{$model('page-title')}</h1>)
+  default return   ()
 };
 
 declare
@@ -570,7 +600,8 @@ function post:author($node as node(), $model as map(*)) {
 
 declare
 function post:summary($node as node(), $model as map(*)) {
-<p class="p-summary">{$model("page-summary")}</p>
+  if(  $model("page-summary") eq '' ) then ()
+  else(<p class="p-summary">{$model("page-summary")}</p>)
 };
 
 
@@ -616,8 +647,19 @@ templates:process( $content, $model )
 };
 
 
+declare
+function post:reply-context($node as node(), $model as map(*)) {
+let $postType :=   post:getPostType( $model('doc-entry')/node() )
+let $reply-context :=
+  switch ($postType)
+   case "comment" return (
+    post:getReplyContext( $model )
+    )
+  default return   ()
+return
+$reply-context
 
-
+};
 
 (:
 

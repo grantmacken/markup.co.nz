@@ -37,6 +37,7 @@ function data-map:loadModel($node as node(), $model as map(*)) {
 
     let $data-pages-path :=  $config:data-root || '/pages'
     let $data-posts-path :=  $config:data-root || '/archive'
+    let $data-citations-path :=  $config:data-root || '/citations'
 
     let $request-path := request:get-parameter('exist-path','_contentStamp')
     let $request-resource := request:get-parameter('exist-resource','contentStamp')
@@ -243,6 +244,7 @@ a 'data-item' is going to be a resource without an extension
        'app-data' := $app-data,
        'data-pages-path' := $data-pages-path,
        'data-posts-path' := $data-posts-path,
+       'data-citations-path' := $data-citations-path,
        'data-collection-path' := $data-collection-path,
        'data-content-path' := $contentPath,
        'data-isPage' := $data-isPage,

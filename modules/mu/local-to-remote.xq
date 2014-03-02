@@ -2,6 +2,7 @@ xquery version "3.0";
 
 declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
 declare namespace  atom =  "http://www.w3.org/2005/Atom";
+declare namespace  app =  "http://www.w3.org/2007/app";
 
 declare namespace repo="http://exist-db.org/xquery/repo";
 import module namespace system = "http://exist-db.org/xquery/system";
@@ -38,32 +39,42 @@ timeout="4"
 value = "close"/>
 </http:request>
 
-let $reqPut := <http:request href="{ $urlRemote }"
-method="put"
-username="{ $username }"
-password="{ $password }"
-auth-method="basic"
-send-authorization="true"
-timeout="10"
->
-<http:header name = "Connection"
-value = "close"/>
-<http:body media-type="application/xml"/>
-</http:request>
-
-let $reqGetRemote := <http:request href="{ $urlRemote }"
-method="get"
-username="{ $username }"
-password="{ $password }"
-auth-method="basic"
-send-authorization="false"
-timeout="4"
->
-<http:header name = "Connection"
-value = "close"/>
-</http:request>
-
+let $reqPut :=
+    <http:request
+      href="{ $urlRemote }"
+      method="put"
+      username="{ $username }"
+      password="{ $password }"
+      auth-method="basic"
+      send-authorization="true"
+      timeout="10">
+      <http:header
+         name = "Connection"
+         value = "close"/>
+      <http:body
+         media-type="application/xml"/>
+    </http:request>
 let $inDoc := http:send-request($reqGet)[2]
-let $outDoc := http:send-request( $reqPut , (), $inDoc)
 
-return (http:send-request($reqGetRemote))
+let $isDraft :=
+    if($inDoc//app:control/app:draft/string() eq 'yes') then ( true() )
+    else ( false() )
+
+let $reqGetRemote   :=
+    <http:request
+        href="{ $urlRemote }"
+        method="get"
+        username="{ $username }"
+        password="{ $password }"
+        auth-method="basic"
+        send-authorization="false"
+        timeout="4"
+    >
+    <http:header name = "Connection"
+    value = "close"/>
+    </http:request>
+
+
+return
+if($isDraft ) then ()
+else ( http:send-request( $reqPut , (), $inDoc))

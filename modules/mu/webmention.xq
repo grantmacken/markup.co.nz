@@ -83,21 +83,88 @@ let $sourceHasTextContentType := function( $page ){
 }
 
 let $sourcelinksToTarget  := function($wmSource, $target){not(empty($wmSource//*[@class="h-entry"]//*[@class="e-content"]//a[@href=$target]))}
+														let $sourceTitle  := function($wmSource){$wmSource//title/string()}
+
+let $sourceID := function($wmSource){
+    let $id :=  $wmSource//meta[@name="taguri" ]/@content/string()
+    let $seqID :=  tokenize($id , ':')
+
+    return   map {
+       'postType' := $seqID[3],
+       'identifier' := $seqID[4]
+       }
+    }
+
 
 let $conditions :=
     if( not($isTargetValidResource( $wmTarget )) ) then ( false() )
-    else if( not($isTargetValidResource( $wmTarget )) )  then ( false() )
     else if( not($sourceHasTextContentType($wmSource)) )  then ( false() )
     else if( not($sourcelinksToTarget($wmSource, $target)) )  then ( false() )
     else(true())
+
+
+let $local := 'http://localhost:8080'
+let $rest := '/exist/rest/db/apps/'
+let $domain := substring-after(substring-before( $source, '/archive/' ), 'http://')
+let $seqPath := tokenize($source, '/')
+
+
+let $file:= $seqPath[8]
+let $path :=  string-join(
+    ($seqPath[3] , $seqPath[4], $seqPath[5] , $seqPath[6] , $seqPath[7] ), '/')
+
+
+let $mappedTagUri := $sourceID($wmSource)
+
+(:  TODO PUT URL etc:)
+let $uPut := $local || $rest || $path || '/xxxx' || $mappedTagUri('identifier')
+
+
+let $entry :=
+    <entry xmlns="http://www.w3.org/2005/Atom">
+	<title>recieved mention for {$sourceTitle($wmSource) }</title>
+	<author>
+	    <name>TODO  Try h-entry - Domain Name Author find mention author</name>
+        </author>
+	<published>{ current-dateTime()}</published>
+	<id>tag:{$seqPath[3]},{current-date()}:mention:2tB2</id>
+	<summary/>
+	<updated>{current-date()}</updated>
+	<link rel="mention" type="text/html" href="{$target}"/>
+	<content type="xhtml">
+	 <div xmlns="http://www.w3.org/1999/xhtml">
+	  [x] mentioned this [note article] {$sourceTitle($wmSource)}
+	 </div>
+        </content>
+    </entry>
+
+
+
+
 (:
+   http://markup.co.nz/archive/2014/02/20/134220
    What to do with webmentions
    use markup as atom  with an entry content  h-cite
    <id>tag:markup.co.nz,2014-02-20:cite:xxxx</id>
    <link rel="mention" href="target" />
    place in archive collection
 
-:)
+
+
+let $reqPut :=
+    <http:request href="{ $urlLocal }"
+                  method="put"
+                  username="{ $username }"
+                  password="{ $password }"
+                  auth-method="basic"
+                  send-authorization="true"
+                  status-only="true"
+                  timeout="2">
+       <http:header name = "Connection" value = "close"/>
+       <http:body media-type="application/xml"/>
+    </http:request>
+
+
 
 let $entry :=
     <entry xmlns="http://www.w3.org/2005/Atom">
@@ -117,14 +184,30 @@ let $entry :=
         </content>
     </entry>
 
+let $base := substring-before($target , '/archive/')
+let $local := 'http://localhost:8080'
+let $rest := '/exist/rest'
+let $urlLocal := $local || $rest || $base || '/uri.xml'
+
+let $put := http:send-request( $reqPut , (), $entry)
+
+
+<title>134220</title>
+:)
 return
 if($conditions) then
 <div>
+
+<p>target: {$target}</p>
+<p>source: {$source}</p>
+<p>$uPut: {$uPut}</p>
 <p>sourceHasTextContentType: {$sourceHasTextContentType($wmSource)}</p>
 <p>sourcelinksToTarget: {$sourcelinksToTarget($wmSource, $target)}</p>
 
-<p>isTargetValidResource: {$sourceHasTextContentType($wmTarget)}</p>
 <p>isTargetValidResource: { $isTargetValidResource($wmTarget)  }</p>
+
+{$entry}
+
 {$wmSource}
 </div>
 else()
