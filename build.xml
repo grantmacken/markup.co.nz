@@ -157,6 +157,63 @@ project.description: ${project.description}
 </target>
 
 
+<target name="store-js">
+
+    <echo>${relativePath}</echo>
+    <echo>${fileName}</echo>
+
+ <loadresource property="path">
+  <propertyresource name="relativePath"/>
+  <filterchain>
+    <tokenfilter>
+      <filetokenizer/>
+      <replacestring from="www/" to=""/>
+    </tokenfilter>
+  </filterchain>
+</loadresource>
+
+<echo>${path}</echo>
+
+<property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/${path}</property>
+<property name="srcfile">${relativePath}/${fileName}.js</property>
+<echo>${exist.uri}</echo>
+<xdb:store
+    uri="${exist.uri}"
+    createcollection="false"
+    srcfile="${srcfile}"
+    user="${exist.username}"
+    password="${exist.password}"
+/>
+</target>
+
+
+<target name="store-svg">
+    <echo>${relativePath}</echo>
+    <echo>${fileName}</echo>
+    <loadresource property="path">
+        <propertyresource name="relativePath" />
+        <filterchain>
+            <tokenfilter>
+                <filetokenizer />
+                <replacestring from="www/" to="" />
+            </tokenfilter>
+        </filterchain>
+    </loadresource>
+    <echo>${path}</echo>
+    <property name="exist.domain">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}</property>
+    <echo>${exist.uri}</echo>
+    <xdb:create uri="${exist.domain}" collection="${path}" user="${exist.username}" password="${exist.password}" />
+    <echo>${svg-collection-exists}</echo>
+    <property name="exist.uri">${exist.domain}/${path}</property>
+    <property name="srcfile">${relativePath}/${fileName}.svg</property>
+    <echo>${exist.uri}</echo>
+    <xdb:store uri="${exist.uri}" createcollection="false" srcfile="${srcfile}" user="${exist.username}" password="${exist.password}" />
+</target>
+
+
+
+
+
 <target name="setHomeConditions">
   <fail>
      <condition>
