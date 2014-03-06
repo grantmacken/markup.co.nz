@@ -1,0 +1,16 @@
+//h-entry
+// http://microformats.org/wiki/h-entry
+//https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use
+//http://css-tricks.com/using-svg/
+
+.h-cite{
+    background-color: tint( $page-background, 60% );
+    padding-right: gutter-span($grid: 3 );
+    padding-left: gutter-span($grid: 3 );
+    padding-top: 1em;
+    padding-bottom: 1em;
+    border: dotted blue 1px;
+
+}
+
+
