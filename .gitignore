@@ -1,10 +1,13 @@
 build.properties
+data/
 .build/
 .bundle
 .bumpversion.cfg
 .deploy/templates/
 .deploy/resources/
 .deploy/data/
+.deploy/local/
+.deploy/remote/
 .deploy/modules/
 .komodotools/
 .sass-cache/
@@ -16,3 +19,6 @@ Gemfile.lock
 .deploy/repo.xml
 .deploy/pre-install.xql
 build.log
+log.txt
+log.xml
+test.xml
