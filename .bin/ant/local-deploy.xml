@@ -85,8 +85,7 @@
 
     <echo>delete ${dir.deploy} </echo>
     <delete dir="${dir.deploy}" >
-        <include name="**/*" />
-        <include name="*" />
+        <include name="**/**" />
     </delete>
 
     <!--
