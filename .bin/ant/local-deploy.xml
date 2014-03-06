@@ -217,8 +217,10 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
 
     <antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
-    <antcall target="proccess-imagesAndScripts" />
 
+    <!--
+    <antcall target="proccess-imagesAndScripts" />
+   -->
 </target>
 
 
