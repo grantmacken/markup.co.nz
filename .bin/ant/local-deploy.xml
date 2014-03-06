@@ -82,8 +82,22 @@
     <echo>repo.url: ${repo.url}</echo>
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
-<!--
+
     <echo>delete ${dir.deploy} </echo>
+    <delete dir="${dir.deploy}" >
+        <include name="**/*" />
+    </delete>
+
+    <!--
+    <mkdir dir="${dir.deploy}"/>
+    <mkdir dir="${dir.deploy.data}"/>
+    <mkdir dir="${dir.deploy.modules}"/>
+    <mkdir dir="${dir.deploy.styles}"/>
+    <mkdir dir="${dir.deploy.scripts}"/>
+    <mkdir dir="${dir.deploy.images}"/>
+
+
+        <echo>delete ${dir.deploy} </echo>
     <delete dir="${dir.deploy}" >
         <include name="**/*" />
     </delete>
@@ -93,6 +107,8 @@
     <mkdir dir="${dir.deploy.styles}"/>
     <mkdir dir="${dir.deploy.scripts}"/>
     <mkdir dir="${dir.deploy.images}"/>
+
+
 
     <mkdir dir="${dir.project}/${dir.build}"/>
     <antcall target="xar-undeploy-remove" />
