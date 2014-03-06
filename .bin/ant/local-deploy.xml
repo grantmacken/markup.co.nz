@@ -215,12 +215,50 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
         </hosts>
     </echoxml>
 
-<!--
     <antcall target="proccess-sass" />
     <antcall target="proccess-templatesAndModules" />
     <antcall target="proccess-imagesAndScripts" />
--->
 
+</target>
+
+
+
+
+<target name="proccess-md">
+    <property name="pyFile">.bin/md2.py</property>
+     <echo>${pyFile}</echo>
+    <apply executable="python" failonerror="false" dir="${project.base}">
+        <arg value="${pyFile}" />
+        <arg value="-i" />
+        <srcfile />
+        <fileset dir="${dir.www}">
+            <exclude name="**/resources/**" />
+            <include name="**/*.md" />
+        </fileset>
+    </apply>
+</target>
+
+<target name="proccess-sass">
+
+    <echo>compile sass and generate a single stylesheet. {dir.deploy.styles}/style.css. Ref. rb file at root</echo>
+    <exec executable="compass" failonerror="true">
+        <arg value="compile" />
+        <redirector outputproperty="md" alwayslog="true" />
+    </exec>
+</target>
+
+<target name="proccess-templatesAndModules">
+  <!--  <echo>overwrite templates that contain HARD-CODED data</echo>-->
+    <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
+    <copy todir="${dir.deploy.templates}">
+        <fileset dir="templates" />
+    </copy>
+    <echo>delete ${dir.deploy.modules}</echo>
+    <delete dir="${dir.deploy.modules}" />
+    <echo>copy our changed working modules files to ${dir.deploy.modules}</echo>
+    <copy todir="${dir.deploy.modules}">
+        <fileset dir="modules" />
+    </copy>
 </target>
 
 
