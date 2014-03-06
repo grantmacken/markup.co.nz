@@ -98,13 +98,13 @@
     <mkdir dir="${dir.deploy.images}/svg"/>
 
 <antcall target="local-deployment-folder" />
-
+<antcall target="eXist-data-local" />
 
 <!--
     <antcall target="xar-undeploy-remove" />
 
 
-   <antcall target="eXist-data-local" />
+
 
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
@@ -197,7 +197,31 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
 </target>
 
 
+<target name="eXist-data-local">
+    <echo>Everything gets driven locally</echo>
+    <antcall target="proccess-md" />
 
+    <echo>copy our changed md proccessed files to the data dir}</echo>
+    <copy todir="${dir.deploy.data}">
+        <fileset dir=".deploy/data" />
+    </copy>
+
+    <echo>create hosts.xml in data dir}</echo>
+
+    <echoxml file="${dir.deploy.data}/hosts.xml" append="false">
+        <hosts>
+            <local>${host.local}</local>
+            <remote>${host.remote}</remote>
+        </hosts>
+    </echoxml>
+
+<!--
+    <antcall target="proccess-sass" />
+    <antcall target="proccess-templatesAndModules" />
+    <antcall target="proccess-imagesAndScripts" />
+-->
+
+</target>
 
 
 
