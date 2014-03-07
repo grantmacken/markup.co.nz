@@ -252,7 +252,7 @@ declare variable $dir external;
 (: the target collection into which the app is deployed :)
 declare variable $target external;
 
-update delete doc($dir/repo.xml)//*[@password]
+update delete $dir/repo.xml)//*[@password]
 </echo>
 
 
