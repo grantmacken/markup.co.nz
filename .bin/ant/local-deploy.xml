@@ -254,7 +254,7 @@ declare variable $target external;
 
 let $permissions := doc('/db/apps/markup.co.nz/repo.xml')//*[@password]
 
-return update delete doc('/db/apps/markup.co.nz/repo.xml')//permissions
+return update delete doc('/db/apps/markup.co.nz/repo.xml')//*[1]
 
 </echo>
 
