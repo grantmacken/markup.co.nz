@@ -123,10 +123,10 @@ repo:remove("http://${project.domain}")
     <antcall target="local-deployment-folder" />
 
     <antcall target="proccess-templatesAndModules" />
-
+<!--
     <antcall target="eXist-data-local" />
 
-
+-->
     <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
     <echo>Build the deployment xar</echo>
@@ -164,7 +164,7 @@ repo:remove("http://${project.domain}")
         <type>application</type>
         <target>${project.domain}</target>
         <prepare>pre-install.xql</prepare>
-        <finish></finish>
+        <finish>post-install.xql</finish>
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
 </echoxml>
@@ -254,7 +254,7 @@ declare variable $target external;
 
 let $permissions := doc('/db/apps/markup.co.nz/repo.xml')//*[@password]
 
- return update value $permissions/@password with 'x'
+ return delete node doc('/db/apps/markup.co.nz/repo.xml')//*[@password]
 
 </echo>
 
