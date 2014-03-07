@@ -118,8 +118,6 @@ repo:remove("http://${project.domain}")
     </delete>
 
     <mkdir dir=".deploy" />
-
-<!--
     <mkdir dir="${dir.deploy}" />
     <mkdir dir="${dir.deploy.data}" />
     <mkdir dir="${dir.deploy.modules}" />
@@ -127,6 +125,9 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy.scripts}" />
     <mkdir dir="${dir.deploy.images}" />
     <mkdir dir="${dir.deploy.images}/svg" />
+
+
+    <!--
     <antcall target="local-deployment-folder" />
     <antcall target="eXist-data-local" />
     <echo>Remove existing deployment</echo>
