@@ -105,31 +105,14 @@ repo:remove("http://${project.domain}")
             <include name="controller.xql"/>
             <include name="expath-pkg.xml"/>
             <include name="repo.xml"/>
-            <inclue name="data.xconf"/>
+            <exclude name="data.xconf"/>
             <exclude name="archive.xconf"/>
             <exclude name="pre-install.xql"/>
         </fileset>
     </copy>
 
-<echo>The repo: update repo just in case changes made to properties file</echo>
-<echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
-    <meta xmlns="http://exist-db.org/xquery/repo">
-        <description>${project.description}</description>
-        <author>${project.author}</author>
-        <website>http://${project.domain}</website>
-        <status>alpha</status>
-        <license>GNU-LGPL</license>
-        <copyright>true</copyright>
-        <type>application</type>
-        <target>${project.domain}</target>
-        <prepare>pre-install.xql</prepare>
-        <finish>post-install.xql</finish>
-        <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
-    </meta>
-</echoxml>
 
-
-<echo file="${dir.deploy}/pre-install.xql" append="false">
+<echo file="${dir.deploy}/pre-install.xql">
 xquery version "1.0";
 
 import module namespace xdb="http://exist-db.org/xquery/xmldb";
@@ -164,22 +147,7 @@ local:mkcol("/db/system/config", $target),
 xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf")
 </echo>
 
-<echo file="${dir.deploy}/post-install.xql" append="false">
-xquery version "1.0";
 
-import module namespace xdb="http://exist-db.org/xquery/xmldb";
-
-(: The following external variables are set by the repo:deploy function :)
-
-(: file path pointing to the exist installation directory :)
-declare variable $home external;
-(: path to the directory containing the unpacked .xar package :)
-declare variable $dir external;
-(: the target collection into which the app is deployed :)
-declare variable $target external;
-
-update delete doc($dir/repo.xml)//*[@password]
-</echo>
 
     <echo>copy our template files.</echo>
 
