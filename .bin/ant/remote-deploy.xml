@@ -105,11 +105,81 @@ repo:remove("http://${project.domain}")
             <include name="controller.xql"/>
             <include name="expath-pkg.xml"/>
             <include name="repo.xml"/>
-            <exclude name="dat.xconf"/>
+            <inclue name="data.xconf"/>
             <exclude name="archive.xconf"/>
             <exclude name="pre-install.xql"/>
         </fileset>
     </copy>
+
+<echo>The repo: update repo just in case changes made to properties file</echo>
+<echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
+    <meta xmlns="http://exist-db.org/xquery/repo">
+        <description>${project.description}</description>
+        <author>${project.author}</author>
+        <website>http://${project.domain}</website>
+        <status>alpha</status>
+        <license>GNU-LGPL</license>
+        <copyright>true</copyright>
+        <type>application</type>
+        <target>${project.domain}</target>
+        <prepare>pre-install.xql</prepare>
+        <finish>post-install.xql</finish>
+        <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
+    </meta>
+</echoxml>
+
+
+<echo file="${dir.deploy}/pre-install.xql" append="false">
+xquery version "1.0";
+
+import module namespace xdb="http://exist-db.org/xquery/xmldb";
+
+(: The following external variables are set by the repo:deploy function :)
+
+(: file path pointing to the exist installation directory :)
+declare variable $home external;
+(: path to the directory containing the unpacked .xar package :)
+declare variable $dir external;
+(: the target collection into which the app is deployed :)
+declare variable $target external;
+
+declare function local:mkcol-recursive($collection, $components) {
+    if (exists($components)) then
+        let $newColl := concat($collection, "/", $components[1])
+        return (
+            xdb:create-collection($collection, $components[1]),
+            local:mkcol-recursive($newColl, subsequence($components, 2))
+        )
+    else
+        ()
+};
+
+(: Helper function to recursively create a collection hierarchy. :)
+declare function local:mkcol($collection, $path) {
+    local:mkcol-recursive($collection, tokenize($path, "/"))
+};
+
+(: store the collection configuration:)
+local:mkcol("/db/system/config", $target),
+xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf")
+</echo>
+
+<echo file="${dir.deploy}/post-install.xql" append="false">
+xquery version "1.0";
+
+import module namespace xdb="http://exist-db.org/xquery/xmldb";
+
+(: The following external variables are set by the repo:deploy function :)
+
+(: file path pointing to the exist installation directory :)
+declare variable $home external;
+(: path to the directory containing the unpacked .xar package :)
+declare variable $dir external;
+(: the target collection into which the app is deployed :)
+declare variable $target external;
+
+update delete doc($dir/repo.xml)//*[@password]
+</echo>
 
     <echo>copy our template files.</echo>
 
@@ -125,20 +195,15 @@ repo:remove("http://${project.domain}")
           <fileset dir=".deploy/local/modules" >
             <include name="**/*.xql"/>
             <include name="**/*.xqm"/>
+            <exclude name="_local"/>
         </fileset>
     </copy>
 
-
-<!--
     <echo>copy our data files.</echo>
     <copy todir="${dir.deploy.data}">
         <fileset dir=".deploy/local/data" />
     </copy>
 
--->
-
-
-<!--
     <antcall target="xar-undeploy-remove" />
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
@@ -147,7 +212,7 @@ repo:remove("http://${project.domain}")
 
     <antcall target="browse" />
 
--->
+
 
 </target>
 
@@ -324,7 +389,7 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 <target name="clear-nginx-cache">
 <echo>Empty Ngnix cache EVERYTHING in it</echo>
     <exec executable="ssh">
-        <arg value="featon" />
+        <arg value="${host.ssh}" />
         <arg value="cd ${dir.nginx-cache};" />
         <arg value="rm -R *" />
     </exec>

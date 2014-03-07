@@ -65,4 +65,4 @@ main.js loads the icons svg file
 	document.body.insertBefore(xmlhttp.responseXML.firstChild, document.body.firstChild)
     });
 
-so there we have it, my html looks much cleaner.
+RightO,so there we have it, my html looks much cleaner.
