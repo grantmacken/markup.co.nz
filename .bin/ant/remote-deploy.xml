@@ -13,9 +13,10 @@
     <property name="dir.deploy.data" value="${dir.deploy}/data"/>
     <property name="dir.deploy.modules" value="${dir.deploy}/modules"/>
     <property name="dir.deploy.templates" value="${dir.deploy}/templates"/>
-    <property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>
-    <property name="dir.deploy.scripts" value="${dir.deploy}/resources/scripts"/>
-    <property name="dir.deploy.images" value="${dir.deploy}/resources/images"/>
+    <property name="dir.deploy.resources" value="${dir.deploy}/resources"/>
+    <property name="dir.deploy.styles" value="${dir.deploy.resources}/styles"/>
+    <property name="dir.deploy.scripts" value="${dir.deploy.resources}/scripts"/>
+    <property name="dir.deploy.images" value="${dir.deploy.resources}/images"/>
 
 
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
@@ -156,7 +157,26 @@ repo:remove("http://${project.domain}")
         <fileset dir=".deploy/local/data" />
     </copy>
 
+    <echo>copy our resources</echo>
+
+    <echo>copy our resources. images, styles and, scripts</echo>
+    <copy todir="${dir.deploy.resources}">
+        <fileset dir=".deploy/local/resources" >
+            <include name="**/*.svg"/>
+            <include name="**/*.png"/>
+            <include name="**/*.css"/>
+            <include name="**/*.js"/>
+        </fileset>
+    </copy>
+
+
+
+
+
+
+
     <antcall target="xar-undeploy-remove" />
+
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="xar-install" />
@@ -222,6 +242,7 @@ repo:remove("http://${project.domain}")
         </fileset>
     </copy>
 </target>
+
 
 <target name="proccess-imagesAndScripts">
     <echo>TODO: optimise images then copy to ${dir.deploy}/resources/images</echo>

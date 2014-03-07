@@ -352,7 +352,7 @@ else
 
 
 <target name="eXist-data-local">
-    <echo>Procces md again </echo>
+    <echo>Proccess md again </echo>
     <antcall target="proccess-md" />
 
     <echo>copy our changed md proccessed files to the data dir</echo>
