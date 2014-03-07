@@ -30,6 +30,10 @@
         <pathelement path="${dir.exist}/exist-optional.jar"/>
     </path>
 
+     <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+        <classpath refid="classpath.core"/>
+    </typedef>
+
 <property name="repo-undeploy-remove">
 xquery version "3.0";
 import module namespace repo="http://exist-db.org/xquery/repo";
