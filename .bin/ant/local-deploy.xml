@@ -107,7 +107,11 @@ repo:remove("http://${project.domain}")
 
     <antcall target="local-deployment-folder" />
     <antcall target="eXist-data-local" />
-    <antcall target="xar-undeploy-remove" />
+
+
+<!--    <antcall target="xar-undeploy-remove" /> -->
+
+
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="xar-install" />
