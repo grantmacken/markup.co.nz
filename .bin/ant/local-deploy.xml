@@ -200,7 +200,7 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
 <target name="eXist-data-local">
     <echo>TODO we don't need to procces md again</echo>
 
-    <antcall target="proccess-md" />
+    <!-- <antcall target="proccess-md" /> -->
 
     <echo>copy our changed md proccessed files to the data dir</echo>
     <copy todir="${dir.deploy.data}">
