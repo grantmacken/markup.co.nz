@@ -254,7 +254,7 @@ declare variable $target external;
 
 let $doc := doc('xmldb:exist:///db/apps/markup.co.nz/repo.xml')/node()
 
-return update delete $doc//*[./@group]
+return update delete $doc//*[11]
 
 </echo>
 
