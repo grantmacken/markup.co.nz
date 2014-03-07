@@ -252,7 +252,7 @@ declare variable $dir external;
 (: the target collection into which the app is deployed :)
 declare variable $target external;
 
-let $doc := doc('xmldb:exist:///db/apps/markup.co.nz/repo.xml')node()
+let $doc := doc('xmldb:exist:///db/apps/markup.co.nz/repo.xml')/node()
 
 return update delete $doc//*[3]
 
