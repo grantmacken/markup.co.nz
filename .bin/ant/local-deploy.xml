@@ -58,9 +58,6 @@ repo:remove("http://${project.domain}")
     </exec>
    <echo>${out.git.commit}</echo>
 
-
-   <!--
-
     <exec executable="git" failonerror="true">
         <arg value="status" />
         <redirector outputproperty="out.git.status"/>
@@ -71,18 +68,16 @@ repo:remove("http://${project.domain}")
         <arg value="patch" />
     </exec>
 
-    -->
 
     <!-- Everytime we upload semversion patch -->
 
-    <!--
+
     <exec executable="cat" failonerror="true">
         <arg value="sem.version" />
         <redirector outputproperty="out.project.version"/>
     </exec>
     <echo>Build number in version.txt: ${out.project.version}  </echo>
 
-   -->
 </target>
 
 
@@ -143,9 +138,6 @@ repo:remove("http://${project.domain}")
 
 <target name="local-deployment-folder">
 
-<echo>Copy over expath-pkg.xml and controller.xql to root</echo>
-   <copy todir="${dir.deploy}" file=".deploy/controller.xql"/>
-   <copy todir="${dir.deploy}" file=".deploy/expath-pkg.xml"/>
 
 
 <echo>The repo: update the expath packages file</echo>
