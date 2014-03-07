@@ -140,7 +140,7 @@ repo:remove("http://${project.domain}")
 
 
 
-<echo>The repo: update the expath packages file</echo>
+<echo>The expath-pkg: update the expath packages file</echo>
 <echoxml file="${dir.deploy}/expath-pkg.xml" append="false" namespacepolicy="elementsOnly">
     <package abbrev="${project.abbrev}" name="http://${project.domain}" spec="1.0" version="${out.project.version}" xmlns="http://expath.org/ns/pkg">
       <title>${project.domain}</title>
@@ -166,6 +166,8 @@ repo:remove("http://${project.domain}")
 </echoxml>
 
 
+<echo>xconf: for our data archive collection</echo>
+
 <echoxml file="${dir.deploy}/archive.xconf" append="false" namespacepolicy="elementsOnly">
 <collection xmlns="http://exist-db.org/collection-config/1.0">
     <triggers>
@@ -176,6 +178,7 @@ repo:remove("http://${project.domain}")
 </collection>
 </echoxml>
 
+<echo>xconf: for our data files</echo>
 
 <echoxml file="${dir.deploy}/data.xconf" append="false" namespacepolicy="elementsOnly">
 <collection xmlns="http://exist-db.org/collection-config/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -185,6 +188,7 @@ repo:remove("http://${project.domain}")
 </collection>
 </echoxml>
 
+<echo>pre-install.xql: for our data files</echo>
 
 <echo file="${dir.deploy}/pre-install.xql">
 xquery version "1.0";
