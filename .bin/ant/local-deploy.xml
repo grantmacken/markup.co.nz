@@ -254,7 +254,7 @@ declare variable $target external;
 
 let $permissions := doc('/db/apps/${project.domain}/repo.xml')//*[@password]
 
-return update delete $permissions
+return delete $permissions
 
 </echo>
 
