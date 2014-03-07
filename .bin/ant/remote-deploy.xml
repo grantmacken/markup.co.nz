@@ -169,12 +169,6 @@ repo:remove("http://${project.domain}")
         </fileset>
     </copy>
 
-
-
-
-
-
-
     <antcall target="xar-undeploy-remove" />
 
     <antcall target="build-xar" />
