@@ -254,7 +254,7 @@ declare variable $target external;
 
 let $doc := doc('/db/apps/${project.domain}/repo.xml')
 
-return update value $doc//*/@password with ''
+return update delete $doc//*[@password]
 
 </echo>
 
