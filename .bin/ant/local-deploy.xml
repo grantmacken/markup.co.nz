@@ -107,7 +107,8 @@ repo:remove("http://${project.domain}")
 
 
 
-
+     <mkdir dir=".deploy" />
+     <mkdir dir="${dir.deploy}" />
 
     <echo>delete ${dir.deploy} </echo>
     <delete includeEmptyDirs="true" >
