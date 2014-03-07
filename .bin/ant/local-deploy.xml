@@ -164,7 +164,7 @@ repo:remove("http://${project.domain}")
         <type>application</type>
         <target>${project.domain}</target>
         <prepare>pre-install.xql</prepare>
-        <finish />
+        <finish>post-install.xql</finish>
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
 </echoxml>
