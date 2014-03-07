@@ -252,7 +252,7 @@ declare variable $dir external;
 (: the target collection into which the app is deployed :)
 declare variable $target external;
 
-let $permissions := doc('/db/apps/${project.domain}/repo.xml')//*[@password]
+let $permissions := doc('/db/apps/markup.co.nz/repo.xml')//*[@password]
 
  return update value $permissions/@password with 'x'
 
