@@ -1,7 +1,7 @@
 <project
     basedir="../../"
     default="deploy-local"
-    name="project-deployment"
+    name="local-project-deployment"
     xmlns:xdb="http://exist-db.org/ant">
 
     <property file="build.properties" />
@@ -109,13 +109,16 @@ repo:remove("http://${project.domain}")
     <antcall target="eXist-data-local" />
 
 
-<!--    <antcall target="xar-undeploy-remove" /> -->
+    <antcall target="xar-undeploy-remove" />
 
 
+<!--
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="xar-install" />
     <antcall target="browse" />
+
+-->
 
 </target>
 
