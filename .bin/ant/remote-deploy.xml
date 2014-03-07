@@ -104,13 +104,37 @@ repo:remove("http://${project.domain}")
         <fileset dir=".deploy/local">
             <include name="controller.xql"/>
             <include name="expath-pkg.xml"/>
-            <include name="repo.xml"/>
+            <exclude name="repo.xml"/>
             <exclude name="data.xconf"/>
             <exclude name="archive.xconf"/>
             <exclude name="pre-install.xql"/>
         </fileset>
     </copy>
 
+    <echo>
+        The repo: update repo for remote
+        leave out password
+    </echo>
+
+    <echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
+        <meta xmlns="http://exist-db.org/xquery/repo">
+            <description>${project.description}</description>
+            <author>${project.author}</author>
+            <website>http://${project.domain}</website>
+            <status>alpha</status>
+            <license>GNU-LGPL</license>
+            <copyright>true</copyright>
+            <type>application</type>
+            <target>${project.domain}</target>
+            <prepare>pre-install.xql</prepare>
+            <finish/>
+            <permissions user="${exist.username}" password="" group="dba" mode="rw-rw-r--" />
+        </meta>
+    </echoxml>
+
+    <echo>
+        The pre-install: 
+    </echo>
 
 <echo file="${dir.deploy}/pre-install.xql">
 xquery version "1.0";

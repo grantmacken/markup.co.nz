@@ -123,10 +123,8 @@ repo:remove("http://${project.domain}")
     <antcall target="local-deployment-folder" />
 
     <antcall target="proccess-templatesAndModules" />
-<!--
+<!---->
     <antcall target="eXist-data-local" />
-
--->
     <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
     <echo>Build the deployment xar</echo>
@@ -164,7 +162,7 @@ repo:remove("http://${project.domain}")
         <type>application</type>
         <target>${project.domain}</target>
         <prepare>pre-install.xql</prepare>
-        <finish>post-install.xql</finish>
+        <finish/>
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
 </echoxml>
@@ -238,28 +236,9 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "
 xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf")
 </echo>
 
-<echo file="${dir.deploy}/post-install.xql" append="false">
-xquery version "1.0";
-
-import module namespace xdb="http://exist-db.org/xquery/xmldb";
-
-(: The following external variables are set by the repo:deploy function :)
-
-(: file path pointing to the exist installation directory :)
-declare variable $home external;
-(: path to the directory containing the unpacked .xar package :)
-declare variable $dir external;
-(: the target collection into which the app is deployed :)
-declare variable $target external;
-
-let $doc := doc('xmldb:exist:///db/apps/markup.co.nz/repo.xml')/node()
-
-return update delete $doc//*[11]
-
-</echo>
 
 
-<echo>finally our contoller: for our data files</echo>
+<echo>finally our controller: for our data files</echo>
 
 <echo file="${dir.deploy}/controller.xql" append="false" >
 xquery version "3.0";
