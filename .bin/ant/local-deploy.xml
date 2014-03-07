@@ -108,10 +108,10 @@ repo:remove("http://${project.domain}")
     <echo>delete ${dir.deploy} </echo>
     <delete includeEmptyDirs="true" >
         <fileset dir="${dir.deploy}"  defaultexcludes="false">
-            <include name="/**" />
+            <include name="*/**" />
         </fileset>
     </delete>
-    
+
  <!--
     <mkdir dir=".deploy" />
     <mkdir dir="${dir.deploy}" />
