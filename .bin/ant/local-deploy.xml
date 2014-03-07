@@ -95,12 +95,15 @@ repo:remove("http://${project.domain}")
     <echo>repo.update: ${repo.update}</echo>
     <echo>xar-file: ${xar-file}</echo>
 
+
     <echo>delete ${dir.deploy} </echo>
-    <delete dir="${dir.deploy}" >
-        <include name="**/*" />
+    <delete dir=".deploy" includeEmptyDirs="true" >
+        <fileset dir="local"  defaultexcludes="false">
+            <include name="**/*" />
+        </fileset>
     </delete>
 
-
+<!--
     <mkdir dir="${dir.deploy}" />
     <mkdir dir="${dir.deploy.data}" />
     <mkdir dir="${dir.deploy.modules}" />
@@ -120,7 +123,7 @@ repo:remove("http://${project.domain}")
     <antcall target="xar-install" />
     <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
-
+-->
 </target>
 
 <target name="local-deployment-folder">
@@ -208,9 +211,8 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
 
 
 <target name="eXist-data-local">
-    <echo>TODO we don't need to procces md again</echo>
-
-    <!-- <antcall target="proccess-md" /> -->
+    <echo>Procces md again </echo>
+    <antcall target="proccess-md" />
 
     <echo>copy our changed md proccessed files to the data dir</echo>
     <copy todir="${dir.deploy.data}">
