@@ -111,7 +111,8 @@ repo:remove("http://${project.domain}")
             <include name="/**" />
         </fileset>
     </delete>
-
+    
+ <!--
     <mkdir dir=".deploy" />
     <mkdir dir="${dir.deploy}" />
     <mkdir dir="${dir.deploy.data}" />
@@ -121,7 +122,7 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy.images}" />
     <mkdir dir="${dir.deploy.images}/svg" />
     <antcall target="local-deployment-folder" />
-    <!--
+
     <antcall target="eXist-data-local" />
     <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
@@ -226,6 +227,9 @@ local:mkcol(concat("/system/config", $target), "data/archive"),
 xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
 xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf")
 </echo>
+
+
+<echo>finally our contoller: for our data files</echo>
 
 <echo file="${dir.deploy}/controller.xql" append="false" >
 xquery version "3.0";
