@@ -252,7 +252,7 @@ declare variable $dir external;
 (: the target collection into which the app is deployed :)
 declare variable $target external;
 
-let $doc := doc( '/db/apps/markup.co.nz/repo.xml')/node()
+let $doc := doc('/db/apps/${project.domain}/repo.xml')/node()
 
 return update value $doc//@password with ''
 
