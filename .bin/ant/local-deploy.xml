@@ -122,7 +122,11 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy.images}/svg" />
     <antcall target="local-deployment-folder" />
 
-    <antcall target="eXist-data-local" />
+    <antcall target="proccess-templatesAndModules" />
+
+    <!-- <antcall target="eXist-data-local" />-->
+
+
     <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
     <echo>Build the deployment xar</echo>
@@ -169,7 +173,7 @@ repo:remove("http://${project.domain}")
 <echo>
     xconf: for our data archive collection
     This calls a _local trigger
-
+    Note: we to do not want end up in the remote
 </echo>
 
 <echoxml file="${dir.deploy}/archive.xconf" append="false" namespacepolicy="elementsOnly">
@@ -371,7 +375,7 @@ else
 
 
     <antcall target="proccess-sass" />
-    <antcall target="proccess-templatesAndModules" />
+
     <antcall target="proccess-imagesAndScripts" />
 </target>
 

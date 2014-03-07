@@ -32,6 +32,10 @@ return
 
     let  $urlRemote := $remote || $rest || $uri
 
+    return( $urlRemote )
+
+    (:
+
     let $reqGetRemote   :=
 	<http:request
 	    href="{ $urlRemote }"
@@ -49,4 +53,6 @@ return
 	let $reply := http:send-request( $reqGetRemote )
 	return
 	(concat($reply/@status/string(), ': ', $reply/@message/string() ), $reply//atom:content/node(),  $urlRemote  )
+
+ :)
     )

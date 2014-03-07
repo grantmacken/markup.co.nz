@@ -47,7 +47,6 @@ Then store the file. 	curl to check if we can fetch it and its returning the rig
 
     curl -v http://markup.co.nz/resources/images/svg/icons.svg
 
-
 Ok. lets go to our templates/includes  folder open up head.html and add
 
     html
