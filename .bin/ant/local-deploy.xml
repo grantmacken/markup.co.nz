@@ -101,25 +101,25 @@ repo:remove("http://${project.domain}")
     </delete>
 
 
-    <mkdir dir="${dir.deploy}"/>
-    <mkdir dir="${dir.deploy.data}"/>
-    <mkdir dir="${dir.deploy.modules}"/>
-    <mkdir dir="${dir.deploy.styles}"/>
-    <mkdir dir="${dir.deploy.scripts}"/>
-    <mkdir dir="${dir.deploy.images}"/>
-    <mkdir dir="${dir.deploy.images}/svg"/>
-
+    <mkdir dir="${dir.deploy}" />
+    <mkdir dir="${dir.deploy.data}" />
+    <mkdir dir="${dir.deploy.modules}" />
+    <mkdir dir="${dir.deploy.styles}" />
+    <mkdir dir="${dir.deploy.scripts}" />
+    <mkdir dir="${dir.deploy.images}" />
+    <mkdir dir="${dir.deploy.images}/svg" />
     <antcall target="local-deployment-folder" />
     <antcall target="eXist-data-local" />
-
-     <echo>Remove existing deployment</echo>
+    <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
+    <echo>Build the deployment xar</echo>
     <antcall target="build-xar" />
+    <echo>Upload the deployment xar</echo>
     <antcall target="xar-upload" />
+    <echo>install the deployment</echo>
     <antcall target="xar-install" />
+    <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
-
-
 
 </target>
 
@@ -325,6 +325,12 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
 <echo>eXist reply:  ${undeploy-remove}</echo>
     <exec executable="curl">
         <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
+    </exec>
+</target>
+
+<target name="browse">
+    <exec executable="${browser}" spawn="true">
+        <arg value="${project.url.browse}" />
     </exec>
 </target>
 
