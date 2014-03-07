@@ -30,6 +30,14 @@
         <pathelement path="${dir.exist}/exist-optional.jar"/>
     </path>
 
+<property name="repo-undeploy-remove">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+repo:undeploy("http://${project.domain}"),
+repo:remove("http://${project.domain}")
+</property>
+
+
 
     <target name="deploy-bumpversion">
      <!--
@@ -97,20 +105,14 @@
     <mkdir dir="${dir.deploy.images}"/>
     <mkdir dir="${dir.deploy.images}/svg"/>
 
-<antcall target="local-deployment-folder" />
-<antcall target="eXist-data-local" />
-
-<!--
+    <antcall target="local-deployment-folder" />
+    <antcall target="eXist-data-local" />
     <antcall target="xar-undeploy-remove" />
-
-
-
-
     <antcall target="build-xar" />
     <antcall target="xar-upload" />
     <antcall target="xar-install" />
     <antcall target="browse" />
--->
+
 </target>
 
 <target name="local-deployment-folder">
@@ -272,6 +274,50 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
     <copy todir="${dir.deploy.scripts}" includeemptydirs="true">
         <fileset dir="www/resources/scripts" />
     </copy>
+</target>
+
+
+
+
+<target name="build-xar">
+    <zip destfile="${xar-location}" basedir="${dir.deploy}" whenempty="create" fallbacktoUTF8="true" excludes=".git*" />
+</target>
+
+<target name="xar-upload">
+    <exec executable="curl">
+        <arg line="-T ${xar-location} -u ${exist.username}:${exist.password} ${repo.url}/${xar-file}" />
+    </exec>
+    <exec executable="curl">
+        <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}" />
+    </exec>
+</target>
+
+
+<target name="xar-install" >
+<property name="install-and-deploy">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
+</property>
+
+<xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />
+</target>
+
+
+
+<target name="xar-undeploy-remove">
+<xdb:xquery
+    uri="${exist.db}"
+    query="${repo-undeploy-remove}"
+    user="${exist.username}"
+    password="${exist.password}"
+    outputproperty="undeploy-remove"
+/>
+
+<echo>eXist reply:  ${undeploy-remove}</echo>
+    <exec executable="curl">
+        <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
+    </exec>
 </target>
 
 </project>
