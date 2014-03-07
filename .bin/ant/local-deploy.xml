@@ -124,7 +124,7 @@ repo:remove("http://${project.domain}")
 
     <antcall target="proccess-templatesAndModules" />
 
-    <antcall target="eXist-data-local" />
+    <!--<antcall target="eXist-data-local" /> -->
 
 
     <echo>Remove existing deployment</echo>
@@ -252,7 +252,7 @@ declare variable $dir external;
 (: the target collection into which the app is deployed :)
 declare variable $target external;
 
-update delete $dir/repo.xml)//*[@password]
+()
 </echo>
 
 
