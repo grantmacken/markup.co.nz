@@ -252,7 +252,10 @@ declare variable $dir external;
 (: the target collection into which the app is deployed :)
 declare variable $target external;
 
-()
+let $doc := doc( $dir || 'repo.xml')/node()
+
+return update value $doc//@password with ''
+
 </echo>
 
 
