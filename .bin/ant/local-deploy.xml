@@ -255,8 +255,6 @@ xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"),
     <copy todir="${dir.deploy.templates}">
         <fileset dir="templates" />
     </copy>
-    <echo>delete ${dir.deploy.modules}</echo>
-    <delete dir="${dir.deploy.modules}" />
     <echo>copy our changed working modules files to ${dir.deploy.modules}</echo>
     <copy todir="${dir.deploy.modules}">
         <fileset dir="modules" />
