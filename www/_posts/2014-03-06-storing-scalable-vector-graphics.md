@@ -8,7 +8,7 @@ categories: svg
 draft: yes
 ---
 
-I have included some svg icons in my pages on this site, however they are loaded  with the page. I want to add them to the images/svg and then dymamically load them and insert into the dom.
+I have included some svg icons in my pages on this site, however they are loaded  with the page. I want to add them to the images/svg and then dynamically load them and insert into the Dom.
 
 First make sure svg 'on save' is uploaded to localhost.
 
@@ -47,7 +47,7 @@ Then store the file. 	curl to check if we can fetch it and its returning the rig
 
     curl -v http://markup.co.nz/resources/images/svg/icons.svg
 
-Ok. lets go to our templates/includes  folder open up head.html and add
+OK. lets go to our templates/includes  folder open up head.html and add
 
     html
     <script type="text/javascript" src="/resources/scripts/lib/sarissa.js"> </script>
@@ -65,4 +65,16 @@ main.js loads the icons svg file
 	document.body.insertBefore(xmlhttp.responseXML.firstChild, document.body.firstChild)
     });
 
-RightO,so there we have it, my html looks much cleaner.
+Right ,so there we have it, my html looks much cleaner.
+
+Not so fast. What I now want to do is
+
+1. Preproccess our SVG before an upload.
+
+    1. Optimise svg so we get a smaller filesize.
+
+    2. Sanity Check the smaller file to see if it is not visually damaged.
+
+    2. create a gzipped version for ngnix to serve
+
+3. Upload SVG trigger from localhost to remote.
