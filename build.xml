@@ -71,6 +71,20 @@ project.description: ${project.description}
     </exec>
 </target>
 
+<target name="get-path">
+    <loadresource property="path">
+        <propertyresource name="relativePath" />
+        <filterchain>
+            <tokenfilter>
+                <filetokenizer />
+                <replacestring from="www/" to="" />
+            </tokenfilter>
+        </filterchain>
+    </loadresource>
+    <echo>${path}</echo>
+</target>
+
+
 <target name="store-xqm">
 <echo>${relativePath}</echo>
 <echo>${fileName}</echo>
@@ -187,32 +201,102 @@ project.description: ${project.description}
 </target>
 
 
-<target name="store-svg">
-    <echo>${relativePath}</echo>
-    <echo>${fileName}</echo>
-    <loadresource property="path">
-        <propertyresource name="relativePath" />
-        <filterchain>
-            <tokenfilter>
-                <filetokenizer />
-                <replacestring from="www/" to="" />
-            </tokenfilter>
-        </filterchain>
-    </loadresource>
-    <echo>${path}</echo>
+
+<target name="store-svg" depends="get-path">
+    <echo>relativePath:  ${relativePath}</echo>
+    <echo>fileName: ${fileName}</echo>
+    <echo>path ${path}</echo>
+
+    <property name="srcFile">${relativePath}/${fileName}.svg</property>
+    <property name="deployFile">${dir.deploy.images}/svg/${fileName}.svg</property>
+    <property name="deployGzipFile">${dir.deploy.images}/svg/${fileName}.svg.gz</property>
+    <property name="deployScourGzipFile">${dir.deploy.images}/svg/${fileName}.svgz</property>
+    <property name="resultURL">http://www.${project.domain}/${path}/${fileName}.svg</property>
+
+
+    <echo>src File: ${srcFile}</echo>
+    <echo>deploy File ${deployFile}</echo>
+    <echo>deploy Scour Gzip File: ${deployScourGzipFile}</echo>
+    <echo>deploy Gzip File ${deployGzipFile}</echo>
+
+    <antcall target="preproccess-svg-file"  />
+
     <property name="exist.domain">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}</property>
-    <echo>${exist.uri}</echo>
+    <echo>Adding} collection:  ${path}  to domain:  ${exist.domain}</echo>
     <xdb:create uri="${exist.domain}" collection="${path}" user="${exist.username}" password="${exist.password}" />
-    <echo>${svg-collection-exists}</echo>
     <property name="exist.uri">${exist.domain}/${path}</property>
-    <property name="srcfile">${relativePath}/${fileName}.svg</property>
-    <echo>${exist.uri}</echo>
-    <xdb:store uri="${exist.uri}" createcollection="false" srcfile="${srcfile}" user="${exist.username}" password="${exist.password}" />
+
+    <echo>
+        Note: Both exist and nginx know about svg and svgz mimetypes
+        So just store without forcing mimetype
+    </echo>
+
+
+    <echo>Storing ${deployFile} to  ${exist.uri}</echo>
+    <xdb:store uri="${exist.uri}"
+               createcollection="false"
+               srcfile="${deployFile}"
+               user="${exist.username}"
+               password="${exist.password}"
+               />
+
+    <echo>Storing ${deployGzipFile} to  ${exist.uri}</echo>
+    <xdb:store uri="${exist.uri}"
+               createcollection="false"
+               srcfile="${deployGzipFile}"
+               user="${exist.username}"
+               password="${exist.password}"
+               />
+
+<echo>
+ Tests: are we serving gzipped svg
+
+curl  -s -o /dev/null  -w "size_download=%{size_download}" ${resultURL}
+
+curl  -s -o /dev/null  -H "Accept-Encoding: gzip,deflate" -w "size_download=%{size_download}"  ${resultURL}
+
+curl -s -I -H "Accept-Encoding: gzip,deflate"  ${resultURL}  | grep -i "Content-Encoding:"
+</echo>
+
+
+
 </target>
 
+<target name="preproccess-svg-file">
+    <echo>optimise SVG then copy to flattened dir: ${dir.deploy.images}/svg</echo>
 
+   <echo>Check if scour installed</echo>
+   <exec executable="/bin/sh">
+       <arg line='-c "scour --version"' />
+       <redirector outputproperty="scour-version" />
+   </exec>
 
+  <echo>scour version: ${scour-version}</echo>
 
+   <echo>Run Scour</echo>
+   <exec executable="/bin/sh">
+       <arg line='-c "scour -i ${srcFile} -o ${deployFile} --strip-xml-prolog --indent=none"' />
+       <redirector outputproperty="scour-out" />
+   </exec>
+
+   <echo>Check if gzip installed</echo>
+   <exec executable="/bin/sh">
+       <arg line='-c "gzip --version"' />
+       <redirector outputproperty="scour-version" />
+   </exec>
+
+ <echo>gzip version: ${scour-version}</echo>
+
+   <echo>Run Gzip</echo>
+
+   <exec executable="/bin/sh">
+       <arg line='-c "gzip -v -9 &lt; ${deployFile} &gt; ${deployGzipFile}"' />
+       <redirector outputproperty="gzip-out" />
+   </exec>
+
+   <echo>gzip out: ${gzip-out}</echo>
+
+</target>
 
 <target name="setHomeConditions">
   <fail>
@@ -244,9 +328,6 @@ project.description: ${project.description}
     <equals arg1="${outfile}" arg2="FAIL" />
   </condition>
 </target>
-
-
-
 
 <target name="isHome" if="is.home">
  <property name="path">home</property>
@@ -321,30 +402,6 @@ project.description: ${project.description}
     />
 </target>
 
-<target name="remote-store-post" unless="has.md2Failed"  if="is.mdPost">
-
-<echo>outfile:  ${outfile}</echo>
- <exec executable="/bin/sh">
-       <arg value="-c"/>
-       <arg line="&quot; echo ${outfile} | sed 's:^\.deploy\/data\/\(.*\)\/.*$:\1:' &quot;" />
-       <redirector outputproperty="bash.out.collection" />
-   </exec>
-
-<echo>bash.out.collection:  ${bash.out.collection}</echo>
-
-<property name="exist.remote.uri">xmldb:exist://${host.remote}:8080/exist/xmlrpc/db/apps/${project.domain}/data/${bash.out.collection}</property>
-  <echo>EXIST.REMOTE.URI:  ${exist.remote.uri} </echo>
-  <xdb:store
-        uri="${exist.remote.uri}"
-        createcollection="true"
-        srcfile="${outfile}"
-        user="${exist.username}"
-        password="${exist.password}"
-/>
-</target>
-
-
-
 
 <target name="proccess-md">
     <property name="pyFile">.bin/md2.py</property>
@@ -361,7 +418,6 @@ project.description: ${project.description}
 </target>
 
 <target name="proccess-sass">
-
     <echo>compile sass and generate a single stylesheet. {dir.deploy.styles}/style.css. Ref. rb file at root</echo>
     <exec executable="compass" failonerror="true">
         <arg value="compile" />
@@ -394,390 +450,6 @@ project.description: ${project.description}
     </copy>
 </target>
 
-
-<target name="eXist-data-local">
-    <echo>Everything gets driven locally</echo>
-    <antcall target="proccess-md" />
-
-    <echo>copy our changed md proccessed files to the data dir}</echo>
-    <copy todir="${dir.deploy.data}">
-        <fileset dir=".deploy/data" />
-    </copy>
-
-    <echo>create hosts.xml in data dir}</echo>
-
-    <echoxml file="${dir.deploy.data}/hosts.xml" append="false">
-        <hosts>
-            <local>${host.local}</local>
-            <remote>${host.remote}</remote>
-        </hosts>
-    </echoxml>
-
-
-    <antcall target="proccess-sass" />
-    <antcall target="proccess-templatesAndModules" />
-    <antcall target="proccess-imagesAndScripts" />
-
-</target>
-
-<target name="eXist-data-remote">
-    <echo>Everything gets driven remotely</echo>
-<!-- <antcall target="proccess-md" /> -->
-    <antcall target="proccess-sass" />
-    <antcall target="proccess-templatesAndModules" />
-    <antcall target="proccess-imagesAndScripts" />
-</target>
-
-
-
-
-<target name="local-deployment-folder">
-
-<echo>Copy over expath-pkg.xml and controller.xql to root</echo>
-   <copy todir="${dir.deploy}" file=".deploy/controller.xql"/>
-   <copy todir="${dir.deploy}" file=".deploy/expath-pkg.xml"/>
-
-<echo>The repo: update repo just in case changes made to properties file</echo>
-<echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
-    <meta xmlns="http://exist-db.org/xquery/repo">
-        <description>${project.description}</description>
-        <author>${project.author}</author>
-        <website>http://${project.domain}</website>
-        <status>alpha</status>
-        <license>GNU-LGPL</license>
-        <copyright>true</copyright>
-        <type>application</type>
-        <target>${project.domain}</target>
-        <prepare>pre-install.xql</prepare>
-        <finish />
-        <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
-    </meta>
-</echoxml>
-
-
-<echoxml file="${dir.deploy}/archive.xconf" append="false" namespacepolicy="elementsOnly">
-<collection xmlns="http://exist-db.org/collection-config/1.0">
-    <triggers>
-        <trigger class="org.exist.collections.triggers.XQueryTrigger">
-            <parameter name="url" value="xmldb:exist://localhost:8080/db/apps/markup.co.nz/modules/mu/archive-trigger.xqm"/>
-        </trigger>
-    </triggers>
-</collection>
-</echoxml>
-
-
-<echoxml file="${dir.deploy}/data.xconf" append="false" namespacepolicy="elementsOnly">
-<collection xmlns="http://exist-db.org/collection-config/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <triggers>
-        <trigger class="org.exist.extensions.exquery.restxq.impl.RestXqTrigger"/>
-    </triggers>
-</collection>
-</echoxml>
-
-
-<echo file="${dir.deploy}/pre-install.xql">
-xquery version "1.0";
-
-import module namespace xdb="http://exist-db.org/xquery/xmldb";
-
-(: The following external variables are set by the repo:deploy function :)
-
-(: file path pointing to the exist installation directory :)
-declare variable $home external;
-(: path to the directory containing the unpacked .xar package :)
-declare variable $dir external;
-(: the target collection into which the app is deployed :)
-declare variable $target external;
-
-declare function local:mkcol-recursive($collection, $components) {
-    if (exists($components)) then
-        let $newColl := concat($collection, "/", $components[1])
-        return (
-            xdb:create-collection($collection, $components[1]),
-            local:mkcol-recursive($newColl, subsequence($components, 2))
-        )
-    else
-        ()
-};
-
-(: Helper function to recursively create a collection hierarchy. :)
-declare function local:mkcol($collection, $path) {
-    local:mkcol-recursive($collection, tokenize($path, "/"))
-};
-
-(: store the collection configuration:)
-local:mkcol("/db/system/config", $target),
-local:mkcol(concat("/system/config", $target), "data/archive"),
-xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
-xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf")
-</echo>
-
-</target>
-
-
-<target name="remote-deployment-folder">
-<echo>The repo: update repo just in case changes made to properties file</echo>
-<echoxml file="${dir.deploy}/repo.xml" append="false" namespacepolicy="elementsOnly">
-    <meta xmlns="http://exist-db.org/xquery/repo">
-        <description>${project.description}</description>
-        <author>${project.author}</author>
-        <website>http://${project.domain}</website>
-        <status>alpha</status>
-        <license>GNU-LGPL</license>
-        <copyright>true</copyright>
-        <type>application</type>
-        <target>${project.domain}</target>
-        <prepare />
-        <finish />
-        <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
-    </meta>
-</echoxml>
-
-</target>
-
-
-<target name="build-xar">
-    <zip destfile="${xar-location}" basedir="${dir.deploy}" whenempty="create" fallbacktoUTF8="true" excludes=".git*" />
-</target>
-
-<target name="xar-upload" >
-        <exec executable="curl">
-            <arg line="-T ${xar-location} -u ${exist.username}:${exist.password} ${repo.url}/${xar-file}" />
-        </exec>
-
-        <exec executable="curl">
-            <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}" />
-        </exec>
-</target>
-
-<target name="xar-install" >
-<property name="install-and-deploy">
-xquery version "3.0";
-import module namespace repo="http://exist-db.org/xquery/repo";
-repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
-</property>
-
-<xdb:xquery  uri="${exist.db}" query="${install-and-deploy}" user="${exist.username}" password="${exist.password}" />
-</target>
-
-
-
-<target name="deploy-bumpversion">
-     <!--
-    Everytime we upload increment our semversion
-    We use bumpversion patch ref. .bumpversion.cfg
-    which alters semversion.txt and our pac
-    -->
-    <exec executable="git" failonerror="false">
-        <arg value="commit" />
-        <arg value="-a" />
-        <arg value="-m" />
-        <arg value="bump" />
-        <redirector outputproperty="out.git.commit"/>
-    </exec>
-   <echo>${out.git.commit}</echo>
-
-    <exec executable="git" failonerror="true">
-        <arg value="status" />
-        <redirector outputproperty="out.git.status"/>
-    </exec>
-   <echo>${out.git.status}</echo>
-
-    <exec executable="bumpversion" failonerror="true">
-        <arg value="patch" />
-    </exec>
-    <!-- Everytime we upload semversion patch -->
-    <exec executable="cat" failonerror="true">
-        <arg value="sem.version" />
-        <redirector outputproperty="out.project.version"/>
-    </exec>
-    <echo>Build number in version.txt: ${out.project.version}  </echo>
-</target>
-
-
-
-<target name="xar-build-upload" depends="deploy-bumpversion">
-    <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${dir.project}/${dir.build}/${project.abbrev}-${project.version}.xar" />
-    <property name="project.url" value="http://${project.domain}" />
-    <property name="project.url.browse" value="http://${project.domain}" />
-    <property name="exist.db" value="xmldb:exist://${host.local}:8080/exist/xmlrpc/db" />
-    <property name="repo.url" value="http://${host.local}:8080/exist/apps/public-repo/public/" />
-    <property name="repo.update" value="http://${host.local}:8080/exist/apps/public-repo/modules/update.xql" />
-    <property name="repo.find" value="http://${host.local}:8080/exist/apps/public-repo/modules/find.xql" />
-    <property name="xar-file" value="${project.abbrev}-${project.version}.xar" />
-    <property name="uri.project" value="${project.abbrev}-${project.version}.xar" />
-    <echo>project.version: ${project.version}</echo>
-    <echo>xar-location: ${xar-location}</echo>
-    <echo>repo.url: ${repo.url}</echo>
-    <echo>repo.update: ${repo.update}</echo>
-    <echo>xar-file: ${xar-file}</echo>
-
-    <echo>delete ${dir.deploy} </echo>
-    <delete dir="${dir.deploy}" >
-        <include name="**/*" />
-    </delete>
-    <mkdir dir="${dir.deploy}"/>
-    <mkdir dir="${dir.deploy.data}"/>
-    <mkdir dir="${dir.deploy.modules}"/>
-    <mkdir dir="${dir.deploy.styles}"/>
-    <mkdir dir="${dir.deploy.scripts}"/>
-    <mkdir dir="${dir.deploy.images}"/>
-
-    <mkdir dir="${dir.project}/${dir.build}"/>
-    <antcall target="xar-undeploy-remove" />
-
-   <antcall target="local-deployment-folder" />
-   <antcall target="eXist-data-local" />
-
-    <antcall target="build-xar" />
-    <antcall target="xar-upload" />
-    <antcall target="xar-install" />
-    <antcall target="browse" />
-</target>
-
-<target name="condition-hostRomote">
-  <condition property="isNotSet.hostRomote">
-    <not>
-       <isset property="host.remote" />
-    </not>
-   </condition>
-</target>
-
-<target name="set-hostRomote" if="isNotSet.hostRomote">
-    <echo>Set remote host</echo>
-    <property name="project.domain.remote" value="www.${project.domain}" />
-    <property name="dir.exec" value="${dir.generator}/.bin" />
-    <echo>${dir.exec}</echo>
-    <echo>CHECK: if we can resolve project.domain remotely using :
-    ${project.domain.remote} we want ${project.domain.remote} not to be loopback
-    to ${host.local} and we want check if it is reachable</echo>
-    <exec executable="python" dir="${dir.generator}/.bin" failonerror="false">
-        <arg value="validateDomains.py" />
-        <arg value="-d" />
-        <arg value="${project.domain.remote}" />
-        <redirector outputproperty="project.domain.remoteIP" />
-    </exec>
-    <echo>python out: ${project.domain.remoteIP}</echo>
-    <condition property="out.hostbyname">
-        <isset property="project.domain.remoteIP" />
-    </condition>
-    <echo>${out.hostbyname}</echo>
-    <condition property="has.resolved.remote-domain">
-        <not>
-            <equals arg1="${host.local}" arg2="${project.domain.remoteIP}" />
-        </not>
-    </condition>
-    <echo>CHECK has.resolved - ${has.resolved.remote-domain} ${host.local} not
-    equal ${project.domain.remoteIP}</echo>
-    <condition property="reachable.remotelhost8080">
-        <isreachable url="http://${project.domain.remoteIP}" />
-    </condition>
-    <echo>CHECK ${project.domain.remoteIP} is reachable on port 8080</echo>
-    <fail message="CHECK DEPENDENCIES: failed">
-        <condition>
-            <or>
-                <isfalse value="${out.hostbyname}" />
-                <isfalse value="${has.resolved.remote-domain}" />
-                <isfalse value="${reachable.remotelhost8080}" />
-            </or>
-        </condition>
-    </fail>
-    <property name="host.remote" value="${project.domain.remoteIP}" />
-    <propertyfile file="build.properties">
-        <entry key="host.remote" value="${project.domain.remoteIP}" />
-    </propertyfile>
-</target>
-
-
-<target name="deploy-local">
-    <antcall target="xar-build-upload" />
-</target>
-
-<target name="deploy-remote" depends="condition-hostRomote, set-hostRomote" >
-<echo> DEPLOY TO REMOTE HOST: ${host.remote}</echo>
-    <condition property="reachable.remotelhost8080">
-        <isreachable url="http://${host.remote}" />
-    </condition>
-    <echo>CHECK: ${reachable.remotelhost8080} -  ${host.remote} is reachable on port 8080 </echo>
-
-    <!-- Everytime we upload semversion patch -->
-    <exec executable="cat" failonerror="true">
-        <arg value="sem.version" />
-        <redirector outputproperty="out.project.version"/>
-    </exec>
-    <echo>Semantic Build number in sem.version: ${out.project.version}  </echo>
-
-    <property name="exist.db" value="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db" />
-    <property name="project.version" value="${out.project.version}" />
-    <property name="xar-location" value="${dir.build}/${project.abbrev}-${project.version}.xar" />
-    <property name="project.url" value="http://${project.domain}" />
-    <property name="project.url.browse" value="http://www.${project.domain}" />
-    <property name="repo.url" value="http://${host.remote}:8080/exist/apps/public-repo/public/" />
-    <property name="repo.update" value="http://${host.remote}:8080/exist/apps/public-repo/modules/update.xql" />
-    <property name="repo.find" value="http://${host.remote}:8080/exist/apps/public-repo/modules/find.xql" />
-    <property name="xar-file" value="${project.abbrev}-${project.version}.xar" />
-
-    <echo>project.version: ${project.version}</echo>
-    <echo>xar-location: ${xar-location}</echo>
-    <echo>repo.url: ${repo.url}</echo>
-    <echo>repo.update: ${repo.update}</echo>
-    <echo>xar-file: ${xar-file}</echo>
-
-   <antcall target="xar-undeploy-remove" />
-
-    <antcall target="remote-deployment-folder" />
-
-    <antcall target="eXist-data-remote" />
-
-    <antcall target="build-xar" />
-    <antcall target="xar-upload" />
-    <antcall target="xar-install" />
-    <antcall target="clear-nginx-cache" />
-
-    <antcall target="browse" />
-</target>
-
-<target name="check-nginx-cache">
-  <condition property="has-nginx-cache">
-    <available file="${dir.nginx-cache}" type="dir"/>
-  </condition>
- </target>
-
-<target name="clear-nginx-cache">
-<echo>Empty Ngnix cache EVERYTHING in it</echo>
-    <exec executable="ssh">
-        <arg value="featon" />
-        <arg value="cd ${dir.nginx-cache};" />
-        <arg value="rm -R *" />
-    </exec>
-
-
-<!--  <delete includeemptydirs="true">
-    <fileset dir="${dir.nginx-cache}" includes="**/*"/>
-  </delete>
--->
-</target>
-
-
-
-<target name="xar-undeploy-remove">
-<xdb:xquery
-    uri="${exist.db}"
-    query="${repo-undeploy-remove}"
-    user="${exist.username}"
-    password="${exist.password}"
-    outputproperty="undeploy-remove"
-/>
-
-<echo>eXist reply:  ${undeploy-remove}</echo>
-
-<exec executable="curl">
-    <arg line="-G -u ${exist.username}:${exist.password} ${repo.update}"/>
-</exec>
-
-</target>
-
 <target name="theme">
 <mkdir dir="${dir.generator}/themes/${project.theme}"/>
 <sync todir="${dir.generator}/themes/${project.theme}">
@@ -799,10 +471,6 @@ repo:install-and-deploy("${project.url}","${project.version}" ,"${repo.find}")
         </preserveintarget>
 </sync>
 </target>
-
-
-
-
 
 
 <target name="deploy-info">
