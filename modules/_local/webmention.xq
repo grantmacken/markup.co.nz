@@ -102,23 +102,19 @@ let $conditions :=
     else if( not($sourcelinksToTarget($wmSource, $target)) )  then ( false() )
     else(true())
 
-
 let $local := 'http://localhost:8080'
 let $rest := '/exist/rest/db/apps/'
 let $domain := substring-after(substring-before( $source, '/archive/' ), 'http://')
 let $seqPath := tokenize($source, '/')
 
-
 let $file:= $seqPath[8]
 let $path :=  string-join(
     ($seqPath[3] , $seqPath[4], $seqPath[5] , $seqPath[6] , $seqPath[7] ), '/')
-
 
 let $mappedTagUri := $sourceID($wmSource)
 
 (:  TODO PUT URL etc:)
 let $uPut := $local || $rest || $path || '/xxxx' || $mappedTagUri('identifier')
-
 
 let $entry :=
     <entry xmlns="http://www.w3.org/2005/Atom">
