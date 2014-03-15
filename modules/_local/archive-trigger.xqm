@@ -26,7 +26,7 @@ let $password := $permissions/@password/string()
 let $priority := 'info'
 let $local := 'http://localhost:8080'
 let $rest := '/exist/rest'
-let $urlLocal := $local || $rest || $base || '/uri.xml'
+let $urlLocal := $local || $rest || $base || '/upload-link-atom.xml'
 let $message1 := 'mu:update ' || $urlLocal
 let $reqPut :=
     <http:request href="{ $urlLocal }"
@@ -45,7 +45,7 @@ let $link := <link href="{$uri}" />
 let $put := http:send-request( $reqPut , (), $link)
 let $message := concat($put/@status/string(), ': ' ,$put/@message/string())
 let $log := (util:log($priority,$link), util:log($priority, $message))
-let $eval := util:eval-async(xs:anyURI('local-to-remote.xq'))
+(:let $eval := util:eval-async(xs:anyURI('upload-atom.xq')):)
 return ()
 };
 

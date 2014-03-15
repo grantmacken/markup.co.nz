@@ -12,6 +12,8 @@ import module namespace http = "http://expath.org/ns/http-client";
 import module namespace request="http://exist-db.org/xquery/request";
 import module namespace session = "http://exist-db.org/xquery/session";
 
+(: this is happening async yea yea yea :)
+
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
 let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
 let  $username := $permissions/@user/string()
@@ -21,8 +23,8 @@ let $uri := doc(concat($app-root, "/data/upload-link-atom.xml"))//@href/string()
 let  $local-ip := doc(concat($app-root, "/data/hosts.xml"))//local/string()
 let  $remote-ip := doc(concat($app-root, "/data/hosts.xml"))//remote/string()
 
-let  $local := 'http://localhost:8080'
-let  $remote := 'http://120.138.18.126:8080'
+let  $local := 'http://'  || $local-ip  || ':8080'
+let  $remote := 'http://' || $remote-ip || ':8080'
 let  $rest := '/exist/rest'
 let  $urlLocal := $local || $rest || $uri
 let  $urlRemote := $remote || $rest || $uri
