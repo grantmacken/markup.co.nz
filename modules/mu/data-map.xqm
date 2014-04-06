@@ -23,6 +23,57 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
  : http://atomic.exist-db.org/blogs/eXist/XQueryMap
 :)
 
+
+
+(:~
+Notes:
+reworking my data-map
+
+Every 'html page' served has access to the data-map
+which will enable the 'template page' to be generate
+
+1. navigational links
+2. page element items, titles, content, etc
+
+
+What to include in my data-map
+
+* path data:  fixed common shorthand vars in one place
+
+* site data: site wide data
+
+* request object:
+
+* app object:  these are path type so should be in path data
+
+* page:
+  a page can be generated from
+    1. a posted-entry : a stored atom entry resource
+	1. a archived entry ( a entry  that is a  blog post )
+	    template URI ```/archive/{year}/{month}/{day}/{resource}```
+        2. a collection entry.    ( a entry under a collection )
+	    template URI ```/{collection}/{resource}```
+                            collections example
+			    about: one 'about' index page
+				   many about pages
+    2.  a generated query: a result of a query of collections and resources stored in the the database:
+        1. home.    last 20 entries.
+		template URI ```/index```
+        2. tags:    entries tagged as {tagname}
+		    template URI ```/tags/{tagname}```  tags template
+        3. archive index:  entries orgainised by date
+                    template URI ```/archive/index```  archive template
+                    template URI ```/archive/{year}/index```  archive-year template
+                    template URI ```/archive/{year}/{month}/index```  archive-year-month template
+
+
+
+
+
+entry-node:
+
+:)
+
 declare
    %templates:wrap
 function data-map:loadModel($node as node(), $model as map(*)) {
@@ -32,7 +83,6 @@ function data-map:loadModel($node as node(), $model as map(*)) {
     let $app-root :=  templates:get-app-root($model)
     let $site-title :=  config:app-title($node, $model)
     let $site-domain :=  substring-after( $app-root, 'apps/' )
-    let $app-root :=  templates:get-app-root($model)
     let $app-data :=  $config:data-root
 
     let $data-pages-path :=  $config:data-root || '/pages'

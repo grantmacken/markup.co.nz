@@ -4,18 +4,23 @@ module namespace post="http://markup.co.nz/#post";
 import module namespace templates="http://exist-db.org/xquery/templates" ;
 import module namespace util="http://exist-db.org/xquery/util";
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
+import module namespace response="http://exist-db.org/xquery/response";
+
 import module namespace config="http://exist-db.org/xquery/apps/config"  at "../../modules/config.xqm";
 import module namespace note="http://markup.co.nz/#note" at "note.xqm";
+import module namespace mf2="http://markup.co.nz/#mf2" at "mf2.xqm";
 
 declare namespace  xhtml = "http://www.w3.org/1999/xhtml";
 declare namespace  atom = "http://www.w3.org/2005/Atom";
 declare namespace  xlink = "http://www.w3.org/1999/xlink";
 
+
+
 (:~
 : Post
 : @author Grant MacKenzie
 : @version 0.01
-:
+: response:set-header
 :)
 
 (: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
@@ -94,7 +99,7 @@ let $authorName :=
 
 return
 <div class="h-card p-author card-as-author">
-   <img class="u-photo" src="/resources/images/me.png" alt="{$authorName}" width="48" height="48"/>
+   <img class="u-photo p-name" src="/resources/images/me.png" alt="{$authorName}" width="48" height="48"/>
    <p>authored by <br/><a rel="author" href="/cards/me">{$authorName}</a></p>
 </div>
 };
@@ -254,26 +259,42 @@ let $item := $model('doc-entry')/node()
 let $href := $item/atom:link[@rel='in-reply-to']/@href/string()
 let $base64flag := true()
 let $alogo := 'md5'
-let $citeFileName :=   util:hash($href, $alogo, $base64flag)
+let $hash := replace(util:hash($href, $alogo, $base64flag), '(=+$)', '')
+let $citeFileName :=   translate($hash, '+/=', '-_,')
 let $documentUri  :=   $model('data-citations-path') || '/' || $citeFileName || '.xml'
 let $docAvailable  := doc-available($documentUri)
-(:  As a miniumim display permalink of origin URL :)
+(:  As a miniumim display permalink of origin URL
 
-(:
-   <div class="p-in-reply-to h-cite">
-    <p class="p-author h-card">Emily Smith</p>
-    <p class="p-content">Blah blah blah blah</p>
-    <a class="u-url" href="permalink"><time class="dt-published">YYYY-MM-DD</time></a>
-    <p>Accessed on: <time class="dt-accessed">YYYY-MM-DD</time></p>
-   </div>
+<div class="p-in-reply-to">
+{($documentUri, $docAvailable)}
+ In reply to {post:getReplyToLink($item)}
+</div>
+
 :)
 return
 if( $docAvailable ) then ( doc($documentUri )/node() )
-else(<div class="p-in-reply-to">
-{($documentUri, $docAvailable)}
- In reply to {post:getReplyToLink($item)}
-</div>)
+else(
+ <div class="p-in-reply-to">
+
+ In reply to {post:getReplyToLink($item) }
+   <p>Can not find citation: {$citeFileName } <br/>
+
+   </p>
+
+</div>
+
+)
 };
+
+declare
+function post:getHeadLinkRelInReplyTo( $docEntry ){
+let $href := $docEntry/atom:link[@rel='in-reply-to']/@href/string()
+
+return
+(<link rel="in-reply-to" href="{$href}" type="text/html" /> )
+};
+
+
 
 (: ~~~~~     FEEDs      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
@@ -531,6 +552,7 @@ h-card properties, inside an element with class h-card:
 declare
 function post:card($node as node(), $model as map(*)) {
  if( $model('data-item')  eq  'me') then(
+
     (: representative  h-card on home-page 'rel me'
     doc($model('path-includes') || '/' || 'h-card.html')/node()
      :)
@@ -539,6 +561,12 @@ function post:card($node as node(), $model as map(*)) {
  )
  else()
 };
+
+
+
+
+
+
 
 (: ~~~ POST ENTRY ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ :)
 
@@ -647,19 +675,146 @@ templates:process( $content, $model )
 };
 
 
+(:
+http://markup.co.nz/archive/2014/02/23/sending-webmentions
+
+:)
+
 declare
 function post:reply-context($node as node(), $model as map(*)) {
-let $postType :=   post:getPostType( $model('doc-entry')/node() )
+let $docEntry := $model('doc-entry')/node()
+        (: simple check if a reply-to link before we get post type :)
+let $postType :=
+          if( empty($docEntry/atom:link[@rel='in-reply-to']) ) then ''
+          else( post:getPostType( $docEntry ))
+
 let $reply-context :=
   switch ($postType)
    case "comment" return (
     post:getReplyContext( $model )
     )
-  default return   ()
+  default return  ()
+
+(: If we have a :)
 return
 $reply-context
 
 };
+
+declare
+function post:mentioned($node as node(), $model as map(*)) {
+let $docEntry := $model('doc-entry')/node()
+let $href := $docEntry/atom:link[@rel="alternate" and @type="text/html"]/@href/string()
+let $domain := $model('site-domain')
+let $archivePath := substring-after( $href, '/archive/' )
+let $seqPath := tokenize($archivePath, '/')
+let $year := $seqPath[1]
+let $month := $seqPath[2]
+let $day :=  $seqPath[3]
+let $datePath :=  string-join(($year , $month, $day ) , '/')
+let $path :=  string-join(($model('app-data'), 'mentions' ,$year , $month, $day ) , '/')
+
+let $seqNodes := for $node in xmldb:xcollection($path)
+      where $node/*[*[@rel="in-reply-to"][@href = $href]]
+      group by $rel := $node/*[*[@rel]]//@rel/string()
+       order by $rel descending
+        return  <div><strong>{$rel}</strong>: {count($node)} mention
+        {
+         for $itm in $node
+                  return
+                  $itm
+        }
+
+
+        </div>
+
+
+return $seqNodes
+
+(:
+let $seqItem := for $item in xmldb:xcollection($path)
+             group by $year := year-from-dateTime($item/atom:published)
+             order by $year descending
+             return  <div><strong>{$year}</strong>: {count($item)} posts
+                 <div>{
+                  for $itm in $item
+                     group by $month := month-from-dateTime($itm/atom:published)
+                     order by $month descending
+                  return
+                  <div>  <strong>{$getMonth($month)}</strong>: {$itemCount($itm)}
+                   {
+                    for $i in $itm
+                    order by day-from-dateTime($i/atom:published) descending
+                    return
+                   <article  class="h-entry h-as-{post:getPostType($i)}">
+                     <div>
+                         {post:getTitle($i)}
+                        </div>
+                        {post:getDivPublishedDate($i)}
+                     <div class="e-summary">
+                      {post:getSummary($i) }
+                     </div>
+                   </article>
+                   }
+                  </div>
+                  }</div>
+             </div>
+
+:)
+
+
+};
+
+
+
+
+declare
+function post:head-link-webebmention($node as node(), $model as map(*)) {
+let $docEntry := $model('doc-entry')/node()
+let  $href := 'http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/_local/webmention.xq'
+(:let $href := $docEntry/atom:link[@rel='webmention']/@href/string():)
+let $link := (<link rel="webmention" href="{$href}" /> )
+
+let $addHeader :=
+   if (not(empty($link) )) then (
+      let $href :=  $href
+      let $linkValue := '<'  ||  $href || '>; rel="webmention"'
+      return response:set-header("Link",  $linkValue)                                            )
+   else()
+
+return
+$link
+};
+
+declare
+function post:head-link-rel-in-reply-to($node as node(), $model as map(*)) {
+let $docEntry := $model('doc-entry')/node()
+        (: simple check if a reply-to link before we get post type :)
+let $postType :=
+          if( empty($docEntry/atom:link[@rel='in-reply-to']) ) then ''
+          else( post:getPostType( $docEntry ))
+
+let $link :=
+  switch ($postType)
+   case "comment" return (
+    post:getHeadLinkRelInReplyTo( $docEntry )
+
+    )
+  default return ()
+
+(: should I use link 'Title' with  "in reply to ":)
+let $addHeader :=
+   if (not(empty($link) )) then (
+      let $href :=  $docEntry/atom:link[@rel='in-reply-to']/@href/string()
+      let $linkValue := '<'  ||  $href || '>; rel="in-reply-to"'
+      return response:set-header("Link",  $linkValue)                                            )
+   else()
+
+(: If we have a :)
+return
+$link
+};
+
 
 (:
 

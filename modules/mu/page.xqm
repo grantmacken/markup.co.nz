@@ -30,7 +30,7 @@ function page:head-title($node as node(), $model as map(*)) {
 (:TODO only web mention on posts in archive:)
 declare
 function page:head-link-webebmention($node as node(), $model as map(*)) {
-let  $rest := 'http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/mu/webmention.xq'
+let  $rest := 'http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/_local/webmention.xq'
 return
 <link rel="webmention" href="{ $rest}" />
 };
@@ -45,7 +45,61 @@ function page:head-meta-taguri($node as node(), $model as map(*)) {
 <meta  name="taguri" content="{$model('page-id')}" />
 };
 
+
 (:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:)
+
+declare
+function page:test($node as node(), $model as map(*)) {
+  <article role="main">{$model('page-content')/*/node()}</article>
+};
+
+
+(:
+  uri Template /authors/{author} where  {author} == $model('data-item')
+  template 'authors.html'
+  data path
+    app-data , data-collection-path , data-item
+:)
+
+declare
+function page:author($node as node(), $model as map(*)) {
+ let $seq := ( $model('app-data'),  $model('data-collection-path'),	 $model('data-item'))
+ let $path := string-join(  $seq , '/' ) || '.xml'
+ let $docAvailable := doc-available( $path )
+ return
+    if( $docAvailable ) then ( doc( $path )/node() )
+    else()
+};
+
+(:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:)
+
+
+(:
+  uri Template /citations/{citation} where  {citations} == $model('data-item')
+  template 'citations.html'
+  data path
+    app-data , data-collection-path , data-item
+:)
+
+declare
+function page:citation($node as node(), $model as map(*)) {
+ let $seq := ( $model('app-data'),  $model('data-collection-path'),	 $model('data-item'))
+ let $path := string-join(  $seq , '/' ) || '.xml'
+ let $docAvailable := doc-available( $path )
+ return
+    if( $docAvailable ) then ( doc( $path )/node() )
+    else()
+};
+
+
+
+(:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:)
+
+
+
+
+
+
 declare
 function page:article($node as node(), $model as map(*)) {
 let $content :=
