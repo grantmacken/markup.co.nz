@@ -40,37 +40,52 @@ declare function mf2:has-in-reply-to-hyperlink( $page ){
   $hasHyperLink
 };
 
-declare function mf2:node-has-h-card( $node ){
-   if( not(empty($node//*[contains(@class, 'h-card')][1] ))) then (true())
-   else if ( not(empty($node[contains(@class, 'h-card')] ))) then (true())
-   else(false())
+declare function mf2:node-has-h-card( $hEntry ){
+  not(empty($hEntry//*[contains(@class, 'h-card')][ not(ancestor::*[contains(./@class, "h-cite" )])][1] ))
 };
 
-declare function mf2:get-h-card-node( $node ){
-   if(exists($node//*[contains(@class, 'h-card')][1] )) then ($node//*[contains(@class, 'h-card')][1])
-   else ( $node[contains(@class, 'h-card')])
+declare function mf2:get-h-card-node( $hEntry ){
+$hEntry//*[contains(@class, 'h-card')][ not(ancestor::*[contains(./@class, "h-cite" )])][1]
 };
 
 
 
   (:'xPath: look for u-url node in  h-card':)
-declare function mf2:h-card-has-u-url( $node ){
-  not(empty($node//*[contains(@class, "u-url" ) or @rel="author"] ))
+declare function mf2:h-card-has-u-url( $hCard ){
+  not(empty($hCard//*[contains(@class, "u-url" ) or @rel="author"][1] ))
 };
 
-declare function mf2: get-u-url-from-h-card( $node ){
-   $node//*[contains(@class, "u-url" ) or @rel="author"]
+declare function mf2: get-u-url-from-h-card( $hCard ){
+   $hCard//*[contains(@class, "u-url" ) or @rel="author"][1]
+};
+
+(: todo not in h-card or h-cite:)
+
+declare function mf2:h-entry-has-a-p-author( $hEntry ){
+not(empty( $hEntry//*[contains(@class, 'p-author')][ not(ancestor::*[contains(./@class, "h-cite" )])][1]))
 };
 
 
-
-declare function mf2:h-entry-has-a-p-author( $page ){
-exists(mf2:get-h-entry-node( $page )//*[contains(@class, 'p-author')][1])
+declare function mf2:get-h-entry-p-author( $hEntry ){
+$hEntry//*[contains(@class, 'p-author')][ not(ancestor::*[contains(./@class, "h-cite" )])][1]
 };
 
-declare function mf2:get-h-entry-p-author( $page ){
-mf2:get-h-entry-node( $page )//*[contains(@class, 'p-author')][1]
+(: todo not in h-card or h-cite :)
+
+(: returns bool :)
+
+declare function mf2:h-entry-has-a-dt-published( $hEntry ){
+not(empty($hEntry//*[contains(@class, 'dt-published')][ not(ancestor::*[contains(./@class, "h-cite" )])][1] ))
 };
+
+
+(: returns string nodeValue :)
+
+declare function mf2:get-h-entry-dt-published-value( $hEntry ){
+let $publishedNode := $hEntry//*[contains(@class, 'dt-published')][ not(ancestor::*[contains(./@class, "h-cite" )])][1]
+return mf2:parseDT( $publishedNode )
+};
+
 
 
 declare function mf2:parseU( $node ){
@@ -88,6 +103,85 @@ let $rValue :=
        default return ()
 return $rValue
 };
+
+
+declare function mf2:parseDT( $node ){
+(:let $rValue := ():)
+(: if a.u-x[href] or area.u-x[href], then get the href attribute:)
+
+let $nodeName  := lower-case( string( node-name($node)) )
+
+let $rValue :=
+    switch ($nodeName )
+       case 'time' return (
+			if ($node[@datetime]) then ( $node/@datetime/string() )
+			else()
+			)
+	   case 'abbr' return (
+			if ($node[@title]) then ( $node/@title/string() )
+			else()
+			)
+		case 'data' return (
+			if ($node[@value]) then ( $node/@value/string() )
+			else()
+			)
+		case 'input' return (
+			if ($node[@value]) then ( $node/@value/string() )
+			else()
+			)
+       default return (
+       		if ( $node/text() ) then ( $node/string() )
+			else()
+       )
+
+return $rValue
+};
+
+
+
+(:
+var parseDT = function(doc, node, nsResolver) {
+    var rValue = null
+    //  parse the element for the value-class-pattern, if a value is found then return it
+    contextNode = node
+    var exp = './/*[contains(./@class, "value" )]'
+    var pValue = doc.evaluate(exp, contextNode, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    if (pValue.singleNodeValue) {
+	var n = pValue.singleNodeValue
+	if (n.firstChild) {
+	    rValue = n.firstChild.data
+	}
+    }
+
+    if (!rValue) {
+	if (node.nodeName == 'TIME') {
+	    rValue = node.getAttribute('datetime')
+	}
+    }
+    if (!rValue) {
+	if (node.nodeName == 'ABBR') {
+	    rValue = node.getAttribute('title')
+	}
+    }
+
+    if (!rValue) {
+	if (node.nodeName == 'DATA' || node.nodeName == 'INPUT') {
+	    rValue = node.getAttribute('value')
+	}
+    }
+
+    //else return the textContent of the element
+    if (!rValue) {
+	if (node.firstChild) {
+	    rValue = node.firstChild.data
+	}
+
+    }
+    return rValue
+}
+:)
+
+
 
 
 

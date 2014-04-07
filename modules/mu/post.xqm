@@ -9,6 +9,7 @@ import module namespace response="http://exist-db.org/xquery/response";
 import module namespace config="http://exist-db.org/xquery/apps/config"  at "../../modules/config.xqm";
 import module namespace note="http://markup.co.nz/#note" at "note.xqm";
 import module namespace mf2="http://markup.co.nz/#mf2" at "mf2.xqm";
+import module namespace utility="http://markup.co.nz/#utility" at "utility.xqm";
 
 declare namespace  xhtml = "http://www.w3.org/1999/xhtml";
 declare namespace  atom = "http://www.w3.org/2005/Atom";
@@ -201,6 +202,7 @@ declare
 function post:getAbbevContent($item) {
 let $r := switch (post:getPostType($item))
    case "note" return  post:getNote($item/atom:content/text())
+   case "comment" return  post:getNote($item/atom:content/text())
    default return
    ($item/atom:summary/string(),
    <hr/> ,
@@ -214,6 +216,7 @@ declare
 function post:getFullContent($item) {
 let $r := switch (post:getPostType($item))
    case "note" return  post:getNote($item/atom:content/text())
+   case "comment" return  post:getNote($item/atom:content/text())
    default return (
     $item/atom:content/node()
    )
@@ -257,10 +260,7 @@ declare
 function post:getReplyContext( $model ) {
 let $item := $model('doc-entry')/node()
 let $href := $item/atom:link[@rel='in-reply-to']/@href/string()
-let $base64flag := true()
-let $alogo := 'md5'
-let $hash := replace(util:hash($href, $alogo, $base64flag), '(=+$)', '')
-let $citeFileName :=   translate($hash, '+/=', '-_,')
+let $citeFileName :=   utility:urlHash( $href )
 let $documentUri  :=   $model('data-citations-path') || '/' || $citeFileName || '.xml'
 let $docAvailable  := doc-available($documentUri)
 (:  As a miniumim display permalink of origin URL
@@ -275,6 +275,9 @@ return
 if( $docAvailable ) then ( doc($documentUri )/node() )
 else(
  <div class="p-in-reply-to">
+
+ <p>{$href}</p>
+
 
  In reply to {post:getReplyToLink($item) }
    <p>Can not find citation: {$citeFileName } <br/>

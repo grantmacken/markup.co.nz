@@ -13,7 +13,7 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 :
 : @author Grant MacKenzie
 : @version 0.01
-:
+: import module namespace utility="http://markup.co.nz/#utility" at "utility.xqm";
 :)
 
 

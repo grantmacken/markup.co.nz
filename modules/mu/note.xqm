@@ -10,10 +10,26 @@ declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
 declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
 (:~
-: Post
+: Note
 : @author Grant MacKenzie
 : @version 0.01
 :
+: a note is plain text
+: the server auto generates inline content
+:
+: hyperlinks
+:
+: 	@person links to people
+:       #hashTags
+:       machinetags
+	    https://www.flickr.com/groups/api/discuss/72157594497877875
+	    http://www.aaronland.info/talks/mw10_machinetags/#102
+	    http://tagaholic.me/2009/03/26/what-are-machine-tags.html
+: images
+: hash tags
+:
+: http://aaronparecki.com/articles/2013/05/09/1/experimenting-with-auto-embedding-content
+: http://sandeep.shetty.in/2013_06_01_archive.html
 :)
 
 declare
