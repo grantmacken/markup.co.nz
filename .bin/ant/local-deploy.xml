@@ -240,9 +240,9 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy.data}/authors" />
     <echo>A place to store ...citations of other pages as h-cite markup</echo>
     <mkdir dir="${dir.deploy.data}/citations" />
-    <echo>A place to store ...xml job ques triggeed by stuff being stored elsewhere</echo>
+    <echo>A place to store ...xml job ques triggered by stuff being stored elsewhere</echo>
     <mkdir dir="${dir.deploy.data}/jobs" />
-     <echo>A place to store ... webmentions; where others in-reply-to my stuff have commented, liked, reposted my stuff on thier site, and sent me a web mention. stored as h-cite markup</echo>
+     <echo>A place to store ... webmentions; where others in-reply-to my\n stuff have commented, liked, reposted my stuff on thier site, and sent me a web mention. stored as h-cite markup</echo>
     <mkdir dir="${dir.deploy.data}/mentions" />
 
     <mkdir dir="${dir.deploy.templates}" />
