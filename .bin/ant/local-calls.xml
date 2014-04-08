@@ -40,7 +40,8 @@ $encode(${n})
 
 <xdb:xquery
             uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
-            query="${q_encode}" user="${exist.username}"
+            query="${q_encode}"
+	    user="${exist.username}"
             password="${exist.password}"
             outputproperty="encoded" />
 <echo>${encoded}</echo>

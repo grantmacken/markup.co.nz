@@ -420,6 +420,13 @@ curl -s -I -H "Accept-Encoding: gzip,deflate"  ${resultURL}  | grep -i "Content-
 </target>
 
 
+
+<!--
+TODO: remove proccess targets
+rely on on save which auto triggers upload
+
+-->
+
 <target name="proccess-md">
     <property name="pyFile">.bin/md2.py</property>
      <echo>${pyFile}</echo>
@@ -466,6 +473,10 @@ curl -s -I -H "Accept-Encoding: gzip,deflate"  ${resultURL}  | grep -i "Content-
         <fileset dir="www/resources/scripts" />
     </copy>
 </target>
+
+
+<!-- TODO: remove proccess targets  -->
+
 
 <target name="theme">
 <mkdir dir="${dir.generator}/themes/${project.theme}"/>
@@ -562,6 +573,31 @@ return $seq[contains(., '${project.domain}')]</property>
 
 <target name="get-project-domain" >
     <echo>${project.domain}</echo>
+</target>
+
+
+
+<!-- local deploy targets -->
+
+<target name="local-deploy" >
+     <ant antfile=".bin/ant/local-deploy.xml" target="deploy-local"/>
+</target>
+
+
+<target name="backup-data" >
+     <ant antfile=".bin/ant/local-deploy.xml" target="backup-data"/>
+</target>
+
+<target name="backup-resources" >
+     <ant antfile=".bin/ant/local-deploy.xml" target="backup-resources"/>
+</target>
+
+<target name="backup-modules" >
+     <ant antfile=".bin/ant/local-deploy.xml" target="backup-modules"/>
+</target>
+
+<target name="backup-templates" >
+     <ant antfile=".bin/ant/local-deploy.xml" target="backup-templates"/>
 </target>
 
 
