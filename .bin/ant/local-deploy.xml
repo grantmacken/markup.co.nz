@@ -10,16 +10,16 @@
     <property name="dir.backup" value=".backup/local"/>
     <property name="dir.build" value=".build/local"/>
     <property name="dir.deploy" value=".deploy/local"/>
-    <property name="dir.www" value="www"/>
-    <property name="dir.deploy.data" value="${dir.deploy}/data"/>
-    <property name="dir.deploy.modules" value="${dir.deploy}/modules"/>
-    <property name="dir.deploy.templates" value="${dir.deploy}/templates"/>
-     <property name="dir.deploy.resources" value="${dir.deploy}/resources"/>
+    <!--<property name="dir.www" value="www"/>-->
+    <!--<property name="dir.deploy.data" value="${dir.deploy}/data"/>-->
+    <!--<property name="dir.deploy.modules" value="${dir.deploy}/modules"/>-->
+    <!--<property name="dir.deploy.templates" value="${dir.deploy}/templates"/>-->
+    <!-- <property name="dir.deploy.resources" value="${dir.deploy}/resources"/>-->
+    <!---->
+    <!--<property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>-->
+    <!--<property name="dir.deploy.scripts" value="${dir.deploy}/resources/scripts"/>-->
+    <!--<property name="dir.deploy.images" value="${dir.deploy}/resources/images"/>-->
 
-    <property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>
-    <property name="dir.deploy.scripts" value="${dir.deploy}/resources/scripts"/>
-    <property name="dir.deploy.images" value="${dir.deploy}/resources/images"/>
-    <property name="dir.backup" value=".build/local"/>
 
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
 
@@ -231,56 +231,56 @@ repo:remove("http://${project.domain}")
 
 
     <mkdir dir="${dir.deploy}" />
-
-
-    <mkdir dir="${dir.deploy.data}" />
+    <mkdir dir="${dir.deploy}/data" />
     <echo>A place to store date archived atom entries as atom markup</echo>
-    <mkdir dir="${dir.deploy.data}/archive" />
+    <mkdir dir="${dir.deploy}/data/archive" />
     <echo>A place to store pages based on collections as atom markup</echo>
-    <mkdir dir="${dir.deploy.data}/pages" />
+    <mkdir dir="${dir.deploy}/data/pages" />
     <echo>A place to store ... other authors as h-card markup</echo>
-    <mkdir dir="${dir.deploy.data}/authors" />
+    <mkdir dir="${dir.deploy}/data/authors" />
     <echo>A place to store ...citations of other pages as h-cite markup</echo>
-    <mkdir dir="${dir.deploy.data}/citations" />
+    <mkdir dir="${dir.deploy}/data/citations" />
     <echo>A place to store ...xml job ques triggered by stuff being stored elsewhere</echo>
-    <mkdir dir="${dir.deploy.data}/jobs" />
+    <mkdir dir="${dir.deploy}/data/jobs" />
     <echo>A place to store ... webmentions;
     where others in-reply-to my stuff have commented, liked, reposted my stuff
     on thier site, and sent me a web mention. stored as h-cite markup</echo>
-    <mkdir dir="${dir.deploy.data}/mentions" />
+    <mkdir dir="${dir.deploy}/data/mentions" />
 
     <mkdir dir="${dir.deploy.templates}" />
-    <mkdir dir="${dir.deploy.templates}/includes" />
-    <mkdir dir="${dir.deploy.templates}/pages" />
-    <mkdir dir="${dir.deploy.templates}/posts" />
+    <!--<mkdir dir="${dir.deploy.templates}/includes" />-->
+    <!--<mkdir dir="${dir.deploy.templates}/pages" />-->
+    <!--<mkdir dir="${dir.deploy.templates}/posts" />-->
 
     <mkdir dir="${dir.deploy.modules}" />
-    <mkdir dir="${dir.deploy.modules}/mu" />
-    <mkdir dir="${dir.deploy.modules}/api" />
-    <mkdir dir="${dir.deploy.modules}/_local" />
+    <!--<mkdir dir="${dir.deploy.modules}/mu" />-->
+    <!--<mkdir dir="${dir.deploy.modules}/api" />-->
+    <!--<mkdir dir="${dir.deploy.modules}/_local" />-->
 
-    <mkdir dir="${dir.deploy.styles}" />
-    <mkdir dir="${dir.deploy.scripts}" />
-    <mkdir dir="${dir.deploy.images}" />
-    <mkdir dir="${dir.deploy.images}/svg" />
-    <mkdir dir="${dir.deploy.images}/png" />
-    <mkdir dir="${dir.deploy.images}/jpeg" />
+    <mkdir dir="${dir.deploy.resources}" />
+    <!---->
+    <!--<mkdir dir="${dir.deploy}" />-->
+    <!--<mkdir dir="${dir.deploy.scripts}" />-->
+    <!--<mkdir dir="${dir.deploy.images}" />-->
+    <!--<mkdir dir="${dir.deploy.images}/svg" />-->
+    <!--<mkdir dir="${dir.deploy.images}/png" />-->
+    <!--<mkdir dir="${dir.deploy.images}/jpeg" />-->
 
 
     <antcall target="local-deployment-folder" />
 
     <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
-    <copy todir="${dir.deploy.templates}">
+    <copy todir="${dir.deploy}/templates">
         <fileset dir="${dir.backup}/templates" />
     </copy>
     <echo>copy our changed working modules files to ${dir.deploy.modules}</echo>
-    <copy todir="${dir.deploy.modules}">
+    <copy todir="${dir.deploy}/modules">
         <fileset dir="${dir.backup}/modules" />
     </copy>
 
     <echo>copy our changed working resources files to ${dir.deploy.resources}</echo>
-    <copy todir="${dir.deploy.resources}">
-        <fileset dir="${dir.backup}/modules" />
+    <copy todir="${dir.deploy}/resources">
+        <fileset dir="${dir.backup}/resources" />
     </copy>
 
     <echo>copy our changed working data files to ${dir.deploy.data}</echo>
