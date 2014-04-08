@@ -228,18 +228,40 @@ repo:remove("http://${project.domain}")
     </delete>
 
 
-
     <mkdir dir="${dir.deploy}" />
+
+
     <mkdir dir="${dir.deploy.data}" />
+    <echo>A place to store date archived atom entries as atom markup</echo>
+    <mkdir dir="${dir.deploy.data}/archive" />
+    <echo>A place to store pages based on collections as atom markup</echo>
+    <mkdir dir="${dir.deploy.data}/pages" />
+    <echo>A place to store ... other authors as h-card markup</echo>
+    <mkdir dir="${dir.deploy.data}/authors" />
+    <echo>A place to store ...citations of other pages as h-cite markup</echo>
+    <mkdir dir="${dir.deploy.data}/citations" />
+    <echo>A place to store ...xml job ques triggeed by stuff being stored elsewhere</echo>
+    <mkdir dir="${dir.deploy.data}/jobs" />
+     <echo>A place to store ... webmentions; where others in-reply-to my stuff have commented, liked, reposted my stuff on thier site, and sent me a web mention. stored as h-cite markup</echo>
+    <mkdir dir="${dir.deploy.data}/mentions" />
+
     <mkdir dir="${dir.deploy.templates}" />
+    <mkdir dir="${dir.deploy.templates}/includes" />
+    <mkdir dir="${dir.deploy.templates}/pages" />
+    <mkdir dir="${dir.deploy.templates}/posts" />
+
     <mkdir dir="${dir.deploy.modules}" />
     <mkdir dir="${dir.deploy.modules}/mu" />
     <mkdir dir="${dir.deploy.modules}/api" />
     <mkdir dir="${dir.deploy.modules}/_local" />
+
     <mkdir dir="${dir.deploy.styles}" />
     <mkdir dir="${dir.deploy.scripts}" />
     <mkdir dir="${dir.deploy.images}" />
     <mkdir dir="${dir.deploy.images}/svg" />
+    <mkdir dir="${dir.deploy.images}/png" />
+    <mkdir dir="${dir.deploy.images}/jpeg" />
+
 
     <antcall target="local-deployment-folder" />
 
