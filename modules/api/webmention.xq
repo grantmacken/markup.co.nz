@@ -12,15 +12,14 @@ import module namespace http = "http://expath.org/ns/http-client";
 import module namespace request="http://exist-db.org/xquery/request";
 import module namespace response="http://exist-db.org/xquery/response";
 
-
 import module namespace mf2="http://markup.co.nz/#mf2"  at '../mu/mf2.xqm';
 import module namespace note="http://markup.co.nz/#note"  at '../mu/note.xqm';
 import module namespace utility = "http://markup.co.nz/#utility"  at '../mu/utility.xqm';
 
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
 let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
-let  $username := $permissions/@user/string()
-let  $password := $permissions/@password/string()
+let $username := $permissions/@user/string()
+let $password := $permissions/@password/string()
 
 let $getContextPath := request:get-context-path()
 
@@ -30,8 +29,17 @@ let $target := request:get-parameter('target',())
 (: $source Thats YOU:  you are mentioning your URL as a source:)
 let $source := request:get-parameter('source',())
 let $code := 202
+let $redirectURL := 'http://markup.co.nz/error'
 
-let $statusCode := response:set-status-code($code)
+(:
+TODO: to make responsive add job to que
+set status then async out to carry out job
+:)
+
+let $continue := if( empty($target) or  empty($source) ) then (
+      response:redirect-to($redirectURL)
+      )
+    else( response:set-status-code($code) )
 
 
 let $isTargetWebMentionLinkInHeader := function( $page ){
@@ -73,6 +81,10 @@ let $reqSource :=
     <http:request href="{ $source }" method="get" timeout="2">
 	<http:header name="Connection" value="close" />
     </http:request>
+
+
+
+
 
 let $wmTarget := http:send-request( $reqTarget )
 
@@ -362,7 +374,7 @@ let $put := http:send-request( $reqPut , (), $entry )
 
 
 
-  <p>$hCardURLValue: { $hCardURLValue  }</p>
+<p>$hCardURLValue: { $hCardURLValue  }</p>
 <p>$resolvedURL: { $resolvedURL  }</p>
 <p>$hasStoredHcard: { $stored-h-card  }</p>
 

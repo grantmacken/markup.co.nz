@@ -232,6 +232,10 @@ for item in metadata:
             elControl = ET.SubElement(eEntry, '{%s}control' % (APP_NAMESPACE))
             elDraft = ET.SubElement(elControl, "{%s}draft" % (APP_NAMESPACE))
             elDraft.text = metadata[item]
+        elif new_element == 'update':
+            elControl = ET.SubElement(eEntry, '{%s}control' % (APP_NAMESPACE))
+            elDraft = ET.SubElement(elControl, "{%s}update" % (APP_NAMESPACE))
+            elDraft.text = metadata[item]
         else:
             addElement( item, metadata[item] )
     except KeyError:

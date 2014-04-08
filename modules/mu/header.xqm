@@ -11,7 +11,6 @@ function header:site-title( $node as node(),$model as map(*)) {
         <h1 id="site-title" >{upper-case(replace( $model('site-title'), '-', ' '))}</h1>
 };
 
-
 declare
 function header:title( $node as node(),$model as map(*)) {
     if( $model('page-isHome') ) then (

@@ -64,7 +64,20 @@ xmldb:collection-available("/apps/${project.domain}/data/archive/${ymd}")
 <echo>${isAvailable}</echo>
 </target>
 
-
+<!--  ESTABLISH IF RESOURCE EXISTS   -->
+<target name="resource-available" >
+<property name="q_resource-available">
+xquery version "3.0";
+doc-available("/apps/${project.domain}/data/authors/${hash}.xml" )
+</property>
+<xdb:xquery
+            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_resource-available}"
+	    user="${exist.username}"
+            password="${exist.password}"
+            outputproperty="isResourceAvailable" />
+<echo>${isResourceAvailable}</echo>
+</target>
 
 <!--  Count Child Resources xmldb:get-child-resources  -->
 <target name="child-resources-count" >
@@ -105,13 +118,12 @@ util:uuid()
 <property name="q_hash">
 xquery version "3.0";
 import module namespace util="http://exist-db.org/xquery/util";
-import module namespace xmldb="http://exist-db.org/xquery/xmldb";
-let $message  := "${inreplyto}"
+let $href  := "${url}"
 let $base64flag := true()
 let $alogo := 'md5'
+let $hash := replace(util:hash($href, $alogo, $base64flag), '(=+$)', '')
 return
-util:hash($message, $alogo, $base64flag)
-
+translate( $hash, '+/', '-_')
 </property>
 <xdb:xquery
             uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"

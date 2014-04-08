@@ -101,6 +101,23 @@ project.description: ${project.description}
 />
 </target>
 
+
+<target name="store-xql">
+<echo>${relativePath}</echo>
+<echo>${fileName}</echo>
+<property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/${relativePath}</property>
+<property name="srcfile">${relativePath}/${fileName}.xql</property>
+<echo>${exist.uri}</echo>
+<xdb:store
+    uri="${exist.uri}"
+    createcollection="true"
+    srcfile="${srcfile}"
+    user="${exist.username}"
+    password="${exist.password}"
+    permissions="rwxrwxr-x"
+/>
+</target>
+
 <target name="store-xq">
 <echo>${relativePath}</echo>
 <echo>${fileName}</echo>
@@ -523,6 +540,10 @@ return $seq[contains(., '${project.domain}')]</property>
 
 <target name="collection-available" >
     <ant antfile=".bin/ant/local-calls.xml" target="collection-available"/>
+</target>
+
+<target name="resource-available" >
+    <ant antfile=".bin/ant/local-calls.xml" target="resource-available"/>
 </target>
 
 <target name="get-uuid" >

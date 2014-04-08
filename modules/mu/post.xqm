@@ -770,25 +770,6 @@ let $seqItem := for $item in xmldb:xcollection($path)
 
 
 
-
-declare
-function post:head-link-webebmention($node as node(), $model as map(*)) {
-let $docEntry := $model('doc-entry')/node()
-let  $href := 'http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/_local/webmention.xq'
-(:let $href := $docEntry/atom:link[@rel='webmention']/@href/string():)
-let $link := (<link rel="webmention" href="{$href}" /> )
-
-let $addHeader :=
-   if (not(empty($link) )) then (
-      let $href :=  $href
-      let $linkValue := '<'  ||  $href || '>; rel="webmention"'
-      return response:set-header("Link",  $linkValue)                                            )
-   else()
-
-return
-$link
-};
-
 declare
 function post:head-link-rel-in-reply-to($node as node(), $model as map(*)) {
 let $docEntry := $model('doc-entry')/node()

@@ -1,6 +1,11 @@
 @import "compass/typography";
 @import "compass/typography/vertical_rhythm";
 
+
+/**
+ ONLY use functions and vars here
+*/
+
 @function emify($target, $context) {
    @if $target == 0 { @return 0 }
    @return $target / $context + 0em;
@@ -14,6 +19,11 @@
 }
 
 
+/**
+ ONLY use vars here
+*/
+
+
 // Fonts, measure, leading and typefaces
 // ------------------------------------------------------------
 
@@ -23,11 +33,13 @@ $regular: 400;
 $bold: 600;
 
 // Base Font
-$base-font-family: Helvetica, Arial, sans-serif;
+$base-font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 $base-font-weight: $regular;
 
 // Headings
 $header-font-weight: $bold;
+
+
 
 
 // SET-UP CORE FONT SIZING AND RHYTHM
@@ -35,10 +47,21 @@ $base-font-size: 16px;  // Sets the browser default size. Shouldn't need to chan
 $base-line-height: 8px; // Baseline grid. Set to a sensible, small size.
 @include establish-baseline;
 
+
+
 // Fixed Font
 $fixed-font-family:  Menlo, DejaVu Sans Mono, Bitstream Vera Sans Mono , Nu Sans Mono, Droid Sans Mono, Proggy Clean ,Consolas ,Lucida Console, BPMono, monospace;
 $fixed-font-size: 85%;
 $fixed-line-height: $base-line-height;
+
+@mixin myTypography {
+   max-width: 40em;
+   text-rendering: optimizeLegibility;
+   webkit-font-smoothing: antialiased;
+   text-align: left;
+  }
+
+
 
 /*
  * http://compass-style.org/reference/compass/typography/vertical_rhythm/

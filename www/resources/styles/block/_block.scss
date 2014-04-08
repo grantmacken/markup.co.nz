@@ -26,11 +26,16 @@ h3, h4, h5, h6 {
 	font-weight: $header-font-weight;
 }
 
-div, p, pre, label {
+div, p, pre, label, aside {
+        @include myTypography;
 	@include adjust-font-size-to(16px);
 	margin: 0 0 rhythm(2, 16px) 0;
 	// 2 lines below, based on font size
 }
+
+/*p, li {
+   @include myTypography
+}*/
 
 
 

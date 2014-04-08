@@ -4,13 +4,13 @@ author: Grant MacKenzie
 published: 2014-02-23T10:00:12
 id: tag:markup.co.nz,2014-02-23:article:2tE1
 summary: Some background notes on sending webmentions.
-categories: webmention
+categories: webmentions
+update: no
 ---
 
 A work in progress
 
-Two parts
-
+Two parts.
 
 1. This article: a  'publishing client' which can send webmentions
 2. Next article: my servers capability of receiving webmentions an doing
@@ -28,8 +28,8 @@ To implement webmentions what a 'Publishing Client' should be able to do is **re
 sending a **Response Post** to the **web mention endpoint**. The web mention endpoint is discovered by looking up the URL to see if the endpoint is referenced in either the URLs header on in the head of the URLs document.
 
 
-Identifier
-----------
+My Identifier
+-------------
 
 A set of 'types of  *Response Posts* '
 
@@ -59,39 +59,79 @@ So what we have is a
 [relationship between links]( http://www.iana.org/assignments/link-relations/link-relations.xhtml )
  where the link relationship value is in [in reply to]( http://micro formats.org/wiki/rel-in-reply-to ).
 
-This link relationship will be expressed in our markdown front-matter.
+Front Matter As A Server Directive.
+-----------------------------------
 
-```rel-in-reply-to:  URL```
+This link relationship is expressed in our markdown front-matter,
+```rel-in-reply-to:  URL``
+when we create a comment.
 
-We can use the url to discover the 'webmention' endpoint to ping to, so the
-author of the post I am commenting on will know I am mentioning their post
+This generates a atom entry on the server with contained 'link' markup and the taguri
 
-The reply context
------------------
+    xml
+    <link rel="in-reply-to" type="text/html" href="http://barryfrost.com/how-to-comment"/>
+    <id>tag:markup.co.nz,2014-02-26:comment:2tH1</id>
 
-A 'comment' is always about another 'post' so to understand what the comment is
-in reply to, its helpful to provide some reply context.
+When we add stuff to the front matter we want the server to do stuff with it.
+With his ```rel-in-reply-to``` will we want the link relationship expressed
 
-This reply context stuff becomes a section in our permalink page marked up as a microformat h-cite container. Its not part of our content, but is there to reader some understanding of the origin of the content. I might 'cite' this page in another post so it might be best to store a collection of Citations with the unique identifier being a
-taguri or the URL
+1. in the head of the document as a **link element**
+
+2. in the **HTTP header field**  when the document in served ref: [rfc5988]( http://tools.ietf.org/html/rfc5988 )
+
+3. in the body of the document as part of the reply context for the entry. Marked up as a h-entry containing an h-cite with an anchor that has an attribute ```class="u-in-reply-to"``` ref: [indiewebcamp](https://indiewebcamp.com/comment)
+
+If we do the above, when we ping the webmention endpoint, then the endpoint should be able to discover who (me) pinged them, and if they have the capability uncover authorship, content, etc. by examining my microformated markup.
+
+Testing 1 2 3
+-------------
+
+reference post: <br/>[http://markup.co.nz/archive/2014/02/26/153016](http://markup.co.nz/archive/2014/02/26/153016)
+
+```curl -s -i http://markup.co.nz/archive/2014/02/26/153016 | grep 'in-reply-to'```
+
+    Link: <http://barryfrost.com/how-to-comment>; rel="in-reply-to"
+	    <link rel="in-reply-to" href="http://barryfrost.com/how-to-comment" type="text/html" />
+		<div class="p-in-reply-to">
+     In reply to <a rel="in-reply-to" href="http://barryfrost.com/how-to-comment">http://barryfrost.com/how-to-comment</a>
+    grant@grant:~$
 
 
-Web site: author(s), article and publication title where appropriate, as well as a URL, and a date when the site was accessed.
+Webmention Endpoint
+-------------------
 
-As a minimum a line  on the webpage  'In reply to  hyperlinked URL'  should do.
+We can use the ```rel-in-reply-to:  URL``` to discover the *webmention endpoint* to ping to, so the author of the post I am commenting on will know I am mentioning their post.
 
+When should we ping the endpoint.
 
-What we are looking for in the cited page.
+1. After my draft goes from yes to no. Draft key value become 'no'  triggers upload from localhost to remote occurs.
 
-* URL
-* Title. The document Title or if document microformated  look for  h-entry then for p-name
-* TODO: Author.  If document microformated  look for  h-entry then for p-author and or h-card. If this fails  the page author maybe in the page head as meta element. If this fails then look up homepage we might find a h-card there. If we do find an h-card add to collection of hcards.
-* TODO: Published date and or maybe a date when the site was accessed.
-* TODO: Summary:  If the Page content is in a short note form like a tweet the whole note otherwise look for summary. If no summary then empty.
+2. After an major update ( note: not just typos - this is the meaning of the atom updated element).
 
-
-
-TODO
+What I am thinking of is after the draft stops being a draft the font-matter *draft*  becomes *update* with the default set to no.  Setting to yes, both uploads to remote and pings the webmention endpoint, then the  front-matter *update*  resets back to no. DONE.
 
 
-Hack notes:
+Testing Webmentions
+-------------------
+
+DONE: Create an webmention endpoint on localhost ```/modules_local/webmention.xq```
+
+DONE: Create a test note [ I am going to try comment on this note](http://markup.co.nz/archive/2014/03/16/083751)
+
+```curl -s -i http://markup.co.nz/archive/2014/03/16/083751 | grep 'rel="webmention"'```
+
+We should see our own webmention endpoint in both the response header and a link in the document head
+
+	Link: <http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/_local/webmention.xq>; rel="webmention"
+	    <link rel="webmention" href="http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/_local/webmention.xq" />
+    grant@grant:~$
+
+With this in place we can make on our own page
+
+Create a comment  with macro ```new comment`` which comments on the note.
+
+[comment created] ( http://markup.co.nz/archive/2014/03/16/141619 )
+
+Create reply context with macro ```reply-context``` which generates and stores citation
+
+

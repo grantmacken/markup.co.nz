@@ -1,6 +1,16 @@
 // ADD YOUR OWN MIXINS AND HELPERS HERE
 // DESCRIBE WHAT EACH DOES AND HOW TO USE THEM
 //$page-background
+
+
+// Paragraphs
+//http://www.lukew.com/ff/entry.asp?1856&utm_source=Responsive+Design+Weekly&utm_campaign=df7137db4d-Responsive_Design_Weekly_103&utm_medium=email&utm_term=0_df65b6d7c8-df7137db4d-59035113
+
+//Paragraph widths
+//Kerning: text-rendering
+//Sub-pixel font lettering
+
+
 @mixin layout-block {
     @include border-radius(12px);
     @include box-shadow(0 0 40px $page-background inset);
