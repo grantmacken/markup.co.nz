@@ -269,22 +269,24 @@ repo:remove("http://${project.domain}")
 
     <antcall target="local-deployment-folder" />
 
-    <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
+    <echo>copy from ${dir.backup} to  ${dir.deploy}</echo>
+
+    <echo>copy our changed working template files</echo>
     <copy todir="${dir.deploy}/templates">
         <fileset dir="${dir.backup}/templates" />
     </copy>
-    <echo>copy our changed working modules files to ${dir.deploy.modules}</echo>
+    <echo>copy our changed working modules</echo>
     <copy todir="${dir.deploy}/modules">
         <fileset dir="${dir.backup}/modules" />
     </copy>
 
-    <echo>copy our changed working resources files to ${dir.deploy.resources}</echo>
+    <echo>copy our changed working resources files</echo>
     <copy todir="${dir.deploy}/resources">
         <fileset dir="${dir.backup}/resources" />
     </copy>
 
-    <echo>copy our changed working data files to ${dir.deploy.data}</echo>
-    <copy todir="${dir.deploy.data}">
+    <echo>copy our changed working data files</echo>
+    <copy todir="${dir.deploy}/data">
         <fileset dir="${dir.backup}/data" />
     </copy>
 
