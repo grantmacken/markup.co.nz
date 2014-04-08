@@ -75,19 +75,16 @@ repo:remove("http://${project.domain}")
       and use backup for post deployment
     -->
 
-   <target name="backup-resources">
-    <mkdir dir="${dir.backup}/resources" />
+   <target name="backup">
 
+    <mkdir dir="${dir.backup}/resources" />
     <delete includeEmptyDirs="true" >
         <fileset dir="${dir.backup}/resources"  defaultexcludes="false">
             <include name="*/**" />
         </fileset>
     </delete>
-
     <mkdir dir="${dir.backup}/resources" />
-
-
-<xdb:extract xmlns:xdb="http://exist-db.org/ant"
+    <xdb:extract xmlns:xdb="http://exist-db.org/ant"
             uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/resources"
             destdir="${dir.backup}/resources"
             subcollections="true"
@@ -96,35 +93,25 @@ repo:remove("http://${project.domain}")
             user="${exist.username}"
             password="${exist.password}"
             />
-   </target>
 
-
-   <target name="backup-modules">
     <mkdir dir="${dir.backup}/modules" />
-
     <delete includeEmptyDirs="true" >
         <fileset dir="${dir.backup}/modules"  defaultexcludes="false">
             <include name="*/**" />
         </fileset>
     </delete>
-
     <mkdir dir="${dir.backup}/modules" />
+    <xdb:extract xmlns:xdb="http://exist-db.org/ant"
+                uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/modules"
+                destdir="${dir.backup}/modules"
+                subcollections="true"
+                createdirectories="true"
+                overwrite="true"
+                user="${exist.username}"
+                password="${exist.password}"
+                />
 
-
-<xdb:extract xmlns:xdb="http://exist-db.org/ant"
-            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/modules"
-            destdir="${dir.backup}/modules"
-            subcollections="true"
-            createdirectories="true"
-            overwrite="true"
-            user="${exist.username}"
-            password="${exist.password}"
-            />
-   </target>
-
-   <target name="backup-templates">
     <mkdir dir="${dir.backup}/templates" />
-
     <delete includeEmptyDirs="true" >
         <fileset dir="${dir.backup}/templates"  defaultexcludes="false">
             <include name="*/**" />
@@ -132,18 +119,16 @@ repo:remove("http://${project.domain}")
     </delete>
 
     <mkdir dir="${dir.backup}/templates" />
-
-
-<xdb:extract xmlns:xdb="http://exist-db.org/ant"
-            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/templates"
-            destdir="${dir.backup}/templates"
-            subcollections="true"
-            createdirectories="true"
-            overwrite="true"
-            user="${exist.username}"
-            password="${exist.password}"
-            />
-   </target>
+    <xdb:extract xmlns:xdb="http://exist-db.org/ant"
+                uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/templates"
+                destdir="${dir.backup}/templates"
+                subcollections="true"
+                createdirectories="true"
+                overwrite="true"
+                user="${exist.username}"
+                password="${exist.password}"
+                />
+    </target>
 
     <target name="deploy-bumpversion">
      <!--
@@ -213,10 +198,10 @@ repo:remove("http://${project.domain}")
 
         -->
 
-        <antcall target="backup-data" />
-        <antcall target="backup-resources" />
-        <antcall target="backup-modules" />
-        <antcall target="backup-templates" />
+        <!--<antcall target="backup-data" />-->
+        <!--<antcall target="backup-resources" />-->
+        <!--<antcall target="backup-modules" />-->
+        <!--<antcall target="backup-templates" />-->
 
 
      <mkdir dir=".deploy" />
@@ -247,25 +232,9 @@ repo:remove("http://${project.domain}")
     on thier site, and sent me a web mention. stored as h-cite markup</echo>
     <mkdir dir="${dir.deploy}/data/mentions" />
 
-    <mkdir dir="${dir.deploy.templates}" />
-    <!--<mkdir dir="${dir.deploy.templates}/includes" />-->
-    <!--<mkdir dir="${dir.deploy.templates}/pages" />-->
-    <!--<mkdir dir="${dir.deploy.templates}/posts" />-->
-
-    <mkdir dir="${dir.deploy.modules}" />
-    <!--<mkdir dir="${dir.deploy.modules}/mu" />-->
-    <!--<mkdir dir="${dir.deploy.modules}/api" />-->
-    <!--<mkdir dir="${dir.deploy.modules}/_local" />-->
-
-    <mkdir dir="${dir.deploy.resources}" />
-    <!---->
-    <!--<mkdir dir="${dir.deploy}" />-->
-    <!--<mkdir dir="${dir.deploy.scripts}" />-->
-    <!--<mkdir dir="${dir.deploy.images}" />-->
-    <!--<mkdir dir="${dir.deploy.images}/svg" />-->
-    <!--<mkdir dir="${dir.deploy.images}/png" />-->
-    <!--<mkdir dir="${dir.deploy.images}/jpeg" />-->
-
+    <mkdir dir="${dir.deploy}/templates" />
+    <mkdir dir="${dir.deploy}/modules" />
+    <mkdir dir="${dir.deploy}/resources" />
 
     <antcall target="local-deployment-folder" />
 
@@ -274,6 +243,10 @@ repo:remove("http://${project.domain}")
     <echo>copy our changed working template files</echo>
     <copy todir="${dir.deploy}/templates">
         <fileset dir="${dir.backup}/templates" />
+        <mapper type="glob"
+                from="*.html.xml"
+                to="*.html"/>
+
     </copy>
     <echo>copy our changed working modules</echo>
     <copy todir="${dir.deploy}/modules">
@@ -290,28 +263,28 @@ repo:remove("http://${project.domain}")
         <fileset dir="${dir.backup}/data" />
     </copy>
 
-
-    <echo>create hosts.xml in data dir</echo>
-
-    <echoxml file="${dir.deploy.data}/hosts.xml" append="false">
-        <hosts>
-            <local>${host.local}</local>
-            <remote>${host.remote}</remote>
-        </hosts>
-    </echoxml>
-
-
-    <antcall target="eXist-data-local" />
-    <echo>Remove existing deployment</echo>
-    <antcall target="xar-undeploy-remove" />
-    <echo>Build the deployment xar</echo>
-    <antcall target="build-xar" />
-    <echo>Upload the deployment xar</echo>
-    <antcall target="xar-upload" />
-    <echo>install the deployment</echo>
-    <antcall target="xar-install" />
-    <echo>browse and maybe run tests with phantomjs</echo>
-    <antcall target="browse" />
+    <!---->
+    <!--<echo>create hosts.xml in data dir</echo>-->
+    <!---->
+    <!--<echoxml file="${dir.deploy.data}/hosts.xml" append="false">-->
+    <!--    <hosts>-->
+    <!--        <local>${host.local}</local>-->
+    <!--        <remote>${host.remote}</remote>-->
+    <!--    </hosts>-->
+    <!--</echoxml>-->
+    <!---->
+    <!---->
+    <!--<antcall target="eXist-data-local" />-->
+    <!--<echo>Remove existing deployment</echo>-->
+    <!--<antcall target="xar-undeploy-remove" />-->
+    <!--<echo>Build the deployment xar</echo>-->
+    <!--<antcall target="build-xar" />-->
+    <!--<echo>Upload the deployment xar</echo>-->
+    <!--<antcall target="xar-upload" />-->
+    <!--<echo>install the deployment</echo>-->
+    <!--<antcall target="xar-install" />-->
+    <!--<echo>browse and maybe run tests with phantomjs</echo>-->
+    <!--<antcall target="browse" />-->
 
 </target>
 
