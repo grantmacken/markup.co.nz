@@ -115,6 +115,7 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy.templates}" />
     <mkdir dir="${dir.deploy.modules}" />
     <mkdir dir="${dir.deploy.modules}/mu" />
+    <mkdir dir="${dir.deploy.modules}/api" />
     <mkdir dir="${dir.deploy.modules}/_local" />
     <mkdir dir="${dir.deploy.styles}" />
     <mkdir dir="${dir.deploy.scripts}" />
@@ -204,7 +205,7 @@ repo:remove("http://${project.domain}")
 <collection xmlns="http://exist-db.org/collection-config/1.0">
     <triggers>
         <trigger class="org.exist.collections.triggers.XQueryTrigger">
-            <parameter name="url" value="xmldb:exist://127.0.0.1:8080/db/apps/markup.co.nz/modules/_local/resources-trigger.xqm"/>
+            <parameter name="url" value="xmldb:exist://127.0.0.1:8080/db/apps/${project.domain}/modules/_local/resources-trigger.xqm"/>
         </trigger>
     </triggers>
 </collection>
