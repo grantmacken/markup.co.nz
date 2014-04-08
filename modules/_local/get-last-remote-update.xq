@@ -19,7 +19,7 @@ let  $username := $permissions/@user/string()
 let  $password := $permissions/@password/string()
 let $hosts :=  doc(concat($app-root, "/data/hosts.xml"))
 
-let $uri := doc(concat($app-root, "/data/uri.xml"))//@href/string()
+let $uri := doc(concat($app-root, "/data/upload-link-atom.xml"))//@href/string()
 
 return
   if( empty($uri) ) then ( 'no last update file' )

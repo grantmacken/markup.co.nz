@@ -12,7 +12,10 @@ import module namespace http = "http://expath.org/ns/http-client";
 import module namespace request="http://exist-db.org/xquery/request";
 import module namespace session = "http://exist-db.org/xquery/session";
 
-(: this is happening async yea yea yea :)
+(:
+   this is happening async yea yea yea
+   test: check response using oxygen
+:)
 
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
 let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
@@ -54,14 +57,25 @@ let $reqPut :=
          name = "Connection"
          value = "close"/>
       <http:body
-         media-type="application/xml"/>
+         media-type="application/xml"
+         method="xml"
+         />
     </http:request>
 
 let $inDoc := http:send-request($reqGet)[2]
 
-let $isDraft :=
-    if($inDoc//app:control/app:draft/string() eq 'yes') then ( true() )
+let $isNotDraft :=
+    if($inDoc//app:control/app:draft/string() eq 'no') then ( true() )
     else ( false() )
+
+let $isUpate :=
+    if($inDoc//app:control/app:update/string() eq 'yes') then ( true() )
+    else ( false() )
+
+let $canSend :=
+    if( $isUpate or $isNotDraft ) then ( true() )
+    else ( false() )
+
 
 let $reqGetRemote   :=
     <http:request
@@ -77,7 +91,11 @@ let $reqGetRemote   :=
     value = "close"/>
     </http:request>
 
+let $sendPut := if( $canSend ) then (http:send-request( $reqPut , (), $inDoc) )
+                else ( )
 
 return
-if($isDraft ) then ()
-else ( http:send-request( $reqPut , (), $inDoc))
+if( $canSend ) then (
+http:send-request( $reqGetRemote  )
+)
+else ( $canSend )
