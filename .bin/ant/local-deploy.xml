@@ -263,28 +263,28 @@ repo:remove("http://${project.domain}")
         <fileset dir="${dir.backup}/data" />
     </copy>
 
-    <!---->
-    <!--<echo>create hosts.xml in data dir</echo>-->
-    <!---->
-    <!--<echoxml file="${dir.deploy.data}/hosts.xml" append="false">-->
-    <!--    <hosts>-->
-    <!--        <local>${host.local}</local>-->
-    <!--        <remote>${host.remote}</remote>-->
-    <!--    </hosts>-->
-    <!--</echoxml>-->
-    <!---->
-    <!---->
-    <!--<antcall target="eXist-data-local" />-->
-    <!--<echo>Remove existing deployment</echo>-->
-    <!--<antcall target="xar-undeploy-remove" />-->
-    <!--<echo>Build the deployment xar</echo>-->
-    <!--<antcall target="build-xar" />-->
-    <!--<echo>Upload the deployment xar</echo>-->
-    <!--<antcall target="xar-upload" />-->
-    <!--<echo>install the deployment</echo>-->
-    <!--<antcall target="xar-install" />-->
-    <!--<echo>browse and maybe run tests with phantomjs</echo>-->
-    <!--<antcall target="browse" />-->
+
+    <echo>create hosts.xml in data dir</echo>
+
+    <echoxml file="${dir.deploy.data}/hosts.xml" append="false">
+        <hosts>
+            <local>${host.local}</local>
+            <remote>${host.remote}</remote>
+        </hosts>
+    </echoxml>
+
+
+
+    <echo>Remove existing deployment</echo>
+    <antcall target="xar-undeploy-remove" />
+    <echo>Build the deployment xar</echo>
+    <antcall target="build-xar" />
+    <echo>Upload the deployment xar</echo>
+    <antcall target="xar-upload" />
+    <echo>install the deployment</echo>
+    <antcall target="xar-install" />
+    <echo>browse and maybe run tests with phantomjs</echo>
+    <antcall target="browse" />
 
 </target>
 
