@@ -48,13 +48,10 @@ let $reqPut :=
       send-authorization="true"
       timeout="20">
       <http:header
-         name="Connection"
-         value="close"/>
+         name = "Connection"
+         value = "close"/>
       <http:body
-         media-type="image/svg+xml"
-    	 method="xml"
-    	 indent="no"
-    	 omit-xml-declaration="yes"
+         media-type="text/css"
 	 />
     </http:request>
 
@@ -76,6 +73,7 @@ let $reqGetRemote   :=
 
 let $sendRemote  := http:send-request( $reqPut , (), $inDoc)
 
-(: http:send-request( $reqPut , (), $inDoc) :)
+
+
 return
 ( http:send-request( $reqGetRemote , ()) )

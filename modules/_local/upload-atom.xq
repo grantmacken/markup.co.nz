@@ -18,11 +18,15 @@ import module namespace session = "http://exist-db.org/xquery/session";
 :)
 
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
+let $app-path  :=   substring-after( $app-root ,'//')
+let $domain  :=   substring-after( $app-root ,'/apps/')
 let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
 let  $username := $permissions/@user/string()
 let  $password := $permissions/@password/string()
 
 let $uri := doc(concat($app-root, "/data/upload-link-atom.xml"))//@href/string()
+let $name := substring-before(tokenize($uri , '/' )[count(tokenize($uri , '/' ))], '.')
+
 let  $local-ip := doc(concat($app-root, "/data/hosts.xml"))//local/string()
 let  $remote-ip := doc(concat($app-root, "/data/hosts.xml"))//remote/string()
 
@@ -31,8 +35,10 @@ let  $remote := 'http://' || $remote-ip || ':8080'
 let  $rest := '/exist/rest'
 let  $urlLocal := $local || $rest || $uri
 let  $urlRemote := $remote || $rest || $uri
+let  $urlWWW := 'http://www.'  || $domain  || substring-before(substring-after( $uri , '/data'), $name ) || $name
 
 let $reqGet := <http:request href="{ $urlLocal }"
+
 method="get"
 username="{ $username }"
 password="{ $password }"
@@ -94,8 +100,57 @@ let $reqGetRemote   :=
 let $sendPut := if( $canSend ) then (http:send-request( $reqPut , (), $inDoc) )
                 else ( )
 
+let $query :=
+<query xmlns="http://exist.sourceforge.net/NS/exist">
+<text>
+import module namespace process="http://exist-db.org/xquery/process" at "java:org.exist.xquery.modules.process.ProcessModule";
+import module namespace system="http://exist-db.org/xquery/system";
+
+let <![CDATA[$username]]> := '{$username}'
+let <![CDATA[$password]]> := '{$password}'
+
+<![CDATA[
+let $target := 'archive'
+let $options := <options>
+		    <workingDir>bin/nginx-cache-purge</workingDir>
+		    <stdin><line>./nginx-cache-purge '{$target}' /usr/local/nginx/cache</line></stdin>
+		</options>
+
+let $check := <options>
+		    <workingDir>bin/nginx-cache-inspector/</workingDir>
+		    <stdin><line>./nginx-cache-inspector '{$target}' /usr/local/nginx/cache</line></stdin>
+		</options>
+let $cmd :=  '/bin/sh'
+return
+( system:as-user($username, $password, process:execute($cmd, $options )))
+]]></text>
+    <properties>
+        <property name="indent" value="yes"/>
+    </properties>
+</query>
+
+
+let $clearCache := if( $canSend ) then (
+http:send-request( <http:request
+    href="{$remote || $rest || $app-path}"
+    method="post"
+    username="{$username}"
+    password="{$password}"
+    auth-method="basic"
+    send-authorization="true"
+    timeout="10"
+>
+<http:header name="Connection" value="close"/>
+
+<http:body media-type='application/xml'>
+ {$query}
+</http:body>
+
+</http:request>))
+                else ( )
+
 return
 if( $canSend ) then (
-http:send-request( $reqGetRemote  )
+( $clearCache  , http:send-request( $reqGetRemote  ))
 )
-else ( $canSend )
+else ( ($name, $urlWWW, $urlRemote) )

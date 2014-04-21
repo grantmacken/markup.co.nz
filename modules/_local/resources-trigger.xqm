@@ -71,8 +71,7 @@ return
 switch ($ext)
    case "svg" return util:eval-async($uploadXQ)
    case "svg-gz" return  util:eval-async($uploadXQ)
-   case "Duck" return "Quack"
-   case "Dog" case "Pitbull" return "Wuff"
+   (:case "css" return   util:eval-async($uploadXQ):)
    default return util:log($priority,'CAN_NOT_HANDLE_YET')
 };
 
