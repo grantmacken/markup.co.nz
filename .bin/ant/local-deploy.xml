@@ -538,7 +538,7 @@ declare variable $target external;
 sm:chmod(xs:anyURI($target || "/data/_jobs"), "rwxrwx-wx")
 
 :)
-(  )
+( sm:chmod(xs:anyURI($target || "/data/_jobs"), "rwxrwx-wx") )
 
 </echo>
 
