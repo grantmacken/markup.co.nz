@@ -285,7 +285,6 @@ repo:remove("http://${project.domain}")
 
     <antcall target="local-deployment-folder" />
 
-<!--
 
     <antcall target="local-copy" />
 
@@ -310,12 +309,62 @@ repo:remove("http://${project.domain}")
     <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
 
-   -->
+  <!-- -->
 
 </target>
 
 
 <target name="local-copy">
+    <echo>Copy our ...
+    changed working TEMPLATES files</echo>
+    <copy todir="${dir.deploy}/templates">
+        <fileset dir="templates" />
+    </copy>
+
+    <echo>copy our ...
+    changed working module files</echo>
+    <copy todir="${dir.deploy}/modules">
+        <fileset dir="modules" />
+    </copy>
+
+    <echo>copy our ...
+    eXist backup resources files except svg. we copy from a backup as our
+    working files have been preproccesssed prior to upload. We want these
+    changes to become part of the deploy
+    </echo>
+    <copy todir="${dir.deploy}/resources">
+        <fileset dir="${dir.backup}/resources" >
+            <exclude name="**/*.xml" />
+        </fileset>
+    </copy>
+
+
+    <echo>copy our ...
+    eXist backup svg resources
+    working svg files have been preproccesssed prior to upload.
+    We want these changes to become part of the deploy
+    </echo>
+
+    <copy todir="${dir.deploy}/resources">
+        <fileset dir="${dir.backup}/resources" />
+                <mapper type="glob"
+                from="*.svg.xml"
+                to="*.svg"/>
+    </copy>
+
+<!--    <echo>copy our ...
+    eXist backup data files
+    working files have been preproccesssed prior to upload. We want these
+    changes to become part of the deploy
+    </echo>
+
+    <echo>copy our changed working data files</echo>
+    <copy todir="${dir.deploy}/data">
+        <fileset dir="${dir.backup}/data" />
+    </copy>-->
+
+
+    <!--
 
     <echo>Copy templates </echo>
 
@@ -350,7 +399,7 @@ repo:remove("http://${project.domain}")
     <copy todir="${dir.deploy}/data">
         <fileset dir="${dir.backup}/data" />
     </copy>
-
+    -->
 </target>
 
 <target name="local-deployment-folder">
