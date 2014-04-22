@@ -188,6 +188,8 @@ repo:remove("http://${project.domain}")
 
     <mkdir dir=".backup" />
     <mkdir dir="${dir.backup}" />
+    
+    <antcall target="backup" />
 
      <!-- TODO a sync routine
          on localhost in data/archive and data/pages collection
