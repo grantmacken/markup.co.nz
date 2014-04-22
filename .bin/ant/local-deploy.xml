@@ -462,9 +462,7 @@ declare variable $dir external;
 declare variable $target external;
 
 (: Allow guests to add documents to collection but not read:)
-( sm:chmod(xs:anyURI($target || "/data/_jobs"), "rwxrwx-wx"),
-
-)
+( sm:chmod(xs:anyURI($target || "/data/_jobs"), "rwxrwx-wx") )
 
 </echo>
 
