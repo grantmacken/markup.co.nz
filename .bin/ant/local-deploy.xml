@@ -325,7 +325,7 @@ repo:remove("http://${project.domain}")
 
 
 
-    <echo>Remove existing deployment</echo>
+<!--    <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
     <echo>Build the deployment xar</echo>
     <antcall target="build-xar" />
@@ -335,6 +335,8 @@ repo:remove("http://${project.domain}")
     <antcall target="xar-install" />
     <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
+
+    -->
 
 </target>
 
