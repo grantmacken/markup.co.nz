@@ -188,7 +188,15 @@ repo:remove("http://${project.domain}")
 
     <mkdir dir=".backup" />
     <mkdir dir="${dir.backup}" />
-    
+    <echo>delete ${dir.backup} </echo>
+    <delete includeEmptyDirs="true" >
+        <fileset dir="${dir.backup}"  defaultexcludes="false">
+            <include name="*/**" />
+        </fileset>
+    </delete>
+
+
+
     <antcall target="backup" />
 
      <!-- TODO a sync routine
