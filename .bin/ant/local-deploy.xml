@@ -316,7 +316,7 @@ repo:remove("http://${project.domain}")
 
     <echo>create hosts.xml in data dir</echo>
 
-    <echoxml file="${dir.deploy.data}/hosts.xml" append="false">
+    <echoxml file="${dir.deploy}/data/hosts.xml" append="false">
         <hosts>
             <local>${host.local}</local>
             <remote>${host.remote}</remote>
