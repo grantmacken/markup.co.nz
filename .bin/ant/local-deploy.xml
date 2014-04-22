@@ -298,7 +298,14 @@ repo:remove("http://${project.domain}")
         <fileset dir="${dir.backup}/modules" />
     </copy>
 
-    <echo>copy our changed working resources files</echo>
+    <echo>copy our changed working resources files except svg</echo>
+    <copy todir="${dir.deploy}/resources">
+        <fileset dir="${dir.backup}/resources" >
+            <exclude name="**/*.xml" />
+        </fileset>
+    </copy>
+
+
     <copy todir="${dir.deploy}/resources">
         <fileset dir="${dir.backup}/resources" />
                 <mapper type="glob"
@@ -457,7 +464,7 @@ declare variable $dir external;
 declare variable $target external;
 
 (: Allow guests to add documents to collection but not read:)
-( sm:chmod(xs:anyURI($target || "/data/jobs"), "rwxrwx-wx"),
+( sm:chmod(xs:anyURI($target || "/data/_jobs"), "rwxrwx-wx"),
 
 )
 
