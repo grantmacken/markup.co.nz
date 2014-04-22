@@ -449,38 +449,6 @@ curl -s -I -H "Accept-Encoding: gzip,deflate"  ${resultURL}  | grep -i "Content-
 </target>
 
 
-<target name="deploy-info">
-<property name="q_repo-list">
-xquery version "3.0";
-import module namespace repo="http://exist-db.org/xquery/repo";
-let $seq := repo:list()
-return string-join($seq, ',')
-</property>
-
-<xdb:xquery
-            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
-            query="${q_repo-list}" user="${exist.username}"
-            password="${exist.password}"
-            outputproperty="repo-list" />
-<echo>${repo-list}</echo>
-
-<property name="q_repo-find">xquery version "3.0";
-import module namespace repo="http://exist-db.org/xquery/repo";
-let $seq := repo:list()
-return $seq[contains(., '${project.domain}')]</property>
-
-<xdb:xquery uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
-            query="${q_repo-find}" user="${exist.username}"
-            password="${exist.password}"
-            outputproperty="repo-find" />
-<echo>${repo-find}</echo>
-<echo>LIST resources and collections in: xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}</echo>
-<xdb:list uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}"
-          collections="true"
-          resources="true"
-          outputproperty="collections" />
-<echo>${collections}</echo>
-</target>
 
 
 
@@ -530,6 +498,40 @@ return $seq[contains(., '${project.domain}')]</property>
 
 
 <!-- local deploy targets -->
+
+<target name="deploy-info">
+<property name="q_repo-list">
+xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+let $seq := repo:list()
+return string-join($seq, ',')
+</property>
+
+<xdb:xquery
+            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_repo-list}" user="${exist.username}"
+            password="${exist.password}"
+            outputproperty="repo-list" />
+<echo>${repo-list}</echo>
+
+<property name="q_repo-find">xquery version "3.0";
+import module namespace repo="http://exist-db.org/xquery/repo";
+let $seq := repo:list()
+return $seq[contains(., '${project.domain}')]</property>
+
+<xdb:xquery uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_repo-find}" user="${exist.username}"
+            password="${exist.password}"
+            outputproperty="repo-find" />
+<echo>${repo-find}</echo>
+<echo>LIST resources and collections in: xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}</echo>
+<xdb:list uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}"
+          collections="true"
+          resources="true"
+          outputproperty="collections" />
+<echo>${collections}</echo>
+</target>
+
 
 <target name="local-deploy" >
      <ant antfile=".bin/ant/local-deploy.xml" target="deploy-local"/>

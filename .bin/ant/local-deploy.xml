@@ -202,6 +202,8 @@ repo:remove("http://${project.domain}")
         <!--<antcall target="backup-templates" />-->
 
 
+
+
      <mkdir dir=".deploy" />
      <mkdir dir="${dir.deploy}" />
 
@@ -283,43 +285,9 @@ repo:remove("http://${project.domain}")
 
     <antcall target="local-deployment-folder" />
 
-    <echo>copy from ${dir.backup} to  ${dir.deploy}</echo>
+<!--
 
-    <echo>copy our changed working template files</echo>
-    <copy todir="${dir.deploy}/templates">
-        <fileset dir="${dir.backup}/templates" />
-        <mapper type="glob"
-                from="*.html.xml"
-                to="*.html"/>
-
-    </copy>
-    <echo>copy our changed working modules</echo>
-    <copy todir="${dir.deploy}/modules">
-        <fileset dir="${dir.backup}/modules" />
-    </copy>
-
-    <echo>copy our changed working resources files except svg</echo>
-    <copy todir="${dir.deploy}/resources">
-        <fileset dir="${dir.backup}/resources" >
-            <exclude name="**/*.xml" />
-        </fileset>
-    </copy>
-
-
-    <copy todir="${dir.deploy}/resources">
-        <fileset dir="${dir.backup}/resources" />
-                <mapper type="glob"
-                from="*.svg.xml"
-                to="*.svg"/>
-    </copy>
-
-
-
-    <echo>copy our changed working data files</echo>
-    <copy todir="${dir.deploy}/data">
-        <fileset dir="${dir.backup}/data" />
-    </copy>
-
+    <antcall target="local-copy" />
 
     <echo>create hosts.xml in data dir</echo>
 
@@ -342,6 +310,46 @@ repo:remove("http://${project.domain}")
     <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
 
+   -->
+
+</target>
+
+
+<target name="local-copy">
+
+    <echo>Copy templates </echo>
+
+    <echo>copy our changed working template files</echo>
+    <copy todir="${dir.deploy}/templates">
+        <fileset dir="${dir.backup}/templates" />
+        <mapper type="glob"
+                from="*.html.xml"
+                to="*.html"/>
+
+    </copy>
+    <echo>copy our changed working modules</echo>
+    <copy todir="${dir.deploy}/modules">
+        <fileset dir="${dir.backup}/modules" />
+    </copy>
+
+    <echo>copy our changed working resources files except svg</echo>
+    <copy todir="${dir.deploy}/resources">
+        <fileset dir="${dir.backup}/resources" >
+            <exclude name="**/*.xml" />
+        </fileset>
+    </copy>
+
+    <copy todir="${dir.deploy}/resources">
+        <fileset dir="${dir.backup}/resources" />
+                <mapper type="glob"
+                from="*.svg.xml"
+                to="*.svg"/>
+    </copy>
+
+    <echo>copy our changed working data files</echo>
+    <copy todir="${dir.deploy}/data">
+        <fileset dir="${dir.backup}/data" />
+    </copy>
 
 </target>
 
@@ -448,7 +456,9 @@ xmldb:store-files-from-pattern(concat("/system/config", $target, "/resources"), 
 </echo>
 
 
-<echo>prost-install.xql: for our data files</echo>
+<echo>post-install.xql ...
+ change any neccessary permissions
+</echo>
 
 <echo file="${dir.deploy}/post-install.xql">
 xquery version "3.0";
