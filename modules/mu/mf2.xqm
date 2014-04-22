@@ -6,7 +6,7 @@ import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 (:~
  : mf2
  : This module provide some   microformats 2 helper functions
- :  for parse  xhtml documents that are marked up with microformats 2 syntax.
+ :  for parsing  xhtml documents that are marked up with microformats 2 syntax.
  :
  :  indieweb
  :
@@ -14,8 +14,6 @@ import module namespace xmldb="http://exist-db.org/xquery/xmldb";
  : @version 0.01 :
  :
 :)
-
-
 
 
 declare function mf2:has-h-entry( $page ){

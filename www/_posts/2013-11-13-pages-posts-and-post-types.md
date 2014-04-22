@@ -50,8 +50,6 @@ Test:  [validate-h-entry](http://indiewebify.me/validate-h-entry/?url=http%3A%2F
 plain text.
 
 
-
-
 Reference Links:
 
 * [blogger: posts-vs-pages](http://www.mybloggerlab.com/2013/02/what-is-the-difference-between-posts-vs-pages-in-blogger.html)

@@ -134,4 +134,32 @@ translate( $hash, '+/', '-_')
 <echo>${hash}</echo>
 </target>
 
+
+
+<target name="get-users" >
+<property name="q_users">
+xquery version "3.0";
+import module namespace util="http://exist-db.org/xquery/util";
+import module namespace sm="http://exist-db.org/xquery/securitymanager";
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
+
+
+let $currentUser := xmldb:get-current-user()
+let $users  := sm:list-users()
+
+return
+$users
+</property>
+<xdb:xquery
+            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_users}" user="${exist.username}"
+            password="${exist.password}"
+            destfile="test.xml" />
+<!--<echo file="q_out.xml" append="false">${exist.users}</echo>-->
+</target>
+
+
+
+
+
 </project>

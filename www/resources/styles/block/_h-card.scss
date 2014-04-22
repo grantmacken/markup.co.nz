@@ -31,13 +31,13 @@ float : right;
       padding: .25em;
       margin-left: 1em;
       }
-
 }
 
 /**
  * When the h-card is in the footer of the body as in the home page
  * We display the implied  main h-card about me
 */
+
 
 body>footer .h-card, section[role='main']>.h-card{
 @include layout-block;

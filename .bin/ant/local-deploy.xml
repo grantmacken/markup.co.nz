@@ -21,8 +21,6 @@
     <!--<property name="dir.deploy.images" value="${dir.deploy}/resources/images"/>-->
 
 
-    <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
-
     <property name="browser" value="firefox"/>
     <!-- import eXist-db tasks -->
     <path id="classpath.core">
@@ -225,16 +223,63 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy}/data/authors" />
     <echo>A place to store ...citations of other pages as h-cite markup</echo>
     <mkdir dir="${dir.deploy}/data/citations" />
-    <echo>A place to store ...xml job ques triggered by stuff being stored elsewhere</echo>
-    <mkdir dir="${dir.deploy}/data/jobs" />
     <echo>A place to store ... webmentions;
     where others in-reply-to my stuff have commented, liked, reposted my stuff
-    on thier site, and sent me a web mention. stored as h-cite markup</echo>
+    on thier site, and sent me a web mention. stored as h-cite markup in a date archive</echo>
     <mkdir dir="${dir.deploy}/data/mentions" />
+    <echo>A place to store ...xml job ques triggered by stuff being stored elsewhere</echo>
+    <mkdir dir="${dir.deploy}/data/_jobs" />
+    <mkdir dir="${dir.deploy}/data/_jobs/mentions" />
+    <echo>A place to store ... mention jobs. This is a public(guest) write dir . Though can not be read by guest.</echo>
 
     <mkdir dir="${dir.deploy}/templates" />
+    <echo>HTML TEMPLATES ...</echo>
+
+    <echo>XQUERY MODULES ... Make sure these have execute permissions</echo>
     <mkdir dir="${dir.deploy}/modules" />
+
+    <mkdir dir="${dir.deploy}/modules/mu" />
+    <echo>mu xQuery modules ... markup modules
+     the xQuery functions that are called by our HTML templates to create our
+     html views. our data-map , our site navigations, page, posts tags views
+    </echo>
+
+    <mkdir dir="${dir.deploy}/modules/mu/helpers" />
+    <echo>TODO mu helper xQuery modules ... markup modules
+     generic helper functions, base60, mf2 etc
+    </echo>
+
+
+
+    <mkdir dir="${dir.deploy}/modules/api" />
+    <echo>api modules ...
+    These have '.xq' extensions to be used as api endpoints that can be accessed by
+    the public (guest) account by http GET or POST requests
+    They provide access the exist REST interface
+     nginx rewrites /webmentions.xq  as
+     /exist/rest/apps/domain/modules/api/webmention.xq.
+    </echo>
+
+
+    <mkdir dir="${dir.deploy}/modules/triggers" />
+    <echo>trigger modules. The result of the request is some data stored as a job.
+    The storing of a 'job' triggers a xquery-trigger
+    which calls upon xQuery to carry out the task.
+
+    Triggers have '.xqm' extensions and can not be accessed by the public (guest) account.
+    The can only be accessed by the dba account holder
+    </echo>
+
+
+    <mkdir dir="${dir.deploy}/modules/_local" />
+    <echo>_local modules. local modules.
+    used to upload to remote when a file is stored locall
+    </echo>
+
     <mkdir dir="${dir.deploy}/resources" />
+    <mkdir dir="${dir.deploy}/resources/images" />
+    <mkdir dir="${dir.deploy}/resources/styles" />
+    <mkdir dir="${dir.deploy}/resources/scripts" />
 
     <antcall target="local-deployment-folder" />
 
@@ -256,7 +301,12 @@ repo:remove("http://${project.domain}")
     <echo>copy our changed working resources files</echo>
     <copy todir="${dir.deploy}/resources">
         <fileset dir="${dir.backup}/resources" />
+                <mapper type="glob"
+                from="*.svg.xml"
+                to="*.svg"/>
     </copy>
+
+
 
     <echo>copy our changed working data files</echo>
     <copy todir="${dir.deploy}/data">
@@ -310,14 +360,10 @@ repo:remove("http://${project.domain}")
         <type>application</type>
         <target>${project.domain}</target>
         <prepare>pre-install.xql</prepare>
-        <finish/>
+        <finish>post-install.xql</finish>
         <permissions user="${exist.username}" password="${exist.password}" group="dba" mode="rw-rw-r--" />
     </meta>
 </echoxml>
-
-
-
-
 
 <echo>
     xconf: for our data archive collection
@@ -363,31 +409,24 @@ repo:remove("http://${project.domain}")
 <echo>pre-install.xql: for our data files</echo>
 
 <echo file="${dir.deploy}/pre-install.xql">
-xquery version "1.0";
+xquery version "3.0";
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
-import module namespace xdb="http://exist-db.org/xquery/xmldb";
-
-(: The following external variables are set by the repo:deploy function :)
-
-(: file path pointing to the exist installation directory :)
 declare variable $home external;
-(: path to the directory containing the unpacked .xar package :)
 declare variable $dir external;
-(: the target collection into which the app is deployed :)
 declare variable $target external;
 
 declare function local:mkcol-recursive($collection, $components) {
     if (exists($components)) then
         let $newColl := concat($collection, "/", $components[1])
         return (
-            xdb:create-collection($collection, $components[1]),
+            xmldb:create-collection($collection, $components[1]),
             local:mkcol-recursive($newColl, subsequence($components, 2))
         )
     else
         ()
 };
 
-(: Helper function to recursively create a collection hierarchy. :)
 declare function local:mkcol($collection, $path) {
     local:mkcol-recursive($collection, tokenize($path, "/"))
 };
@@ -396,10 +435,32 @@ declare function local:mkcol($collection, $path) {
 local:mkcol("/db/system/config", $target),
 local:mkcol(concat("/system/config", $target), "data/archive"),
 local:mkcol(concat("/system/config", $target), "resources"),
-xdb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
-xdb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf"),
-xdb:store-files-from-pattern(concat("/system/config", $target, "/resources"), $dir, "resources.xconf")
+xmldb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
+xmldb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf"),
+xmldb:store-files-from-pattern(concat("/system/config", $target, "/resources"), $dir, "resources.xconf")
 </echo>
+
+
+<echo>prost-install.xql: for our data files</echo>
+
+<echo file="${dir.deploy}/post-install.xql">
+xquery version "3.0";
+
+import module namespace sm="http://exist-db.org/xquery/securitymanager";
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
+
+(: The following external variables are set by the repo:deploy function :)
+declare variable $home external;
+declare variable $dir external;
+declare variable $target external;
+
+(: Allow guests to add documents to collection but not read:)
+( sm:chmod(xs:anyURI($target || "/data/jobs"), "rwxrwx-wx"),
+
+)
+
+</echo>
+
 
 
 

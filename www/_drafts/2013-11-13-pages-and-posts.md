@@ -2,6 +2,35 @@
 title:  pages and posts
 ---
 
+
+<!--
+
+Testing Webmentions
+-------------------
+
+DONE: Create an webmention endpoint on localhost ```/modules_local/webmention.xq```
+
+DONE: Create a test note [ I am going to try comment on this note](http://markup.co.nz/archive/2014/03/16/083751)
+
+```curl -s -i http://markup.co.nz/archive/2014/03/16/083751 | grep 'rel="webmention"'```
+
+We should see our own webmention endpoint in both the response header and a link in the document head
+
+	Link: <http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/_local/webmention.xq>; rel="webmention"
+	    <link rel="webmention" href="http://localhost:8080/exist/rest/db/apps/markup.co.nz/modules/_local/webmention.xq" />
+    grant@grant:~$
+
+With this in place we can make on our own page
+
+Create a comment  with macro ```new comment`` which comments on the note.
+
+[comment created] ( http://markup.co.nz/archive/2014/03/16/141619 )
+
+Create reply context with macro ```reply-context``` which generates and stores citation
+-->
+
+
+
 Pages and  Posts
 -----------------
 
@@ -31,4 +60,3 @@ Reference Links:
 * [blogger: posts-vs-pages](http://www.mybloggerlab.com/2013/02/what-is-the-difference-between-posts-vs-pages-in-blogger.html)
 * [wordpress: post-vs-page](http://en.support.wordpress.com/post-vs-page/)
 * [semiologic: posts-vs-pages](http://www.semiologic.com/resources/blogging/posts-vs-pages/)
-

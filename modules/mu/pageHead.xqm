@@ -20,7 +20,7 @@ declare namespace  xlink = "http://www.w3.org/1999/xlink";
 declare
 function pageHead:link-webebmention($node as node(), $model as map(*)) {
 let $docEntry := $model('doc-entry')/node()
-let  $href := 'http://' || $model('site-domain') || '/webmention'
+let  $href := 'http://' || $model('site-domain') || '/webmention.xq'
 (:let $href := $docEntry/atom:link[@rel='webmention']/@href/string():)
 let $link := (<link rel="webmention" href="{$href}" /> )
 

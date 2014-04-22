@@ -18,9 +18,7 @@
     <property name="dir.deploy.scripts" value="${dir.deploy.resources}/scripts"/>
     <property name="dir.deploy.images" value="${dir.deploy.resources}/images"/>
 
-
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
-
     <property name="browser" value="firefox"/>
     <!-- import eXist-db tasks -->
     <path id="classpath.core">
@@ -42,10 +40,6 @@ import module namespace repo="http://exist-db.org/xquery/repo";
 repo:undeploy("http://${project.domain}"),
 repo:remove("http://${project.domain}")
 </property>
-
-
-
-
 
 <target name="browse">
     <exec executable="${browser}" spawn="true">
@@ -177,77 +171,8 @@ repo:remove("http://${project.domain}")
     <antcall target="clear-nginx-cache" />
 
     <antcall target="browse" />
-
-
-
 </target>
 
-
-
-
-<target name="remote-deployment-folder">
-
-</target>
-
-<target name="eXist-data-remote">
-    <echo>Preprocess If required</echo>
-    <antcall target="proccess-md" />
-    <antcall target="proccess-sass" />
-    <antcall target="proccess-templatesAndModules" />
-    <antcall target="proccess-imagesAndScripts" />
-
-</target>
-
-
-<target name="proccess-md">
-    <echo>copy our changed md proccessed files to the data dir</echo>
-    <copy todir="${dir.deploy.data}">
-        <fileset dir=".deploy/data" />
-    </copy>
-</target>
-
-
-
-
-<target name="proccess-sass">
-    <echo> TODO compile sass and generate a single stylesheet. {dir.deploy.styles}/style.css. Ref. rb file at root</echo>
-    <echo> TODO for now just copy</echo>
-<!--    <exec executable="compass" failonerror="true">
-        <arg value="compile" />
-        <redirector outputproperty="md" alwayslog="true" />
-    </exec>
--->
-    <copy todir="${dir.deploy.styles}" file=".deploy/local/resources/styles/style.css"/>
-
-</target>
-
-<target name="proccess-templatesAndModules">
-  <!--  <echo>overwrite templates that contain HARD-CODED data</echo>-->
-    <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
-    <copy todir="${dir.deploy.templates}">
-        <fileset dir="templates" />
-    </copy>
-    <echo>copy our changed working modules files to ${dir.deploy.modules}</echo>
-    <copy todir="${dir.deploy.modules}">
-        <fileset dir="modules" >
-             <include name="**/*" />
-             <exclude name="*/archive-trigger.xqm"/>
-             <exclude name="*/local-to-remote.xq"/>
-        </fileset>
-    </copy>
-</target>
-
-
-<target name="proccess-imagesAndScripts">
-    <echo>TODO: optimise images then copy to ${dir.deploy}/resources/images</echo>
-    <copy todir="${dir.deploy.images}" includeemptydirs="true">
-        <fileset dir="www/resources/images" />
-    </copy>
-    <echo>TODO: lint and minify js then copy to ${dir.deploy.scripts}</echo>
-    <copy todir="${dir.deploy.scripts}" includeemptydirs="true">
-        <fileset dir="www/resources/scripts" />
-    </copy>
-</target>
 
 
 <target name="build-xar">

@@ -165,11 +165,15 @@ project.description: ${project.description}
 </target>
 
 <target name="store-scss">
+    <echo>Calling compass from ant</echo>
 <exec executable="compass"
+    dir ="${project.base}"
+    outputproperty="compass.out"
     failonerror="false">
     <arg value="compile"/>
-    <!-- <redirector outputproperty="md" alwayslog="true"/> -->
 </exec>
+
+<echo>${compass.out}</echo>
 
 <property name="srcfile">${dir.deploy}/resources/styles/style.css</property>
 <property name="dbCssDir">resources/styles</property>
@@ -185,6 +189,7 @@ project.description: ${project.description}
     user="${exist.username}"
     password="${exist.password}"
 />
+
 </target>
 
 
@@ -421,63 +426,6 @@ curl -s -I -H "Accept-Encoding: gzip,deflate"  ${resultURL}  | grep -i "Content-
 
 
 
-<!--
-TODO: remove proccess targets
-rely on on save which auto triggers upload
-
--->
-
-<target name="proccess-md">
-    <property name="pyFile">.bin/md2.py</property>
-     <echo>${pyFile}</echo>
-    <apply executable="python" failonerror="false" dir="${project.base}">
-        <arg value="${pyFile}" />
-        <arg value="-i" />
-        <srcfile />
-        <fileset dir="${dir.www}">
-            <exclude name="**/resources/**" />
-            <include name="**/*.md" />
-        </fileset>
-    </apply>
-</target>
-
-<target name="proccess-sass">
-    <echo>compile sass and generate a single stylesheet. {dir.deploy.styles}/style.css. Ref. rb file at root</echo>
-    <exec executable="compass" failonerror="true">
-        <arg value="compile" />
-        <redirector outputproperty="md" alwayslog="true" />
-    </exec>
-</target>
-
-<target name="proccess-templatesAndModules">
-  <!--  <echo>overwrite templates that contain HARD-CODED data</echo>-->
-    <echo>copy our changed working template files to ${dir.deploy.templates}</echo>
-    <copy todir="${dir.deploy.templates}">
-        <fileset dir="templates" />
-    </copy>
-    <echo>delete ${dir.deploy.modules}</echo>
-    <delete dir="${dir.deploy.modules}" />
-    <echo>copy our changed working modules files to ${dir.deploy.modules}</echo>
-    <copy todir="${dir.deploy.modules}">
-        <fileset dir="modules" />
-    </copy>
-</target>
-
-<target name="proccess-imagesAndScripts">
-    <echo>TODO: optimise images then copy to ${dir.deploy}/resources/images</echo>
-    <copy todir="${dir.deploy.images}" includeemptydirs="true">
-        <fileset dir="www/resources/images" />
-    </copy>
-    <echo>TODO: lint and minify js then copy to ${dir.deploy.scripts}</echo>
-    <copy todir="${dir.deploy.scripts}" includeemptydirs="true">
-        <fileset dir="www/resources/scripts" />
-    </copy>
-</target>
-
-
-<!-- TODO: remove proccess targets  -->
-
-
 <target name="theme">
 <mkdir dir="${dir.generator}/themes/${project.theme}"/>
 <sync todir="${dir.generator}/themes/${project.theme}">
@@ -566,6 +514,10 @@ return $seq[contains(., '${project.domain}')]</property>
      <ant antfile=".bin/ant/local-calls.xml" target="get-hash"/>
 </target>
 
+<target name="get-users" >
+     <ant antfile=".bin/ant/local-calls.xml" target="get-users"/>
+</target>
+
 
 <target name="get-project.author" >
     <echo>${project.author}</echo>
@@ -584,21 +536,120 @@ return $seq[contains(., '${project.domain}')]</property>
 </target>
 
 
-<target name="backup-data" >
+<target name="backup" >
      <ant antfile=".bin/ant/local-deploy.xml" target="backup-data"/>
 </target>
 
-<target name="backup-resources" >
-     <ant antfile=".bin/ant/local-deploy.xml" target="backup-resources"/>
+
+<target name="sync-templates">
+    <antcall target="sync-local-templates"/>
+    <antcall target="sync-remote-templates"/>
 </target>
 
-<target name="backup-modules" >
-     <ant antfile=".bin/ant/local-deploy.xml" target="backup-modules"/>
+<target name="sync-modules">
+    <antcall target="sync-local-modules"/>
+    <antcall target="sync-remote-modules"/>
 </target>
 
-<target name="backup-templates" >
-     <ant antfile=".bin/ant/local-deploy.xml" target="backup-templates"/>
+<target name="sync-local-templates">
+<xdb:remove
+    uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}"
+    collection="templates"
+    user="${exist.username}"
+    password="${exist.password}"
+  />
+
+<xdb:store
+    uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/templates"
+    createcollection="true"
+    createsubcollections="true"
+    user="${exist.username}"
+    password="${exist.password}"
+    permissions="rwxrwxr-x">
+    <fileset dir="templates">
+        <include name="*/**"/>
+    </fileset>
+</xdb:store>
+
 </target>
+
+
+
+<target name="sync-remote-templates">
+<xdb:remove
+    uri="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db/apps/${project.domain}"
+    collection="templates"
+    user="${exist.username}"
+    password="${exist.password}"
+  />
+
+<xdb:store
+    uri="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db/apps/${project.domain}/templates"
+    createcollection="true"
+    createsubcollections="true"
+    user="${exist.username}"
+    password="${exist.password}"
+    permissions="rwxrwxr-x">
+    <fileset dir="templates">
+        <include name="*/**"/>
+    </fileset>
+</xdb:store>
+
+</target>
+
+
+
+<target name="sync-local-modules">
+<xdb:remove
+    uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}"
+    collection="modules"
+    user="${exist.username}"
+    password="${exist.password}"
+  />
+
+<xdb:store
+    uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/modules"
+    createcollection="true"
+    createsubcollections="true"
+    user="${exist.username}"
+    password="${exist.password}"
+    permissions="rwxrwxr-x">
+    <fileset dir="modules">
+        <include name="*/**"/>
+    </fileset>
+</xdb:store>
+
+</target>
+
+
+<target name="sync-remote-modules">
+<xdb:remove
+    uri="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db/apps/${project.domain}"
+    collection="modules"
+    user="${exist.username}"
+    password="${exist.password}"
+  />
+
+<xdb:store
+    uri="xmldb:exist://${host.remote}:8080/exist/xmlrpc/db/apps/${project.domain}/modules"
+    createcollection="true"
+    createsubcollections="true"
+    user="${exist.username}"
+    password="${exist.password}"
+    permissions="rwxrwxr-x">
+    <fileset dir="modules">
+        <include name="*/**"/>
+        <exclude name="**/_local/**"/>
+    </fileset>
+</xdb:store>
+
+
+
+
+</target>
+
+
+
 
 
 </project>
