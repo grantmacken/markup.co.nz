@@ -73,6 +73,18 @@ repo:remove("http://${project.domain}")
       and use backup for post deployment
     -->
 
+<target name="app-exists">
+    <condition property="app.exists">
+        <xdb:exist uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps"
+                   collection="${project.domain}" />
+    </condition>
+</target>
+
+
+
+
+
+
    <target name="backup">
 
     <mkdir dir="${dir.backup}/resources" />
@@ -197,7 +209,7 @@ repo:remove("http://${project.domain}")
 
 
 
-<!--     <antcall target="backup" />-->
+   <antcall target="backup" depends="app-exists"  if="app.exists" />
 
      <mkdir dir=".deploy" />
      <mkdir dir="${dir.deploy}" />
@@ -279,7 +291,14 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy}/resources/scripts" />
 
     <antcall target="local-deployment-folder" />
-<!--    <antcall target="local-copy" />
+
+
+<!--
+
+
+    <antcall target="local-copy" />
+
+
     <antcall target="local-data" />
 
     -->
