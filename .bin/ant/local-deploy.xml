@@ -231,11 +231,14 @@ repo:remove("http://${project.domain}")
     where others in-reply-to my stuff have commented, liked, reposted my stuff
     on thier site, and sent me a web mention. stored as h-cite markup in a date archive</echo>
     <mkdir dir="${dir.deploy}/data/mentions" />
-    <echo>A place to store ...xml job ques triggered by stuff being stored elsewhere</echo>
-    <mkdir dir="${dir.deploy}/data/_jobs" />
-    <mkdir dir="${dir.deploy}/data/_jobs/mentions" />
-    <echo>A place to store ... mention jobs. This is a public(guest) write dir . Though can not be read by guest.</echo>
-
+    <echo>A place to store ...
+    xml job ques triggered by stuff being stored elsewhere
+    </echo>
+    <mkdir dir="${dir.deploy}/data/jobs" />
+    <mkdir dir="${dir.deploy}/data/jobs/mentions" />
+    <echo>A place to store ...
+    This is a public(guest) write dir .
+    Though can not be read by guest.</echo>
     <mkdir dir="${dir.deploy}/templates" />
     <echo>HTML TEMPLATES ...</echo>
 
@@ -488,7 +491,7 @@ declare variable $dir external;
 declare variable $target external;
 
 (: Allow guests to add documents to collection but not read
-sm:chmod(xs:anyURI($target || "/data/_jobs"), "rwxrwx-wx")
+sm:chmod(xs:anyURI($target || "/data/jobs"), "rwxrwx-wx")
 
 :)
 ( )
