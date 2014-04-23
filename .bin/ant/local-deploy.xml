@@ -197,22 +197,7 @@ repo:remove("http://${project.domain}")
 
 
 
-    <antcall target="backup" />
-
-     <!-- TODO a sync routine
-         on localhost in data/archive and data/pages collection
-         check if xml resource on localhost has corresponding file
-         if it hasn't remove the resource on localhost
-
-        -->
-
-        <!--<antcall target="backup-data" />-->
-        <!--<antcall target="backup-resources" />-->
-        <!--<antcall target="backup-modules" />-->
-        <!--<antcall target="backup-templates" />-->
-
-
-
+<!--     <antcall target="backup" />-->
 
      <mkdir dir=".deploy" />
      <mkdir dir="${dir.deploy}" />
@@ -294,21 +279,13 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy}/resources/scripts" />
 
     <antcall target="local-deployment-folder" />
-    <antcall target="local-copy" />
+<!--    <antcall target="local-copy" />
     <antcall target="local-data" />
 
-
-<!--    <echo>create hosts.xml in data dir</echo>
-
-    <echoxml file="${dir.deploy}/data/hosts.xml" append="false">
-        <hosts>
-            <local>${host.local}</local>
-            <remote>${host.remote}</remote>
-        </hosts>
-    </echoxml>-->
+    -->
 
 
-    <echo>Remove existing deployment</echo>
+<!--    <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
     <echo>Build the deployment xar</echo>
     <antcall target="build-xar" />
@@ -318,7 +295,7 @@ repo:remove("http://${project.domain}")
     <antcall target="xar-install" />
     <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
-
+-->
   <!-- -->
 
 </target>
