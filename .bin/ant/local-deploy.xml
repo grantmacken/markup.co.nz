@@ -491,10 +491,10 @@ declare variable $dir external;
 declare variable $target external;
 
 (: Allow guests to add documents to collection but not read
-sm:chmod(xs:anyURI($target || "/data/jobs"), "rwxrwx-wx")
+
 
 :)
-( )
+( sm:chmod(xs:anyURI($target || "/data/jobs"), "rwxrwx-wx") )
 
 </echo>
 
@@ -602,10 +602,7 @@ else
   &lt;cache-control cache="yes" /&gt;
 &lt;/dispatch&gt;
 </echo>
-
-
 </target>
-
 
 <target name="local-data">
     <echo>Proccess md again </echo>
@@ -629,7 +626,6 @@ else
             <remote>${host.remote}</remote>
         </hosts>
     </echoxml>
-
 </target>
 
 <target name="proccess-md">
@@ -654,8 +650,6 @@ else
         <redirector outputproperty="md" alwayslog="true" />
     </exec>
 </target>
-
-
 
 <target name="proccess-imagesAndScripts"  unless="app.exists">
     <echo>TODO: optimise images then copy to ${dir.deploy}/resources/images</echo>
