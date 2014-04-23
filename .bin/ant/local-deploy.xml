@@ -75,8 +75,7 @@ repo:remove("http://${project.domain}")
 
 <target name="app-exists" >
     <condition property="app.exists">
-        <xdb:exist uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps"
-                   collection="${project.domain}" />
+        <xdb:exist uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}"/>
     </condition>
 </target>
 
