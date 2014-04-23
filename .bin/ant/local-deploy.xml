@@ -287,24 +287,26 @@ repo:remove("http://${project.domain}")
 
     <antcall target="local-deployment-folder" />
 
-
+    <echo> copy modules and template to deploy dir</echo>
     <antcall target="local-copy"/>
+
+    <echo>
+        if we have a backup restore
+        else proccess
+    </echo>
+
     <antcall target="local-restore"/>
     <antcall target="proccess-sass"/>
+    <antcall target="proccess-imagesAndScripts"/>
+
+    <echo>
+       proccess any md files we have
+    </echo>
 
     <antcall target="local-data" />
 
 
-<!--
-    <antcall target="local-copy" />
-
-
-
-
-    -->
-
-
-<!--    <echo>Remove existing deployment</echo>
+  <echo>Remove existing deployment</echo>
     <antcall target="xar-undeploy-remove" />
     <echo>Build the deployment xar</echo>
     <antcall target="build-xar" />
@@ -314,8 +316,7 @@ repo:remove("http://${project.domain}")
     <antcall target="xar-install" />
     <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
--->
-  <!-- -->
+
 
 </target>
 
@@ -656,7 +657,7 @@ else
 
 
 
-<target name="proccess-imagesAndScripts">
+<target name="proccess-imagesAndScripts"  unless="app.exists">
     <echo>TODO: optimise images then copy to ${dir.deploy}/resources/images</echo>
     <copy todir="${dir.deploy.images}" includeemptydirs="true">
         <fileset dir="www/resources/images" />
