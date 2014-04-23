@@ -80,10 +80,6 @@ repo:remove("http://${project.domain}")
 </target>
 
 
-
-
-
-
    <target name="backup" depends="app-exists" if="app.exists">
 
     <mkdir dir="${dir.backup}/resources" />
@@ -294,12 +290,12 @@ repo:remove("http://${project.domain}")
 
     <antcall target="local-copy"/>
     <antcall target="local-restore"/>
+    <antcall target="proccess-sass"/>
+
     <antcall target="local-data" />
 
 
 <!--
-
-
     <antcall target="local-copy" />
 
 
@@ -366,6 +362,8 @@ repo:remove("http://${project.domain}")
     </copy>
 
 </target>
+
+
 
 
 
@@ -647,7 +645,7 @@ else
     </apply>
 </target>
 
-<target name="proccess-sass">
+<target name="proccess-sass" unless="app.exists">
 
     <echo>compile sass and generate a single stylesheet. ${dir.deploy.styles}/style.css. Ref. rb file at root</echo>
     <exec executable="compass" failonerror="true">
