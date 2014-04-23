@@ -5,7 +5,6 @@ import module namespace util="http://exist-db.org/xquery/util";
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 import module namespace config="http://exist-db.org/xquery/apps/config" at "../../modules/config.xqm";
 import module namespace sm="http://exist-db.org/xquery/securitymanager";
-import module namespace xqjson="http://xqilla.sourceforge.net/lib/xqjson";
 import module namespace session="http://exist-db.org/xquery/session";
 import module namespace response="http://exist-db.org/xquery/response";
 
