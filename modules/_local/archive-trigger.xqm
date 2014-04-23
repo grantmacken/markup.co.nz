@@ -16,35 +16,23 @@ import module namespace http = "http://expath.org/ns/http-client";
 :)
 
 declare function trigger:update-remote( $uri as xs:anyURI ) {
-let $priority := 'info'
-let $message1 := 'mu:update ' || $uri
-let $base := substring-before($uri , '/archive/')
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
-let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
-let $username := $permissions/@user/string()
-let $password := $permissions/@password/string()
-let $priority := 'info'
-let $local := 'http://localhost:8080'
-let $rest := '/exist/rest'
-let $urlLocal := $local || $rest || $base || '/upload-link-atom.xml'
-let $message1 := 'mu:update ' || $urlLocal
-let $reqPut :=
-    <http:request href="{ $urlLocal }"
-                  method="put"
-                  username="{ $username }"
-                  password="{ $password }"
-                  auth-method="basic"
-                  send-authorization="true"
-                  status-only="true"
-                  timeout="2">
-       <http:header name = "Connection" value = "close"/>
-       <http:body media-type="application/xml"/>
-    </http:request>
+let $collection-uri  :=   $app-root || '/data/jobs'
+let $resource-name  :=   'upload-link-atom.xml'
+let $contents  :=   <link href="{$uri}" />
+let $mime-type  :=   'application/xml'
 
-let $link := <link href="{$uri}" />
-let $put := http:send-request( $reqPut , (), $link)
-let $message := concat($put/@status/string(), ': ' ,$put/@message/string())
-let $log := (util:log($priority,$link), util:log($priority, $message))
+let $store := xmldb:store($collection-uri, $resource-name,
+$contents, $mime-type)
+
+let $priority := 'info'
+let $logThis := (
+util:log($priority, $uri),
+util:log($priority, xmldb:get-current-user()),
+util:log($priority, xmldb:is-admin-user(xmldb:get-current-user())),
+util:log($priority, $collection-uri)
+)
+
 let $eval := util:eval-async(xs:anyURI('upload-atom.xq'))
 return ()
 };

@@ -621,7 +621,7 @@ else
     <echo>create hosts.xml in data dir</echo>
 
     <echoxml file="${dir.deploy}/data/hosts.xml" append="false">
-        <hosts>
+        <hosts user="${exist.username}" password="${exist.password}" >
             <local>${host.local}</local>
             <remote>${host.remote}</remote>
         </hosts>
