@@ -292,13 +292,18 @@ repo:remove("http://${project.domain}")
     <antcall target="local-deployment-folder" />
 
 
+    <antcall target="local-copy"/>
+
+    <antcall target="local-data" />
+
+
 <!--
 
 
     <antcall target="local-copy" />
 
 
-    <antcall target="local-data" />
+
 
     -->
 
@@ -319,7 +324,7 @@ repo:remove("http://${project.domain}")
 </target>
 
 
-<target name="local-copy">
+<target name="local-copy" if="app.exists">
     <echo>Copy our ...
     changed working TEMPLATES files</echo>
     <copy todir="${dir.deploy}/templates">
