@@ -498,9 +498,6 @@ sm:chmod(xs:anyURI($target || "/data/jobs"), "rwxrwx-wx")
 
 </echo>
 
-
-
-
 <echo>finally our controller: for our data files</echo>
 
 <echo file="${dir.deploy}/controller.xql" append="false" >
