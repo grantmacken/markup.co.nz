@@ -293,7 +293,7 @@ repo:remove("http://${project.domain}")
 
 
     <antcall target="local-copy"/>
-
+    <antcall target="local-restore"/>
     <antcall target="local-data" />
 
 
@@ -324,7 +324,7 @@ repo:remove("http://${project.domain}")
 </target>
 
 
-<target name="local-copy" if="app.exists">
+<target name="local-copy">
     <echo>Copy our ...
     changed working TEMPLATES files</echo>
     <copy todir="${dir.deploy}/templates">
@@ -337,6 +337,9 @@ repo:remove("http://${project.domain}")
         <fileset dir="modules" />
     </copy>
 
+</target>
+
+<target name="local-restore" if="app.exists">
     <echo>copy our ...
     eXist backup resources files except svg. we copy from a backup as our
     working files have been preproccesssed prior to upload. We want these
@@ -362,59 +365,10 @@ repo:remove("http://${project.domain}")
                 to="*.svg"/>
     </copy>
 
-
-
-
-
-<!--    <echo>copy our ...
-    eXist backup data files
-    working files have been preproccesssed prior to upload. We want these
-    changes to become part of the deploy
-    </echo>
-
-    <echo>copy our changed working data files</echo>
-    <copy todir="${dir.deploy}/data">
-        <fileset dir="${dir.backup}/data" />
-    </copy>-->
-
-
-    <!--
-
-    <echo>Copy templates </echo>
-
-    <echo>copy our changed working template files</echo>
-    <copy todir="${dir.deploy}/templates">
-        <fileset dir="${dir.backup}/templates" />
-        <mapper type="glob"
-                from="*.html.xml"
-                to="*.html"/>
-
-    </copy>
-    <echo>copy our changed working modules</echo>
-    <copy todir="${dir.deploy}/modules">
-        <fileset dir="${dir.backup}/modules" />
-    </copy>
-
-    <echo>copy our changed working resources files except svg</echo>
-    <copy todir="${dir.deploy}/resources">
-        <fileset dir="${dir.backup}/resources" >
-            <exclude name="**/*.xml" />
-        </fileset>
-    </copy>
-
-    <copy todir="${dir.deploy}/resources">
-        <fileset dir="${dir.backup}/resources" />
-                <mapper type="glob"
-                from="*.svg.xml"
-                to="*.svg"/>
-    </copy>
-
-    <echo>copy our changed working data files</echo>
-    <copy todir="${dir.deploy}/data">
-        <fileset dir="${dir.backup}/data" />
-    </copy>
-    -->
 </target>
+
+
+
 
 <target name="local-deployment-folder">
 
