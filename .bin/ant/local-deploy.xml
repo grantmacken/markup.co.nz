@@ -256,8 +256,6 @@ repo:remove("http://${project.domain}")
      generic helper functions, base60, mf2 etc
     </echo>
 
-
-
     <mkdir dir="${dir.deploy}/modules/api" />
     <echo>api modules ...
     These have '.xq' extensions to be used as api endpoints that can be accessed by
@@ -267,7 +265,6 @@ repo:remove("http://${project.domain}")
      /exist/rest/apps/domain/modules/api/webmention.xq.
     </echo>
 
-
     <mkdir dir="${dir.deploy}/modules/triggers" />
     <echo>trigger modules. The result of the request is some data stored as a job.
     The storing of a 'job' triggers a xquery-trigger
@@ -276,7 +273,6 @@ repo:remove("http://${project.domain}")
     Triggers have '.xqm' extensions and can not be accessed by the public (guest) account.
     The can only be accessed by the dba account holder
     </echo>
-
 
     <mkdir dir="${dir.deploy}/modules/_local" />
     <echo>_local modules. local modules.
@@ -415,6 +411,16 @@ repo:remove("http://${project.domain}")
 </collection>
 </echoxml>
 
+<echoxml file="${dir.deploy}/mentions.xconf" append="false" namespacepolicy="elementsOnly">
+<collection xmlns="http://exist-db.org/collection-config/1.0">
+    <triggers>
+        <trigger class="org.exist.collections.triggers.XQueryTrigger">
+            <parameter name="url" value="xmldb:exist://${host.local}:8080/db/apps/${project.domain}/modules/triggers/mentioned.xql"/>
+        </trigger>
+    </triggers>
+</collection>
+</echoxml>
+
 <echo>xconf: for our data files</echo>
 
 <echoxml file="${dir.deploy}/data.xconf" append="false" namespacepolicy="elementsOnly">
@@ -432,7 +438,7 @@ repo:remove("http://${project.domain}")
 <collection xmlns="http://exist-db.org/collection-config/1.0">
     <triggers>
         <trigger class="org.exist.collections.triggers.XQueryTrigger">
-            <parameter name="url" value="xmldb:exist://127.0.0.1:8080/db/apps/${project.domain}/modules/_local/resources-trigger.xqm"/>
+            <parameter name="url" value="xmldb:exist://${host.local}:8080/db/apps/${project.domain}/modules/_local/resources-trigger.xqm"/>
         </trigger>
     </triggers>
 </collection>
@@ -468,9 +474,12 @@ declare function local:mkcol($collection, $path) {
 (: store the collection configuration:)
 local:mkcol("/db/system/config", $target),
 local:mkcol(concat("/system/config", $target), "data/archive"),
+local:mkcol(concat("/system/config", $target), "data/jobs"),
+local:mkcol(concat("/system/config", $target), "data/jobs/mentions"),
 local:mkcol(concat("/system/config", $target), "resources"),
 xmldb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
 xmldb:store-files-from-pattern(concat("/system/config", $target, "/data/archive"), $dir, "archive.xconf"),
+xmldb:store-files-from-pattern(concat("/system/config", $target, "/data/jobs/mentions"), $dir, "mentions.xconf"),
 xmldb:store-files-from-pattern(concat("/system/config", $target, "/resources"), $dir, "resources.xconf")
 </echo>
 
@@ -490,11 +499,10 @@ declare variable $home external;
 declare variable $dir external;
 declare variable $target external;
 
-(: Allow guests to add documents to collection but not read
+(: Allow guests to add documents to collection but not read :)
 
 
-:)
-( sm:chmod(xs:anyURI($target || "/data/jobs"), "rwxrwx-wx") )
+( sm:chmod(xs:anyURI($target || "/data/jobs/mentions"), "rwxrwx-wx") )
 
 </echo>
 

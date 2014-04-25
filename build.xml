@@ -21,13 +21,24 @@
     <property name="dir.nginx-cache" value="/usr/local/nginx/cache"/>
 
     <property name="browser" value="firefox"/>
+
+
+
+
+
     <!-- import eXist-db tasks -->
+
+
+
+
     <path id="classpath.core">
-        <fileset dir="${dir.exist}/lib/core">
-            <include name="*.jar"/>
+        <fileset dir="${dir.exist}/lib">
+            <include name="**/*.jar"/>
         </fileset>
+    
         <pathelement path="${dir.exist}/exist.jar"/>
         <pathelement path="${dir.exist}/exist-optional.jar"/>
+
     </path>
 
      <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
