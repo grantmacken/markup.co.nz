@@ -415,7 +415,7 @@ repo:remove("http://${project.domain}")
 <collection xmlns="http://exist-db.org/collection-config/1.0">
     <triggers>
         <trigger class="org.exist.collections.triggers.XQueryTrigger">
-            <parameter name="url" value="xmldb:exist://${host.local}:8080/db/apps/${project.domain}/modules/triggers/mentioned.xql"/>
+            <parameter name="url" value="xmldb:exist://${host.local}:8080/db/apps/${project.domain}/modules/triggers/mentions.xql"/>
         </trigger>
     </triggers>
 </collection>
@@ -474,7 +474,6 @@ declare function local:mkcol($collection, $path) {
 (: store the collection configuration:)
 local:mkcol("/db/system/config", $target),
 local:mkcol(concat("/system/config", $target), "data/archive"),
-local:mkcol(concat("/system/config", $target), "data/jobs"),
 local:mkcol(concat("/system/config", $target), "data/jobs/mentions"),
 local:mkcol(concat("/system/config", $target), "resources"),
 xmldb:store-files-from-pattern(concat("/system/config", $target, "/data"), $dir, "data.xconf"),
