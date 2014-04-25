@@ -81,7 +81,6 @@ let $canSend :=
     if( $isUpate or $isNotDraft ) then ( true() )
     else ( false() )
 
-
 let $reqGetRemote   :=
     <http:request
         href="{ $urlRemote }"
@@ -107,9 +106,8 @@ import module namespace system="http://exist-db.org/xquery/system";
 
 let <![CDATA[$username]]> := '{$username}'
 let <![CDATA[$password]]> := '{$password}'
-
+let <![CDATA[$target]]> := '{$name}'
 <![CDATA[
-let $target := 'archive'
 let $options := <options>
 		    <workingDir>bin/nginx-cache-purge</workingDir>
 		    <stdin><line>./nginx-cache-purge '{$target}' /usr/local/nginx/cache</line></stdin>
@@ -152,4 +150,4 @@ return
 if( $canSend ) then (
 ( $clearCache  , http:send-request( $reqGetRemote  ))
 )
-else ( ($name, $urlWWW, $urlRemote) )
+else ( ($canSend, $name, $username, $password,   $name, $urlWWW, $urlRemote) )

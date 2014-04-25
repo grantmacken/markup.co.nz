@@ -14,9 +14,8 @@ import module namespace session = "http://exist-db.org/xquery/session";
 
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
 let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
-let $username := $permissions/@user/string()
-let $password := $permissions/@password/string()
-let $link := doc(concat($app-root, "/data/upload-link-atom.xml"))//@href/string()
+
+let $link := doc(concat($app-root, "/data/jobs/upload-link-atom.xml"))//@href/string()
 let $sourceURL := doc($link)//atom:link[@rel="alternate" ]/@href/string()
 let $targetURL := doc($link)//atom:link[@rel="in-reply-to" ]/@href/string()
 

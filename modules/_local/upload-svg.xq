@@ -10,13 +10,16 @@ import module namespace http = "http://expath.org/ns/http-client";
 
 
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
-let $permissions  :=  doc(concat($app-root, "/repo.xml"))/repo:meta/repo:permissions
-let  $username := $permissions/@user/string()
-let  $password := $permissions/@password/string()
+let $app-path  :=   substring-after( $app-root ,'//')
+let $domain  :=   substring-after( $app-root ,'/apps/')
+let $hosts := 	doc(concat($app-root, "/data/hosts.xml"))
+let  $username := $hosts/hosts/@user/string()
+let  $password := $hosts/hosts/@password/string()
+let  $local-ip := $hosts/hosts/local/string()
+let  $remote-ip := $hosts/hosts/remote/string()
 
-let $uri := doc(concat($app-root, "/data/upload-link-svg.xml"))//@href/string()
-let  $local-ip := doc(concat($app-root, "/data/hosts.xml"))//local/string()
-let  $remote-ip := doc(concat($app-root, "/data/hosts.xml"))//remote/string()
+let $uri := doc(concat($app-root, "/data/jobs/upload-link-svg.xml"))//@href/string()
+let $name := substring-before(tokenize($uri , '/' )[count(tokenize($uri , '/' ))], '.')
 
 let  $local := 'http://'  || $local-ip  || ':8080'
 let  $remote := 'http://' || $remote-ip || ':8080'
