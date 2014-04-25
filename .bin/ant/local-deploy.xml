@@ -415,7 +415,7 @@ repo:remove("http://${project.domain}")
 <collection xmlns="http://exist-db.org/collection-config/1.0">
     <triggers>
         <trigger class="org.exist.collections.triggers.XQueryTrigger">
-            <parameter name="url" value="xmldb:exist://${host.local}:8080/db/apps/${project.domain}/modules/triggers/mentions.xql"/>
+            <parameter name="url" value="xmldb:exist://${host.local}:8080/db/apps/${project.domain}/modules/triggers/mentioned.xql"/>
         </trigger>
     </triggers>
 </collection>
