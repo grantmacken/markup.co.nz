@@ -65,7 +65,7 @@ href = ''
 titleText = ''
 
 if not dirName:
-    outfile = os.path.join( '.deploy' ,'data' , 'pages' , 'home' , fName +
+    outfile = os.path.join( 'data' , 'pages' , 'home' , fName +
     '.xml' )
 else:
     if splitDir == '_posts':
@@ -78,7 +78,7 @@ else:
                 year = time.strftime('%Y',atime)
                 month = time.strftime('%m',atime)
                 day = time.strftime('%d',atime)
-                outfile = os.path.join( '.deploy' ,'data' , 'archive', year , month , day, titleText + '.xml' )
+                outfile = os.path.join( 'data' , 'archive', year , month , day, titleText + '.xml' )
                 href = 'http://' + os.path.join( domain, 'archive', year , month ,day, titleText  )
             except ValueError:
                 raise
@@ -89,7 +89,7 @@ else:
            sys.exit('Error!')
     else:
         titleText = fName
-        outfile = os.path.join( '.deploy' ,'data' , 'pages', splitDir, titleText +
+        outfile = os.path.join( 'data' , 'pages', splitDir, titleText +
         '.xml' )
         href = os.path.join( splitDir, fName  )
 

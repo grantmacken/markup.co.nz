@@ -10,16 +10,6 @@
     <property name="dir.backup" value=".backup/local"/>
     <property name="dir.build" value=".build/local"/>
     <property name="dir.deploy" value=".deploy/local"/>
-    <!--<property name="dir.www" value="www"/>-->
-    <!--<property name="dir.deploy.data" value="${dir.deploy}/data"/>-->
-    <!--<property name="dir.deploy.modules" value="${dir.deploy}/modules"/>-->
-    <!--<property name="dir.deploy.templates" value="${dir.deploy}/templates"/>-->
-    <!-- <property name="dir.deploy.resources" value="${dir.deploy}/resources"/>-->
-    <!---->
-    <!--<property name="dir.deploy.styles" value="${dir.deploy}/resources/styles"/>-->
-    <!--<property name="dir.deploy.scripts" value="${dir.deploy}/resources/scripts"/>-->
-    <!--<property name="dir.deploy.images" value="${dir.deploy}/resources/images"/>-->
-
 
     <property name="browser" value="firefox"/>
     <!-- import eXist-db tasks -->
@@ -251,8 +241,8 @@ repo:remove("http://${project.domain}")
      html views. our data-map , our site navigations, page, posts tags views
     </echo>
 
-    <mkdir dir="${dir.deploy}/modules/mu/helpers" />
-    <echo>TODO mu helper xQuery modules ... markup modules
+    <mkdir dir="${dir.deploy}/modules/mu/libs" />
+    <echo>TODO mu helper xQuery libraries ... markup modules
      generic helper functions, base60, mf2 etc
     </echo>
 
@@ -614,11 +604,6 @@ else
 <target name="local-data">
     <echo>Proccess md again </echo>
     <antcall target="proccess-md" />
-
-    <echo>copy our changed md proccessed files to the data dir</echo>
-    <copy todir="${dir.deploy}/data">
-        <fileset dir=".deploy/data" />
-    </copy>
 
     <echo>copy our citations and visiting cards to the data dir</echo>
     <copy todir="${dir.deploy}/data">
