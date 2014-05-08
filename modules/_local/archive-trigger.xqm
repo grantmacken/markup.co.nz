@@ -19,15 +19,16 @@ declare function trigger:update-remote( $uri as xs:anyURI ) {
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
 let $app-path  :=   substring-after( $app-root ,'//')
 let $domain  :=   substring-after( $app-root ,'/apps/')
+let $collection-uri  :=   $app-root || '/data/jobs'
+let $resource-name  :=   'upload-link-atom.xml'
+let $contents  :=   <link href="{$uri}" />
+let $mime-type  :=   'application/xml'
 let $logger-name := $domain || '.log'
 let $priority := 'info'
 let $message :=  $resource-name || ': '  || $uri
 let $logApp := util:log-app($priority, $logger-name, $message )
 
-let $collection-uri  :=   $app-root || '/data/jobs'
-let $resource-name  :=   'upload-link-atom.xml'
-let $contents  :=   <link href="{$uri}" />
-let $mime-type  :=   'application/xml'
+
 
 let $store := xmldb:store($collection-uri, $resource-name,
 $contents, $mime-type)

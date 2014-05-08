@@ -35,7 +35,7 @@
         <fileset dir="${dir.exist}/lib">
             <include name="**/*.jar"/>
         </fileset>
-    
+
         <pathelement path="${dir.exist}/exist.jar"/>
         <pathelement path="${dir.exist}/exist-optional.jar"/>
 
@@ -412,28 +412,48 @@ curl -s -I -H "Accept-Encoding: gzip,deflate"  ${resultURL}  | grep -i "Content-
 </target>
 
 <target name="store-post" unless="has.md2Failed"  if="is.mdPost">
+
+<property name="q_collection">
+xquery version "3.0";
+   let $tok := tokenize( '${outfile}' , '/')
+   let $rem := remove($tok, count($tok))
+   let $join :=  string-join($rem, '/' )
+   return $join
+</property>
+<xdb:xquery
+            uri="xmldb:exist://${host.local}:8080/exist/xmlrpc/db"
+            query="${q_collection}" user="${exist.username}"
+            password="${exist.password}"
+            outputproperty="collection" />
+<echo>${collection}</echo>
+
+
+<property name="exist.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/${collection}</property>
 <echo>outfile:  ${outfile}</echo>
- <exec executable="/bin/sh">
-       <arg value="-c"/>
-       <arg line="&quot; echo ${outfile} | sed 's:^\.deploy\/data\/\(.*\)\/.*$:\1:' &quot;" />
-       <redirector outputproperty="bash.out.collection" />
-   </exec>
+<echo>EXIST.URI:  ${exist.uri} </echo>
 
-<echo>bash.out.collection:  ${bash.out.collection}</echo>
-
-
- <property name="exist.local.uri">xmldb:exist://${host.local}:8080/exist/xmlrpc/db/apps/${project.domain}/data/${bash.out.collection}</property>
-    <echo>OUTFILE:  ${outfile}  </echo>
-    <echo>EXIST.LOCAL.URI:  ${exist.local.uri} </echo>
-
- <xdb:store
-        uri="${exist.local.uri}"
+    <xdb:store
+        uri="${exist.uri}"
         createcollection="true"
         srcfile="${outfile}"
         user="${exist.username}"
         password="${exist.password}"
     />
+
+
+
+<!--
+
+<xdb:store
+        uri="${exist.local.uri}"
+        createcollection="true"
+        srcfile="${basedir}/${outfile}"
+        user="${exist.username}"
+        password="${exist.password}"/>
+
+-->
 </target>
+
 
 
 

@@ -8,11 +8,11 @@ categories:
 draft: yes
 ---
 
-My webmention endpoint
+My Webmention Endpoint
 ----------------------
 
 If you mention something I have said in your site you can notify me at my
-webmention endpoint. I can receive webmention for any any archive post.
+webmention endpoint. I can receive webmention for any any archive post
 
 ```http:markup.co.nz/webmention.xq```
 
@@ -20,7 +20,7 @@ The webmention will be conditionally accepted with a 202 response. If the
 conditions are not met you should get a [indication of the
 problem](http://www.mnot.net/blog/2013/05/15/http_problem) in the response body.
 
-Conditions for acceptance.
+Conditions For Acceptance.
 -------------------------
 
 The request must met certain conditions for acceptance.
@@ -38,7 +38,7 @@ When there is a problem then the response will include the reason for failure
       <detail>Query parameters must be target and source</detail>
     </problem>
 
-Reasons For Failure
+Reasons For Failure.
 ------------------
 
 1. Missing a required query parameter
@@ -69,11 +69,25 @@ script on eXist which will try to do something usefull with the source data.
 
 It will be matter of playing with the script to see what it can generate. If the
 source document has microformated content we will end up with a richer mentions
-section.
+section. If the source document does not have microformated the there will be a
+fallback position.
 
-References
+The trick is figuring out the [type of reponse](http://indiewebcamp.com/responses) the webmention source contains so we can display received mentions as ....
+
+1. A Reply ( Comment ). ref  <http://indiewebcamp.com/comments-presentation>
+2. A like ( Favourite )
+3. A repost ( reshare )
+4. A RSVP  invitation
+
+References.
 ----------
 
 <http://indiewebcamp.com/webmention>
 
 <https://github.com/converspace/webmention>
+
+<http://indiewebcamp.com/comment>
+
+<http://indiewebcamp.com/responses>
+
+<http://indiewebcamp.com/comment-policies>

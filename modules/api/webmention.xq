@@ -12,8 +12,6 @@ import module namespace http = "http://expath.org/ns/http-client";
 import module namespace request="http://exist-db.org/xquery/request";
 import module namespace response="http://exist-db.org/xquery/response";
 
-import module namespace mf2="http://markup.co.nz/#mf2"  at '../mu/mf2.xqm';
-import module namespace note="http://markup.co.nz/#note"  at '../mu/note.xqm';
 import module namespace utility = "http://markup.co.nz/#utility"  at '../mu/utility.xqm';
 
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
@@ -38,12 +36,16 @@ let $targetResource := $splitTarget[count($splitTarget)]
 let $source := request:get-parameter('source',())
 
 (:
+  https://checkmention.appspot.com/
+
 TODO: to make responsive add job to que
 set status then async out to carry out job
 If there is a problem notify user
 
 http://www.mnot.net/blog/2013/05/15/http_problem
 http://msdn.microsoft.com/en-us/library/dd179357.aspx
+
+
 :)
 
 let $missingRequiredQueryParameter := function(){

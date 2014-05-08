@@ -193,7 +193,7 @@ var xAuthorImage = document.createElementNS(xhtml_ns, 'img');
     xAuthorImage.setAttribute('width', icon_size )
     xAuthorImage.setAttribute('height', icon_size )
     xAuthorImage.setAttribute('alt', obj.name)
-    xAuthorImage.setAttribute('class', 'p-photo')
+    xAuthorImage.setAttribute('class', 'u-photo')
     //
 var xParagraph = document.createElementNS(xhtml_ns, 'p');
 var xLineBreak = document.createElementNS(xhtml_ns, 'br');
@@ -247,4 +247,3 @@ var linkInReplyTo =  ko.stringutils.strip(found.split('to:')[1])
 //scimoz.targetStart = scimoz.currentPos;
 //scimoz.targetEnd = scimoz.anchor;
 //scimoz.replaceTarget(text.length, text);
-
