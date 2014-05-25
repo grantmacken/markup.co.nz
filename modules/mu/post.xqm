@@ -717,8 +717,37 @@ let $day :=  $seqPath[3]
 let $datePath :=  string-join(($year , $month, $day ) , '/')
 let $path :=  string-join(($model('app-data'), 'mentions' ,$year , $month, $day ) , '/')
 
+let $display := if( xmldb:collection-available( $path ))then (
+ let $seqNodes := for $node in xmldb:xcollection($path)
+      where $node/*[@rel]
+      group by $rel := $node/*/@rel/string()
+       order by $rel descending
+        return  <div>{count($node)} <strong>{ if(count($node) gt 1 )
+                                                       then ($rel || 's' )
+                                              else($rel)
+
+         }</strong>
+        {
+         for $itm in $node
+                  return
+                  $itm
+        }
+        </div>
+
+ return (<h2>Mentions</h2>, $seqNodes)
+ )
+else()
+
+
+
+
+return ( $display )
+
+
+
+(:
 let $seqNodes := for $node in xmldb:xcollection($path)
-      where $node/*[*[@rel="in-reply-to"][@href = $href]]
+      where $node/*[*[@rel][@href = $href]]
       group by $rel := $node/*[*[@rel]]//@rel/string()
        order by $rel descending
         return  <div><strong>{$rel}</strong>: {count($node)} mention
@@ -733,38 +762,7 @@ let $seqNodes := for $node in xmldb:xcollection($path)
 
 
 return $seqNodes
-
-(:
-let $seqItem := for $item in xmldb:xcollection($path)
-             group by $year := year-from-dateTime($item/atom:published)
-             order by $year descending
-             return  <div><strong>{$year}</strong>: {count($item)} posts
-                 <div>{
-                  for $itm in $item
-                     group by $month := month-from-dateTime($itm/atom:published)
-                     order by $month descending
-                  return
-                  <div>  <strong>{$getMonth($month)}</strong>: {$itemCount($itm)}
-                   {
-                    for $i in $itm
-                    order by day-from-dateTime($i/atom:published) descending
-                    return
-                   <article  class="h-entry h-as-{post:getPostType($i)}">
-                     <div>
-                         {post:getTitle($i)}
-                        </div>
-                        {post:getDivPublishedDate($i)}
-                     <div class="e-summary">
-                      {post:getSummary($i) }
-                     </div>
-                   </article>
-                   }
-                  </div>
-                  }</div>
-             </div>
-
 :)
-
 
 };
 
