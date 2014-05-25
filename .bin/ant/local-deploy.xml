@@ -223,6 +223,10 @@ repo:remove("http://${project.domain}")
     <mkdir dir="${dir.deploy}/data/mentions" />
 
     <mkdir dir="${dir.deploy}/data/cache" />
+    <echoxml file="${dir.deploy}/data/cache/dummy.xml" append="false" namespacepolicy="elementsOnly">
+    <dummy />
+    </echoxml>
+
     <echo>A place to store ...
     externally fetched pages.
     stored as xhtml markup as a result of http-client request
@@ -230,6 +234,9 @@ repo:remove("http://${project.domain}")
     under a date archive [year/month/day]with archive stamp being date last accessed
     This is a public(guest) write dir
     </echo>
+
+
+
     <mkdir dir="${dir.deploy}/data/pages" />
 
     <echo>A place to store ...
