@@ -1,14 +1,30 @@
 xquery version "3.0";
 
-declare namespace  xhtml =  "http://www.w3.org/1999/xhtml";
-declare namespace  atom =  "http://www.w3.org/2005/Atom";
+
+(:~
+webmention.xq
+
+our webmention endpoint end
+@see http://markup.co.nz/archive/2014/04/24/receiving-webmentions
+
+:)
 
 
-declare namespace repo="http://exist-db.org/xquery/repo";
+
+
+
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+declare option output:method "xml";
+declare option output:media-type "application/xml";
+declare option output:indent "yes";
+declare option output:encoding "UTF-8";
+
+import module namespace http = "http://expath.org/ns/http-client";
+
+
 import module namespace system = "http://exist-db.org/xquery/system";
 import module namespace util = "http://exist-db.org/xquery/util";
 import module namespace xmldb = "http://exist-db.org/xquery/xmldb";
-import module namespace http = "http://expath.org/ns/http-client";
 import module namespace request="http://exist-db.org/xquery/request";
 import module namespace response="http://exist-db.org/xquery/response";
 
@@ -72,7 +88,7 @@ let $isTargetWebMentionLinkInHeader := function( $head ){
 }
 
 let $isTargetWebMentionLinkInHead := function( $page ){
-  not(empty($page//xhtml:link[@rel="webmention"]/@href/string()))
+  not(empty($page//*[local-name(.) eq 'link'][@rel="webmention"]/@href/string()))
 }
 
 let $isTargetValidResource := function($head, $page){
@@ -170,14 +186,19 @@ let $condition :=
         let $resource-name  :=   $idHash || '.xml'
         let $contents  :=      <mention target="{$target}" source="{$source}">{$wmSource}</mention>
         let $mime-type  :=   'application/xml'
+	let $priority := 'info'
+	let $log := util:log($priority, '[webmention](' || $collection-uri || ')')
+        let $log := util:log($priority, '[webmention](' || $resource-name || ')' )
+         (:{$contents} :)
         let $store := xmldb:store($collection-uri, $resource-name,
             $contents, $mime-type)
+
         let $beforeArchive := substring-before($target, '/archive/')
         let $afterArchive := substring-after($target, '/archive/')
         let $seqDates := tokenize( $afterArchive , '/')
         let $rmlast := remove( $seqDates , count($seqDates))
         let $dateJoin := string-join($rmlast, '/')
-         return (<location>{$target || '#' || $idHash}</location>)
+         return (<location>{$target || '#' || $idHash} </location> )
         )
         return ( $srcProbs )
       )
