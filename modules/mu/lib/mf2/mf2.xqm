@@ -2,8 +2,6 @@ xquery version "3.0";
 
 module namespace mf2="http://markup.co.nz/#mf2";
 
-
-
 declare namespace  xhtml="http://www.w3.org/1999/xhtml";
 declare namespace test="http://exist-db.org/xquery/xqsuite";
 
@@ -12,6 +10,32 @@ declare option output:method "xml";
 declare option output:media-type "text/xml";
 declare option output:omit-xml-declaration "yes";
 declare option output:indent "yes";
+
+
+declare variable $mf2:whitespace-elements :=
+  ("address",  "article", "aside", "blockquote", "br" ,"dd", "div",
+   "dl", "dt", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header",
+   "hgroup", "hr", "li", "nav", "ol", "p", "pre", "section", "ul" );
+
+
+
+declare variable $mf2:whitelist-block-tags :=
+  ("div","p", "h1", "h2","h3","h4","h5","h6");
+
+declare variable $mf2:whitelist-special-tags :=
+  ("a","img", "q" , "blockquote", "pre" , "code");
+
+declare variable $mf2:whitelist-list-tags :=
+  ("ol", "ul" , "li", "dd", "dt", "dl");
+
+declare variable $mf2:whitelist-inline-tags :=
+  ( "em", "strong" , 'br' , "span", "hr", "cite", "abbr", "acronym", "del",
+  "ins" , "i", "b");
+
+declare variable $mf2:whitelist-tags :=
+  ($mf2:whitelist-block-tags,
+   $mf2:whitelist-list-tags,
+   $mf2:whitelist-inline-tags);
 
 (:~
  : mf2
@@ -24,13 +48,26 @@ declare option output:indent "yes";
  :
  : Specifically we are looking at our ability to process webmentions
 
- : simpler parsing - parsers can now do a simple stream-parse (or in-order DOM tree walk)
- : and parse out all microformat objects,
- : properties, and values, without having to know anything about any specific microformats
- : http://microformats.org/wiki/microformats2-parsing
- : https://github.com/microformats/tests
- : @author Grant MacKenzie
- : @version 0.01 :
+    simpler parsing - parsers can now do a simple stream-parse (or in-order DOM
+    tree walk) and parse out all microformat objects, properties, and values,
+    without having to know anything about any specific microformats
+
+    http://microformats.org/wiki/microformats2-parsing
+
+
+   property tasks
+
+         u-  each mf2 relative or absolute urls needs to be resolved from the document base url
+             to achieve this we need the base url
+
+
+         e-  element content needs to be sanitised
+
+
+  https://github.com/microformats/tests
+  @author Grant MacKenzie
+  @version 0.01 :
+ :
  :
 :)
 
@@ -121,7 +158,7 @@ parse child elements (document order) by:
 
 :)
 
-declare function mf2:dispatch($node as node()) as item()* {
+declare function mf2:dispatch($node ) {
     typeswitch($node)
         case element() return (
                  if ( exists($node[contains(@class, 'h-entry')]) )then( mf2:hEntry($node) )
@@ -133,7 +170,7 @@ declare function mf2:dispatch($node as node()) as item()* {
 };
 
 
-declare function mf2:passthru($nodes as node()*) as item()* {
+declare function mf2:passthru( $nodes ) {
     for $node in $nodes/node() return mf2:dispatch($node)
 };
 
@@ -159,8 +196,10 @@ let $parseImpliedNameProperty := if($noExplicitNameProperty) then(
     	   case 'abbr' return if ($node[@title]) then ( $node/@title/string())else()
            default return ()
     let $step2 :=  if(empty($step1)) then (
-      if     ( $node//*[local-name(.) eq 'img'][1][@alt] )then ( $node//*[local-name(.) eq 'img'][1]/@alt/string())
-      else if( $node//*[local-name(.) eq 'abbr'][1][@title] )then ($node//*[local-name(.) eq 'abbr'][1]/@title/string())
+      if     ( $node//*[local-name(.) eq 'img'][@alt][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1] )
+	then ( $node//*[local-name(.) eq 'img'][@alt][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1]/@alt/string())
+      else if( $node//*[local-name(.) eq 'abbr'][@title][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1] )
+	then ($node//*[local-name(.) eq 'abbr'][@title][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1]/@title/string())
       else if ( $node/text()  ) then ( normalize-space(  string-join($node/text() , '') ) )
       else()
     )
@@ -179,8 +218,10 @@ let $parseImpliedPhotoProperty := if($noExplicitPhotoProperty) then(
     	   case 'object' return if ($node[@data]) then ( $node/@data/string())else()
            default return ()
     let $step2 :=  if(empty($step1)) then (
-      if     ( $node//*[local-name(.) eq 'img'][1][@src][not(contains(@class/string() , 'h-'))] )then ( $node//*[local-name(.) eq 'img'][1]/@src/string())
-      else if( $node//*[local-name(.) eq 'object'][1][@data][not(contains(@class/string() , 'h-'))] )then ($node//*[local-name(.) eq 'object'][1]/@data/string())
+      if     ( $node//*[local-name(.) eq 'img'][@src][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1] )
+	then ( $node//*[local-name(.) eq 'img'][@src][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1]/@src/string()  )
+      else if( $node//*[local-name(.) eq 'object'][@data][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1] )
+	then ( $node//*[local-name(.) eq 'object'][@data][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1]/@data/string())
       else()
     )
     else($step1)
@@ -197,7 +238,8 @@ let $parseImpliedUrlProperty := if($noExplicitUrlProperty) then(
     	   case 'a' return if ($node[@href]) then ( $node/@href/string())else()
            default return ()
     let $step2 :=  if(empty($step1)) then (
-      if( $node//*[local-name(.) eq 'a'][1][@href][not(contains(@class/string() , 'h-'))] )then ( $node//*[local-name(.) eq 'a'][1]/@href/string())
+      if( $node//*[local-name(.) eq 'a'][@href][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1] )
+	then ( $node//*[local-name(.) eq 'a'][@href][count(ancestor-or-self::*[contains(@class/string() , 'h-')]) eq 1][1]/@href/string())
       else()
     )
     else($step1)
@@ -214,7 +256,7 @@ return (  $parseImpliedNameProperty, $parseImpliedPhotoProperty, $parseImpliedUr
 
 (:  START ENTRY PROCCESSING :)
 
-declare function mf2:hEntry($node as node()) as item()* {
+declare function mf2:hEntry($node ) {
     (:parsing for explicit properties :)
     let $explicitProperties :=
          element {'entry'} {
@@ -261,16 +303,31 @@ return ( <entry>{$seqNodes}</entry> )
 declare function mf2:parseForExplicitEntryProperties($node  ) {
     typeswitch($node)
         case element() return (
-            if ( exists($node[contains(@class, 'p-name')]) )then( mf2:parseP($node, 'name'),mf2:passthruEntryProperties($node ) )
+	    if ( exists( $node[ contains(@class, 'e-content') and contains(@class, ' p-summary') and contains(@class, 'p-name') ]) )
+	    then( ( mf2:parseP($node, 'name'),
+		    mf2:parseP($node, 'summary'),
+		    <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node()   )}}</content> ,
+		    mf2:passthruEntryProperties($node )))
+	    else if ( exists( $node[contains(@class, 'e-content') and contains(@class, 'p-name') ]) )
+	    then( (mf2:parseP($node, 'name'),
+			      <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node() )}}</content> ,
+			      mf2:passthruEntryProperties($node )))
+            else if ( exists($node[contains(@class, 'p-name')]) )then( mf2:parseP($node, 'name'),mf2:passthruEntryProperties($node ) )
             else if ( exists($node[contains(@class, 'p-summary')]) )then( mf2:parseP($node, 'summary'),mf2:passthruEntryProperties($node ) )
-            else if ( exists($node[contains(@class, 'e-content')]) )then( <content>{element {local-name($node)} {( $node/node() )}}</content> , mf2:passthruEntryProperties($node ) )
-            (:  p-author - who wrote the entry, optionally embedded h-card(s)           :)
-            else if ( exists($node[contains(@class, 'p-author')][contains(@class, 'h-card')]) )then( element {'author'} {( mf2:dispatch($node) )})
+            else if ( exists($node[contains(@class, 'e-content')]) )then( <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node())}}</content> , mf2:passthruEntryProperties($node ) )
+	    else if ( exists($node[contains(@class, 'p-category')]) )then( mf2:parseP($node, 'category'),mf2:passthruEntryProperties($node ) )
+	    (:  p-author - who wrote the entry, optionally embedded h-card(s)           :)
+            else if ( exists($node[contains(@class, 'p-author') and contains(@class, 'h-card')]) )
+		 then( element {'author'} {( mf2:dispatch($node) )})
             else if ( exists($node[contains(@class, 'p-author')]) )then( mf2:parseP($node, 'author'),mf2:passthruEntryProperties($node )  )
 (: TODO:   h-adr, or h-geo dispatchers          :)
             else if ( exists($node[contains(@class, 'p-location')][contains(@class, 'h-card') or contains(@class, 'h-adr') or contains(@class, 'h-geo')       ]) )
                  then( element {'location'} {( mf2:dispatch($node) )})
             else if ( exists($node[contains(@class, 'p-location')]) )then( mf2:parseP($node, 'location'),mf2:passthruEntryProperties($node )  )
+
+
+	    else if ( exists($node[contains(@class, 'u-url') and contains(@class, 'u-in-reply-to')  ]) )
+		 then(mf2:parseU($node, 'in-reply-to') , mf2:parseU($node, 'url'),mf2:passthruEntryProperties($node )  )
 
             else if ( exists($node[contains(@class, 'u-url')]) )then( mf2:parseU($node, 'url'),mf2:passthruEntryProperties($node )  )
             else if ( exists($node[contains(@class, 'u-uid')]) )then( mf2:parseU($node, 'uid'),mf2:passthruEntryProperties($node )  )
@@ -278,12 +335,14 @@ declare function mf2:parseForExplicitEntryProperties($node  ) {
             else if ( exists($node[contains(@class, 'dt-published')]) )then( mf2:parseDT($node, 'published'),mf2:passthruEntryProperties($node )  )
             else if ( exists($node[contains(@class, 'dt-updated')]  ) )then( mf2:parseDT($node, 'updated'),mf2:passthruEntryProperties($node )  )
              (:experimental property p-comment :)
-(: TODO:   h-cite dispatchers          :)
+
             else if ( exists($node[contains(@class, 'p-comment')][contains(@class, 'h-cite')]) )then( element {'comment'} {( mf2:dispatch($node) )})
             else if ( exists($node[contains(@class, 'p-comment')]) )then( mf2:parseP($node, 'comment'),mf2:passthruEntryProperties($node )  )
             else if ( exists($node[contains(@class, 'u-syndication')]) )then( mf2:parseU($node, 'syndication'),mf2:passthruEntryProperties($node )  )
             else if ( exists($node[contains(@class, 'u-in-reply-to')][contains(@class, 'h-cite')]) )then( element {'in-reply-to'} {( mf2:dispatch($node) )})
 	    else if ( exists($node[contains(@class, 'p-in-reply-to')][contains(@class, 'h-cite')]) )then( element {'in-reply-to'} {( mf2:dispatch($node) )})
+
+
             else if ( exists($node[contains(@class, 'u-in-reply-to')]) )then( mf2:parseU($node, 'in-reply-to'),mf2:passthruEntryProperties($node )  )
 	    else if ( exists($node[contains(@class, 'p-like-of')][contains(@class, 'h-cite')]) )then( element {'in-reply-to'} {( mf2:dispatch($node) )})
             else if ( exists($node[contains(@class, 'u-like-of')][contains(@class, 'h-cite')]) )then( element {'like-of'} {( mf2:dispatch($node) )})
@@ -291,6 +350,10 @@ declare function mf2:parseForExplicitEntryProperties($node  ) {
 	    else if ( exists($node[contains(@class, 'p-repost-of')][contains(@class, 'h-cite')]) )then( element {'in-reply-to'} {( mf2:dispatch($node) )})
             else if ( exists($node[contains(@class, 'u-repost-of')][contains(@class, 'h-cite')]) )then( element {'repost-of'} {( mf2:dispatch($node) )})
             else if ( exists($node[contains(@class, 'u-repost-of')]) )then( mf2:parseU($node, 'repost-of'),mf2:passthruEntryProperties($node )  )
+
+	    (:has a root property with no associated property  could ignore or use 'children' pseudo element  like ref http://waterpigs.co.uk/php-mf2/?
+	    else if ( exists($node[contains(@class, 'h-cite')]) )then( element {'children'} {( mf2:dispatch($node) )})
+             else if ( exists($node[contains(@class, 'h-card')]) )then( element {'children'} {( mf2:dispatch($node) )})  :)
             else(mf2:passthruEntryProperties($node))
          )
         default return mf2:passthruEntryProperties($node)
@@ -308,7 +371,7 @@ declare function mf2:passthruEntryProperties($nodes ) {
 (:  START CARD PROCCESSING :)
 
 
-declare function mf2:hCard($node as node()) as item()* {
+declare function mf2:hCard($node ) {
     let $explicitProperties :=
      element {'card'} {
                  ( mf2:parseForExplicitCardProperties($node ) )
@@ -398,7 +461,14 @@ declare function mf2:parseForExplicitCardProperties( $node ) {
 	    u-uid - unique identifier
 	    :)
             else if ( exists($node[contains(@class, 'u-email')]) )then( mf2:parseU($node, 'email'),mf2:passthruCardProperties($node )  )
-            else if ( exists($node[contains(@class, 'u-logo')]) )then( mf2:parseU($node, 'logo'),mf2:passthruCardProperties($node )  )
+
+	    else if ( exists($node[contains(@class, 'u-logo') and  contains(@class, 'u-photo') ]) )
+		 then( 	mf2:parseU($node, 'logo'),
+			mf2:parseU($node, 'photo'),
+			mf2:passthruCardProperties($node )  )
+
+
+	    else if ( exists($node[contains(@class, 'u-logo')]) )then( mf2:parseU($node, 'logo'),mf2:passthruCardProperties($node )  )
 	    else if ( exists($node[contains(@class, 'u-photo')]) )then( mf2:parseU($node, 'photo'),mf2:passthruCardProperties($node )  )
             else if ( exists($node[contains(@class, 'u-url')]) )then( mf2:parseU($node, 'url'),mf2:passthruCardProperties($node )  )
 	    else if ( exists($node[contains(@class, 'u-uid')]) )then( mf2:parseU($node, 'uid'),mf2:passthruCardProperties($node )  )
@@ -466,6 +536,7 @@ declare function mf2:parseForExplicitCardProperties( $node ) {
 	    else if ( exists($node[contains(@class, 'p-job-title')]) )then( mf2:parseP($node, 'job-title'),mf2:passthruCardProperties($node )  )
 	    else if ( exists($node[contains(@class, 'sex')]) )then( mf2:parseP($node, 'sex'),mf2:passthruCardProperties($node )  )
 	    else if ( exists($node[contains(@class, 'p-gender-identity')]) )then( mf2:parseP($node, 'gender-identity'),mf2:passthruCardProperties($node )  )
+
             else(mf2:passthruCardProperties($node))
          )
         default return mf2:passthruCardProperties($node)
@@ -479,7 +550,7 @@ declare function mf2:passthruCardProperties($nodes ) {
 (:  END CARD PROCCESSING :)
 
 (:  START CITE PROCCESSING :)
-declare function mf2:hCite($node as node()) as item()* {
+declare function mf2:hCite($node ) {
     let $explicitProperties :=
      element {'cite'} {mf2:parseForExplicitCiteProperties($node)}
 
@@ -492,9 +563,13 @@ return ( element {'cite'} { $seqNodes } )
 declare function mf2:parseForExplicitCiteProperties( $node ) {
 typeswitch($node)
     case element() return (
-	if ( exists($node[contains(@class, 'p-name')]) )then( mf2:parseP($node, 'name'),mf2:passthruCiteProperties($node ) ) (:name of the work :)
-	else if ( exists($node[contains(@class, 'p-author')][contains(@class, 'h-card')]) )then( element {'author'} {( mf2:dispatch($node) )})
-	else if ( exists($node[contains(@class, 'p-author')]) )then( mf2:parseP($node, 'author'),mf2:passthruEntryProperties($node )  )
+	if ( exists($node[contains(@class, 'e-content') and contains(@class, 'p-name')] ) )then(mf2:parseP($node, 'name'), <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node() )}}</content> , mf2:passthruCiteProperties($node ) )
+        (:NOTE.  might remove this:  'e-content' not included http://microformats.org/wiki/h-cite   :)
+
+	else if ( exists($node[contains(@class, 'p-name')]) )then( mf2:parseP($node, 'name'),mf2:passthruCiteProperties($node ) ) (:name of the work :)
+       (:p-author with emdeded h-card													   :)
+	else if ( exists($node[contains(@class, 'p-author')][contains(@class, 'h-card')]) )then( element {'author'} { ( mf2:dispatch($node )) })
+	else if ( exists($node[contains(@class, 'p-author')]) )then( mf2:parseP($node, 'author'),mf2:passthruCiteProperties($node )  )
 
 	else if ( exists($node[contains(@class, 'dt-published')]))then( mf2:parseDT($node, 'published'),mf2:passthruCiteProperties($node))(:date (and optionally time) of publication :)
 	else if ( exists($node[contains(@class, 'dt-accessed')]))then( mf2:parseDT($node, 'accessed'),mf2:passthruCiteProperties($node))
@@ -513,6 +588,10 @@ typeswitch($node)
 
 	else if ( exists($node[contains(@class, 'p-content')]) )then( mf2:parseP($node, 'content'),mf2:passthruCiteProperties($node )  )
 	(:for when the citation includes the content itself, like when citing short text notes (e.g. tweets).  :)
+
+
+	(:has a root property with no associated property  could ignore or use 'children' pseudo element  like ref http://waterpigs.co.uk/php-mf2/?   :)
+        (:else if ( exists($node[contains(@class, 'h-card')]) )then( element {'card'} {( mf2:passthruCardProperties($node ) )}):)
 
 	else(mf2:passthruCiteProperties($node))
     )
@@ -537,18 +616,20 @@ declare function mf2:passthruCiteProperties($nodes ) {
 declare function mf2:parseP( $node , $name ){
 let $nodeName  := lower-case( string( local-name($node)) )
 let $step1 :=
-    if( exists( $node//*[contains(./@class, "value" )]/text() ) ) then($node//*[contains(./@class, "value" )]/string())
+    if( exists( $node//*[contains(./@class, "value" )]/text() ) ) then( normalize-space($node//*[contains(./@class, "value" )]/string()))
     else()
 
 let $step2 :=
  if(empty($step1)) then (
       switch ($nodeName )
        case 'abbr' return if ($node[@title]) then ( $node/@title/string() )else()
-	   case 'data' return if ($node[@value]) then ( $node/@value/string())else()
-	   case 'input' return if ($node[@value]) then ( $node/@value/string())else()
-	   case 'img' return if ($node[@alt]) then ( $node/@alt/string())else()
-	   case 'area' return if ($node[@alt]) then ( $node/@alt/string())else()
-       default return ( normalize-space( $node/text() ))
+	case 'data' return if ($node[@value]) then ( $node/@value/string())else()
+	case 'input' return if ($node[@value]) then ( $node/@value/string())else()
+	case 'img' return if ($node[@alt]) then ( $node/@alt/string())else()
+	case 'area' return if ($node[@alt]) then ( $node/@alt/string())else()
+       default return (  if ( $node/text()  ) then ( normalize-space($node/string()) )
+			 else()
+	    )
        )
  else($step1)
 
@@ -626,7 +707,7 @@ let $step1 :=
 
 let $step2 := (
  if(empty($step1)) then (
-		if ( $node/text() ) then ( normalize-space($node/string()) )
+		if ( $node/text() ) then ( $node/string() )
 		else()
        )
  else($step1)
@@ -637,4 +718,67 @@ return
     else(
         element{ $tag-name }{$step2}
       )
+};
+
+
+declare function mf2:sanitizer($node as node()) {
+    typeswitch ($node)
+        case element() return
+            if (namespace-uri($node) eq "http://www.w3.org/1999/xhtml") then (
+		let $tag := local-name($node)
+		return (
+		    if( $tag = $mf2:whitelist-tags ) then (element { local-name($node) } { mf2:sanitizer-passthru($node) })
+		    else if($tag = $mf2:whitelist-special-tags )
+			then(
+			     element { local-name($node) } {
+					 switch ( local-name($node) )
+					    case 'img' return  (mf2:sanitizer-img($node) )
+					    case 'a'  return   (mf2:sanitizer-a($node) )
+					    case 'blockquote'  return   (mf2:sanitizer-blockquote($node) )
+					    default return (),
+					    mf2:sanitizer-passthru($node)}
+			     )
+		    else( mf2:sanitizer-passthru($node))
+		    )
+		)
+            else( mf2:sanitizer-passthru($node))
+        default return
+            $node
+};
+
+declare function mf2:sanitizer-passthru($node as node()) {
+  for $child in $node/node() return mf2:sanitizer($child)
+};
+
+
+
+declare function mf2:sanitizer-img($node) {
+for $att in $node/@*
+    return
+    switch ( name($att) )
+	case 'title' return  (attribute { name($att)} {  $att } )
+	case 'src'  return  (attribute { name($att)} {  $att } )
+	case 'alt'  return  (attribute { name($att)} {  $att } )
+	case 'width'  return  (attribute { name($att)} {  $att } )
+	case 'height'  return  (attribute { name($att)} {  $att } )
+	default return ()
+};
+
+declare function mf2:sanitizer-a($node) {
+for $att in $node/@*
+    return
+    switch ( name($att) )
+	case 'title' return  (attribute { name($att)} {  $att } )
+	case 'href'  return  (attribute { name($att)} {  $att } )
+	default return ()
+};
+
+
+declare function mf2:sanitizer-blockquote($node) {
+for $att in $node/@*
+    return
+    switch ( name($att) )
+	case 'title' return  (attribute { name($att)} {  $att } )
+	case 'cite'  return  (attribute { name($att)} {  $att } )
+	default return ()
 };
