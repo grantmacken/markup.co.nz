@@ -6,8 +6,7 @@ declare namespace  atom =  "http://www.w3.org/2005/Atom";
 
 import module namespace xmldb = "http://exist-db.org/xquery/xmldb";
 import module namespace http = "http://expath.org/ns/http-client";
-
-import module namespace mf2="http://markup.co.nz/#mf2" at "../mu/process/mf2.xqm";
+import module namespace util = "http://exist-db.org/xquery/util";
 
 
 (:
@@ -19,18 +18,27 @@ declare function trigger:update-mention( $uri as xs:anyURI ) {
 let $priority := 'info'
 let $message := '[update-mention](' || $uri || ')'
 let $log := util:log($priority, $message )
-(:
-let $collection-uri  :=   $app-root || '/data/jobs'
-let $resource-name  :=   'upload-link-atom.xml'
-let $contents  :=   <link href="{$uri}" />
-let $mime-type  :=   'application/xml'
 
-let $store := xmldb:store($collection-uri, $resource-name,
-$contents, $mime-type)
+(:let $doc := doc( $uri ):)
+(:let $resource-name := util:document-name( $doc ):)
+(:let $log := util:log($priority, '[webmention](' || $resource-name || ')' ):)
+(::)
+(::)
+(::)
+(:(::):)
+(:let $collection-mentions  :=   $app-root || '/data/mentions':):)
+(:let $mime-type  :=   'application/xml':)
 
-let $logApp := util:log-app($priority, $logger-name, $store )
-
-let $eval := util:eval-async(xs:anyURI('upload-atom.xq'))
+(:let $resource-name  :=   'upload-link-atom.xml':)
+(:let $contents  :=   <link href="{$uri}" />:)
+(:let $mime-type  :=   'application/xml':)
+(::)
+(:let $store := xmldb:store($collection-uri, $resource-name,:)
+(:$contents, $mime-type):)
+(::)
+(:let $logApp := util:log-app($priority, $logger-name, $store ):)
+(::)
+(:let $eval := util:eval-async(xs:anyURI('upload-atom.xq')):)
 :)
 return ()
 };
