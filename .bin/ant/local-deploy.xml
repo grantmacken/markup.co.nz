@@ -221,6 +221,17 @@ repo:remove("http://${project.domain}")
     where others in-reply-to my stuff have commented, liked, reposted my stuff
     on thier site, and sent me a web mention. stored as h-cite markup in a date archive</echo>
     <mkdir dir="${dir.deploy}/data/mentions" />
+
+    <mkdir dir="${dir.deploy}/data/cache" />
+    <echo>A place to store ...
+    externally fetched pages.
+    stored as xhtml markup as a result of http-client request
+    resource names are hash of fetched url
+    under a date archive [year/month/day]with archive stamp being date last accessed
+    This is a public(guest) write dir
+    </echo>
+    <mkdir dir="${dir.deploy}/data/pages" />
+
     <echo>A place to store ...
     xml job ques triggered by stuff being stored elsewhere
     </echo>
@@ -305,8 +316,6 @@ repo:remove("http://${project.domain}")
     <antcall target="xar-install" />
     <echo>browse and maybe run tests with phantomjs</echo>
     <antcall target="browse" />
-
-
 </target>
 
 
@@ -352,10 +361,6 @@ repo:remove("http://${project.domain}")
     </copy>
 
 </target>
-
-
-
-
 
 
 <target name="local-deployment-folder">
@@ -491,7 +496,10 @@ declare variable $target external;
 (: Allow guests to add documents to collection but not read :)
 
 
-( sm:chmod(xs:anyURI($target || "/data/jobs/mentions"), "rwxrwx-wx") )
+( sm:chmod(xs:anyURI($target || "/data/jobs/mentions"), "rwxrwx-wx"),
+  sm:chmod(xs:anyURI($target || "/data/cache"), "rwxrwxrwx")
+
+)
 
 </echo>
 
