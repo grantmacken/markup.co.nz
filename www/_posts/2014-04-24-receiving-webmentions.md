@@ -51,17 +51,26 @@ Reasons For Failure.
 8. A GET on source URL did not respond with a text Content-Type
 8. A GET on source URL found the source does not link to the target after looking at the response body document.
 
-
 After these conditions are met we make a hash of the target and resource names and store the raw request response data to our ```data/jobs/mentions``` collection, with the hash as the resource name. ```data/jobs/mentions```. The collection has guest write permissions but no guest read permissions.
+
+Acceptence Response
+-------------------
+
+After we *receive* and *accept* and *store* our webmention we send our response back.
+
 A public resource may be created in the future so so give the user a
 ```202 continue``` status response with with a location URL
 as a response header and in the response body.
+
 
 The location URL will actualy be at the target URL appended with a [fragment
 identifier](http://en.wikipedia.org/wiki/Fragment_identifier). Someone has
 commented on something I wrote in a post to my blog. They sent a webmention. I
 receive the webmention. After I verfify that is valid, I add some sort of
 acknowlegement on the page they mentioned.
+
+Handling and Displaying Comments
+--------------------------------
 
 The creation of a new resource in the ```data/jobs/mentions``` collection
 [triggers](http://exist-db.org/exist/apps/doc/triggers.xml') a call to an xQuery
