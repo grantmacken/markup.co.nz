@@ -504,8 +504,8 @@ declare variable $target external;
 
 
 ( sm:chmod(xs:anyURI($target || "/data/jobs/mentions"), "rwxrwx-wx"),
-  sm:chmod(xs:anyURI($target || "/data/cache"), "rwxrwxrwx")
-
+  sm:chmod(xs:anyURI($target || "/data/cache"), "rwxrwxrwx"),
+  xmldb:remove(xs:anyURI($target || "/data/cache"), 'dummy.xml')
 )
 
 </echo>
