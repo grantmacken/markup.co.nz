@@ -11,31 +11,37 @@ declare option output:media-type "text/xml";
 declare option output:omit-xml-declaration "yes";
 declare option output:indent "yes";
 
-
-declare variable $mf2:whitespace-elements :=
-  ("address",  "article", "aside", "blockquote", "br" ,"dd", "div",
-   "dl", "dt", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header",
-   "hgroup", "hr", "li", "nav", "ol", "p", "pre", "section", "ul" );
-
+(: import my libs :)
+import  module namespace muURL = "http://markup.co.nz/#muURL" at '../muURL/muURL.xqm';
+import  module namespace muSan = "http://markup.co.nz/#muSan" at '../muSan/muSan.xqm';
+import  module namespace muCache = "http://markup.co.nz/#muCache" at '../muCache/muCache.xqm';
 
 
-declare variable $mf2:whitelist-block-tags :=
-  ("div","p", "h1", "h2","h3","h4","h5","h6");
+declare
+function mf2:fetch( $url ) {
+let $resource-name :=  muURL:urlHash( $url ) || '.xml'
+let $collection-uri := $muCache:store-path
+let $document-uri := $collection-uri || '/'  || $resource-name
+let $doc :=  doc( $document-uri )/node()
+return
+$doc
+};
 
-declare variable $mf2:whitelist-special-tags :=
-  ("a","img", "q" , "blockquote", "pre" , "code");
+declare
+function mf2:fetch2( $url ) {
+    muCache:fetch( $url )
+};
 
-declare variable $mf2:whitelist-list-tags :=
-  ("ol", "ul" , "li", "dd", "dt", "dl");
 
-declare variable $mf2:whitelist-inline-tags :=
-  ( "em", "strong" , 'br' , "span", "hr", "cite", "abbr", "acronym", "del",
-  "ins" , "i", "b");
+declare function mf2:parse( $url ) {
+let $node :=
+	try { mf2:fetch( $url  ) }
+	catch * {()}
 
-declare variable $mf2:whitelist-tags :=
-  ($mf2:whitelist-block-tags,
-   $mf2:whitelist-list-tags,
-   $mf2:whitelist-inline-tags);
+return
+mf2:dispatch( $node )
+};
+
 
 (:~
  : mf2
@@ -155,10 +161,27 @@ parse child elements (document order) by:
   parse a child element for properties
     add properties found to current microformat
   parse a child element for microformats (recurse)
-
 :)
 
-declare function mf2:dispatch($node ) {
+
+
+
+
+
+
+(:~
+dispatch is the parser entry point
+ it will extract mf2 from a given node
+
+ muCache:fetch( url ) will return a node from the cache collection
+ retrieve html doc are are
+        sanitized/cleaned with whitelist elements and attributes
+        and  URLs resolved to the base URL
+        and stored in our cache
+        with a hash of the URL as the file name
+
+:)
+declare function mf2:dispatch( $node ) {
     typeswitch($node)
         case element() return (
                  if ( exists($node[contains(@class, 'h-entry')]) )then( mf2:hEntry($node) )
@@ -306,15 +329,15 @@ declare function mf2:parseForExplicitEntryProperties($node  ) {
 	    if ( exists( $node[ contains(@class, 'e-content') and contains(@class, ' p-summary') and contains(@class, 'p-name') ]) )
 	    then( ( mf2:parseP($node, 'name'),
 		    mf2:parseP($node, 'summary'),
-		    <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node()   )}}</content> ,
+		    <content>{element {local-name($node)} {( $node/node()   )}}</content> ,
 		    mf2:passthruEntryProperties($node )))
 	    else if ( exists( $node[contains(@class, 'e-content') and contains(@class, 'p-name') ]) )
 	    then( (mf2:parseP($node, 'name'),
-			      <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node() )}}</content> ,
+			      <content>{element {local-name($node)} { $node/node() }}</content> ,
 			      mf2:passthruEntryProperties($node )))
             else if ( exists($node[contains(@class, 'p-name')]) )then( mf2:parseP($node, 'name'),mf2:passthruEntryProperties($node ) )
             else if ( exists($node[contains(@class, 'p-summary')]) )then( mf2:parseP($node, 'summary'),mf2:passthruEntryProperties($node ) )
-            else if ( exists($node[contains(@class, 'e-content')]) )then( <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node())}}</content> , mf2:passthruEntryProperties($node ) )
+            else if ( exists($node[contains(@class, 'e-content')]) )then( <content>{element {local-name($node)} {( $node/node())}}</content> , mf2:passthruEntryProperties($node ) )
 	    else if ( exists($node[contains(@class, 'p-category')]) )then( mf2:parseP($node, 'category'),mf2:passthruEntryProperties($node ) )
 	    (:  p-author - who wrote the entry, optionally embedded h-card(s)           :)
             else if ( exists($node[contains(@class, 'p-author') and contains(@class, 'h-card')]) )
@@ -563,7 +586,7 @@ return ( element {'cite'} { $seqNodes } )
 declare function mf2:parseForExplicitCiteProperties( $node ) {
 typeswitch($node)
     case element() return (
-	if ( exists($node[contains(@class, 'e-content') and contains(@class, 'p-name')] ) )then(mf2:parseP($node, 'name'), <content>{element {local-name($node)} {( mf2:sanitizer( $node )/node() )}}</content> , mf2:passthruCiteProperties($node ) )
+	if ( exists($node[contains(@class, 'e-content') and contains(@class, 'p-name')] ) )then(mf2:parseP($node, 'name'), <content>{element {local-name($node)} {( $node/node() )}}</content> , mf2:passthruCiteProperties($node ) )
         (:NOTE.  might remove this:  'e-content' not included http://microformats.org/wiki/h-cite   :)
 
 	else if ( exists($node[contains(@class, 'p-name')]) )then( mf2:parseP($node, 'name'),mf2:passthruCiteProperties($node ) ) (:name of the work :)
@@ -718,67 +741,4 @@ return
     else(
         element{ $tag-name }{$step2}
       )
-};
-
-
-declare function mf2:sanitizer($node as node()) {
-    typeswitch ($node)
-        case element() return
-            if (namespace-uri($node) eq "http://www.w3.org/1999/xhtml") then (
-		let $tag := local-name($node)
-		return (
-		    if( $tag = $mf2:whitelist-tags ) then (element { local-name($node) } { mf2:sanitizer-passthru($node) })
-		    else if($tag = $mf2:whitelist-special-tags )
-			then(
-			     element { local-name($node) } {
-					 switch ( local-name($node) )
-					    case 'img' return  (mf2:sanitizer-img($node) )
-					    case 'a'  return   (mf2:sanitizer-a($node) )
-					    case 'blockquote'  return   (mf2:sanitizer-blockquote($node) )
-					    default return (),
-					    mf2:sanitizer-passthru($node)}
-			     )
-		    else( mf2:sanitizer-passthru($node))
-		    )
-		)
-            else( mf2:sanitizer-passthru($node))
-        default return
-            $node
-};
-
-declare function mf2:sanitizer-passthru($node as node()) {
-  for $child in $node/node() return mf2:sanitizer($child)
-};
-
-
-
-declare function mf2:sanitizer-img($node) {
-for $att in $node/@*
-    return
-    switch ( name($att) )
-	case 'title' return  (attribute { name($att)} {  $att } )
-	case 'src'  return  (attribute { name($att)} {  $att } )
-	case 'alt'  return  (attribute { name($att)} {  $att } )
-	case 'width'  return  (attribute { name($att)} {  $att } )
-	case 'height'  return  (attribute { name($att)} {  $att } )
-	default return ()
-};
-
-declare function mf2:sanitizer-a($node) {
-for $att in $node/@*
-    return
-    switch ( name($att) )
-	case 'title' return  (attribute { name($att)} {  $att } )
-	case 'href'  return  (attribute { name($att)} {  $att } )
-	default return ()
-};
-
-
-declare function mf2:sanitizer-blockquote($node) {
-for $att in $node/@*
-    return
-    switch ( name($att) )
-	case 'title' return  (attribute { name($att)} {  $att } )
-	case 'cite'  return  (attribute { name($att)} {  $att } )
-	default return ()
 };
