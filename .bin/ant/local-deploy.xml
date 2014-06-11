@@ -502,7 +502,6 @@ declare variable $target external;
 
 (: Allow guests to add documents to collection but not read :)
 
-
 ( sm:chmod(xs:anyURI($target || "/data/jobs/mentions"), "rwxrwx-wx"),
   sm:chmod(xs:anyURI($target || "/data/cache"), "rwxrwxrwx"),
   xmldb:remove(xs:anyURI($target || "/data/cache"), 'dummy.xml')

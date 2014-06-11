@@ -9,10 +9,6 @@ our webmention endpoint end
 
 :)
 
-
-
-
-
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare option output:method "xml";
 declare option output:media-type "application/xml";
@@ -21,14 +17,17 @@ declare option output:encoding "UTF-8";
 
 import module namespace http = "http://expath.org/ns/http-client";
 
-
 import module namespace system = "http://exist-db.org/xquery/system";
 import module namespace util = "http://exist-db.org/xquery/util";
 import module namespace xmldb = "http://exist-db.org/xquery/xmldb";
 import module namespace request="http://exist-db.org/xquery/request";
 import module namespace response="http://exist-db.org/xquery/response";
 
-import module namespace utility = "http://markup.co.nz/#utility"  at '../mu/utility.xqm';
+(: import my libs :)
+
+import module namespace muURL = "http://markup.co.nz/#muURL"  at '../mu/lib/muURL/muURL.xqm';
+import module namespace muSan = "http://markup.co.nz/#muSan"  at '../mu/lib/muSan/muSan.xqm';
+import module namespace muCache = "http://markup.co.nz/#muCache"  at '../mu/lib/muCache/muCache.xqm';
 
 let $app-root  :=   substring-before( system:get-module-load-path() ,'/module')
 let $app-path  :=   substring-after( $app-root ,'//')
@@ -181,17 +180,32 @@ let $condition :=
         </problem>
         )
         else(
-        let $idHash := utility:urlHash( $source || $target)
-        let $collection-uri  :=   $app-root || '/data/jobs/mentions'
+	     (:let $collection-uri  :=   $app-root || '/data/jobs/mentions'
+        let $idHash := muURL:urlHash( $source || $target )
+
+	let $collection-uri := $muCache:store-path
         let $resource-name  :=   $idHash || '.xml'
-        let $contents  :=      <mention target="{$target}" source="{$source}">{$wmSource}</mention>
+
+	let $baseURL := if(muURL:isBaseInDoc($wmSourceResponseBody))
+			    then ( $wmSourceResponseBody//*[local-name(.) eq 'base' ][@href]/@href/string()  )
+			else($source)
+
+	let $sanitized :=  muSan:sanitizer( $wmSourceResponseBody, $baseURL )
+
+        let $contents  :=      <mention target="{$target}" source="{$source}"  sourceBase="{$baseURL}" >{$sanitized}</mention>
         let $mime-type  :=   'application/xml'
 	let $priority := 'info'
 	let $log := util:log($priority, '[webmention](' || $collection-uri || ')')
         let $log := util:log($priority, '[webmention](' || $resource-name || ')' )
-         (:{$contents} :)
-        let $store := xmldb:store($collection-uri, $resource-name,
-            $contents, $mime-type)
+
+:)
+
+
+         (:{$contents}:)
+	let $store := muCache:store-content( $source , $wmSourceResponseBody )
+        let $idHash := muURL:urlHash( $source || $target )
+        (:let $store := xmldb:store($collection-uri, $resource-name,
+            $contents, $mime-type):)
 
         let $beforeArchive := substring-before($target, '/archive/')
         let $afterArchive := substring-after($target, '/archive/')

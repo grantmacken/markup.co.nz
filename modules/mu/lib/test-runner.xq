@@ -1,31 +1,17 @@
 xquery version "3.0";
-declare boundary-space preserve;
-declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
-declare option output:method "html5";
-declare option output:media-type "text/html";
-declare option output:indent "yes";
-declare option output:encoding "UTF-8";
-
-import module namespace inspect = "http://exist-db.org/xquery/inspection";
-import module namespace request="http://exist-db.org/xquery/request";
-
-import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
-import module namespace muCache="http://markup.co.nz/#muCache" at "../muCache.xqm";
-
-let $module-name := 'muCache'
-let $module-path := xs:anyURI( '../' || $module-name  || '.xqm' )
-
-let $test-name := request:get-parameter('test', 'main')
-let $test-path :=  xs:anyURI( $test-name || ".xqm" )
-
-
-let $inspectModule :=  inspect:inspect-module( $module-path  )
-let $funcs-out :=  inspect:inspect-module( $test-path )
-let $test-out := test:suite( inspect:module-functions( $test-path ))
-
-
-
 (:~
+We want LIVE browser preview testing of tests found in the tests collection as
+we are working on an xquery library module
+
+
+gist -f '%f' -t 'XQuery' -d '  '%(ask:description:Enter Description)' -o < %f
+gist  -t 'XQuery'  -u %(ask:gistID:61082e441e43653b8b75) < %f
+gistID: 61082e441e43653b8b75
+
+I use this with a Komodo toolbox  macro which
+upoload file to  I am working on to localhost server
+and the refreshes  browser view
+
 
 test functions when developing a xquery library
 
@@ -33,8 +19,16 @@ test functions when developing a xquery library
  when the function returns  a 'result'
  then  returned 'result' should pass our assertion tests
 
-We want live testing of tests found in the tests collection
 
+
+DIRECTORY CONVENTIONS
+
+{root}
+    - test-runner.xqm
+    + lib
+	+ {module-name}
+	    + tests
+	    - {$test-name}.xqm (main.xqm default)
 
 NAMING CONVENTIONS
 
@@ -65,12 +59,36 @@ if we need more than one test then
     muURL:get($url)
   }
 
-
-
 @see http://localhost:8080/exist/apps/doc/xqsuite.xml#D1.2.7
 @see https://github.com/wolfgangmm/xqsuite
 @see http://en.wikibooks.org/wiki/XQuery/XUnit_Annotations
+:)
 
+
+declare boundary-space preserve;
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+declare option output:method "html5";
+declare option output:media-type "text/html";
+declare option output:indent "yes";
+declare option output:encoding "UTF-8";
+
+import module namespace inspect = "http://exist-db.org/xquery/inspection";
+import module namespace request="http://exist-db.org/xquery/request";
+
+import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
+
+let $module-name := request:get-parameter('module', 'muURL')
+let $test-name := request:get-parameter('test', 'main')
+
+let $module-path := xs:anyURI(  $module-name || '/' || $module-name  || '.xqm' )
+let $test-path :=  xs:anyURI( $module-name ||  '/tests/' || $test-name || ".xqm" )
+
+let $inspectModule :=  inspect:inspect-module( $module-path  )
+let $funcs-out :=  inspect:inspect-module( $test-path )
+let $test-out := test:suite( inspect:module-functions( $test-path ))
+
+
+(:
 * %test:name("description")
 * %test:args()
 
@@ -81,14 +99,86 @@ if we need more than one test then
 
 * %test:assertEquals('value')
 
-* %test:assertError("error code") - Excepts the function to fail with an error. If an error code is given (optional), it should be contained in the error message or the test will fail.
+* %test:assertError("error code") - Excepts the function to fail with an error.
+  If an error code is given (optional), it should be contained in the error
+  message or the test will fail.
 
-* %test:assertXPath("count($result) = 8") - This is the most powerful assertion. It checks the result against an arbitrary XPath expression. The assertion is true if
+* %test:assertXPath("count($result) = 8") - This is the most powerful assertion.
+  It checks the result against an arbitrary XPath expression. The assertion is
+  true if
 
 * %test:setUp
 * %test:tearDown
 
 :)
+
+let $getAtomicType := function($val){
+ if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic'
+ else if ($val instance of xs:anyURI) then 'xs:anyURI'
+ else if ($val instance of xs:ENTITY) then 'xs:ENTITY'
+ else if ($val instance of xs:ID) then 'xs:ID'
+ else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN'
+ else if ($val instance of xs:language) then 'xs:language'
+ else if ($val instance of xs:NCName) then 'xs:NCName'
+ else if ($val instance of xs:Name) then 'xs:Name'
+ else if ($val instance of xs:token) then 'xs:token'
+ else if ($val instance of xs:normalizedString)
+         then 'xs:normalizedString'
+ else if ($val instance of xs:string) then 'xs:string'
+ else if ($val instance of xs:QName) then 'xs:QName'
+ else if ($val instance of xs:boolean) then 'xs:boolean'
+ else if ($val instance of xs:base64Binary) then 'xs:base64Binary'
+ else if ($val instance of xs:hexBinary) then 'xs:hexBinary'
+ else if ($val instance of xs:byte) then 'xs:byte'
+ else if ($val instance of xs:short) then 'xs:short'
+ else if ($val instance of xs:int) then 'xs:int'
+ else if ($val instance of xs:long) then 'xs:long'
+ else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte'
+ else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort'
+ else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt'
+ else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong'
+ else if ($val instance of xs:positiveInteger)
+         then 'xs:positiveInteger'
+ else if ($val instance of xs:nonNegativeInteger)
+         then 'xs:nonNegativeInteger'
+ else if ($val instance of xs:negativeInteger)
+         then 'xs:negativeInteger'
+ else if ($val instance of xs:nonPositiveInteger)
+         then 'xs:nonPositiveInteger'
+ else if ($val instance of xs:integer) then 'xs:integer'
+ else if ($val instance of xs:decimal) then 'xs:decimal'
+ else if ($val instance of xs:float) then 'xs:float'
+ else if ($val instance of xs:double) then 'xs:double'
+ else if ($val instance of xs:date) then 'xs:date'
+ else if ($val instance of xs:time) then 'xs:time'
+ else if ($val instance of xs:dateTime) then 'xs:dateTime'
+ else if ($val instance of xs:dayTimeDuration)
+         then 'xs:dayTimeDuration'
+ else if ($val instance of xs:yearMonthDuration)
+         then 'xs:yearMonthDuration'
+ else if ($val instance of xs:duration) then 'xs:duration'
+ else if ($val instance of xs:gMonth) then 'xs:gMonth'
+ else if ($val instance of xs:gYear) then 'xs:gYear'
+ else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth'
+ else if ($val instance of xs:gDay) then 'xs:gDay'
+ else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay'
+ else 'unknown'
+}
+
+let $getSequenceType := function( $node){
+ if ($node instance of element()) then 'element'
+ else if ($node instance of attribute()) then 'attribute'
+ else if ($node instance of text()) then 'text'
+ else if ($node instance of document-node()) then 'document-node'
+ else if ($node instance of comment()) then 'comment'
+ else if ($node instance of processing-instruction())
+         then 'processing-instruction'
+ else if ($node instance of empty())
+         then 'empty'
+ else if ($node instance of item())
+         then 'empty'
+ else 'unknown'
+ }
 
 
 
@@ -136,25 +226,12 @@ let $outCases :=
 	      let $type := $item/@type/string()
 	      let $value := $functionNode//annotation[@name="test:args"]/value[$i]/node()
 	      let $arg :=
-	       if( $type eq 'element()' ) then (  $value/string() )
-	       else( "'"  || $value/string()  || "'" )
+		    if( $type eq 'element()' ) then (  $value/string() )
+		    else( "'"  || $value/string()  || "'" )
 	      return $arg
 
-(:
-
-        let $priorFunctionCall :=
-	  if($countFunctionCalls gt 1)
-	     then (
-		let  $priorCallName :=   $functionNode/calls/*[not(contains( @name/string(), $testFunc ))]/@name/string()
-		let  $priorCallString := $priorCallName  || " ( " ||  string-join($args, ",") ||  " )"
-		let $priorCallResult :=  util:eval( $priorCallString )
-		return 	$priorCallResult
-		)
-	  else()
-:)
-
-	let $functionCallString := $functionCall || " ( " ||  string-join($args, ",") ||  " )"
-
+	let $functionCallString :=
+		$functionCall || " ( " ||  string-join($args, ",") ||  " )"
 
 
 	let $displayfunctionCall := if( 'element()' = $functionNode/argument/@type )
@@ -162,26 +239,16 @@ let $outCases :=
 				    else ( $functionCall || " ( " ||  string-join($args, ",") ||  " )")
 
 
-
-(:
-  TODO: more return types
-  we are going to call  'util:eval( $functionCallString )'
-  with the function calls args
-  we need create a string for each type for eval to work
-:)
 	let $functionCallResult :=
 		try { util:eval( $functionCallString ) }
 		catch * {()}
 
-
-
 	let $returnType :=
-		if( $functionCallResult instance of xs:string ) then 'string'
-		else if ($functionCallResult instance of node() )  then 'node'
-		else if ($functionCallResult instance of  xs:boolean )  then 'boolean'
-		 else if ($functionCallResult instance of  xs:anyURI )  then 'URI'
-		else if ($functionCallResult instance of item() )  then 'item'
-		else  ('string')
+		if( $getAtomicType( $functionCallResult )  ne 'unknown' )
+		    then (substring-after($getAtomicType( $functionCallResult ) , ':') )
+		else if ($getSequenceType( $functionCallResult )  ne 'unknown'  )
+			    then $getSequenceType( $functionCallResult )
+		else  ('TODO: unknown')
 
 	let $getRowsAndCols := function($functionCallResult){
 	let $getLineCount := function( $str ){ count( tokenize( $str, '(\r\n?|\n\r?)') )}
@@ -189,8 +256,8 @@ let $outCases :=
 		case "boolean" return (1)
 		case "URI"  return (1)
 		case "string"
-		case "item" return (count( tokenize( $functionCallResult , '(\r\n?|\n\r?)')) )
-		case "node" return (
+		    return (count( tokenize( $functionCallResult , '(\r\n?|\n\r?)')) )
+		case "element" return (
 		    let $outNodes :=  $functionCallResult//*[count(child::text()) eq 0]
 		    let $outNodesCount := count( ( $functionCallResult/* , $outNodes ) )
 		    let $textNodes :=  $functionCallResult//*[./text()]
@@ -199,9 +266,8 @@ let $outCases :=
 		    return if ( $summed gt 20 ) then (20)
 			else ( $summed )
 		    )
+		case "item" return (count( tokenize( $functionCallResult , '(\r\n?|\n\r?)')) )
 		default return (1)
-
-
 	    let  $cols := switch ($returnType)
 		    case "boolean" return (6)
 		    case "URI" return string-length( string($functionCallResult) )
@@ -210,10 +276,8 @@ let $outCases :=
 					  max(
 					  for $line in  tokenize( $functionCallResult , '(\r\n?|\n\r?)')
 					  return string-length($line)) )
-		    case "node" return ( 80 )
+		    case "element" return ( 80 )
 		    default return ( 80)
-
-
          return ( $cols , $rows )
 	}
 
@@ -275,42 +339,6 @@ let $outCases :=
      {$message}
     </div>
     )
-(:
-
-	let $functionCallResult :=  util:eval( $functionCallString )
-
-	let $returnType := $functionCallResult instance of xs:string
-	let $mayBeNode := (starts-with($functionCallResult, '<') and ends-with($functionCallResult, '>'))
-	let $loadXML :=  if( $mayBeNode ) then ( util:parse( $functionCallResult ))
-			 else()
-
-	let $rows := count( tokenize( $functionCallResult , '(\r\n?|\n\r?)'))
-	let $cols :=  max(
-	      for $line in  tokenize( $functionCallResult , '(\r\n?|\n\r?)')
-	      return string-length($line))
-
-        let $heading :=  <h3><a href="#t_{$i}">{$i || ': '|| $testOK} </a></h3>
-	let $paragraph :=  <p>{$node/@name/string()}</p>
-	let $defList :=
-	<dl>
-	  <dt>function call</dt>
-	  <dd>{$functionCallString}</dd>
-	  <dt>function call result </dt>
-	  <dd><textarea cols="{$cols}" rows="{$rows}">{$functionCallResult}</textarea></dd>
-	</dl>
-
-	let $message := switch ($testOK)
-		case "success" return ( $heading , $paragraph, $defList  )
-		case "error" return ($heading , $paragraph,$defList,<p>{  $node/error/@message/string() } </p>)
-		case "failure" return ($heading, $paragraph , $defList, <p>{   ' [ ' || $node/failure/@message/string() ||  ' ] ' || $node/failure/string() } </p>)
-		default return ()
-
-    return (
-    <div class="{$testOK}"  id="{$id }" >
-     { $message  }
-    </div>
-    )
-:)
 
 let $testCases :=
     for $node at $i in  $test-out//testcase
@@ -373,35 +401,12 @@ return (
     <body>{$header}
     <section id="main" role="main">
         <h2>Test Result</h2>
-
         { ($table , $outCases)}
-
   </section>
-
   <footer>
      <textarea cols="300" rows="40">{$funcs-out }</textarea>
       <textarea cols="300" rows="40">{$test-out }</textarea>
   </footer>
-
     </body>
-</html>)
-
-
-(:
-* %test:name("description")
-* %test:args()
-
-* %test:assertEmpty() - returns true if the result is an empty string.
-* %test:assertExists - returns true if the result exists.
-* %test:assertTrue - returns true if the result is true
-* %test:assertFalse - returns true if the result is false
-
-* %test:assertEquals('value')
-
-* %test:assertError("error code") - Excepts the function to fail with an error. If an error code is given (optional), it should be contained in the error message or the test will fail.
-
-* %test:assertXPath("count($result) = 8") - This is the most powerful assertion. It checks the result against an arbitrary XPath expression. The assertion is true if
-
-* %test:setUp
-* %test:tearDown
-:)
+</html>
+)
