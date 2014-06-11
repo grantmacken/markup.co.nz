@@ -18,8 +18,6 @@ import  module namespace muCache = "http://markup.co.nz/#muCache" at '../muCache
 
 declare namespace test="http://exist-db.org/xquery/xqsuite";
 
-
-
 declare function test:setup(){
 muCache:store( 'http://markup.co.nz/archive/2014/03/16/141619' )
 };

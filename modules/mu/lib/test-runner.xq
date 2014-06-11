@@ -19,8 +19,6 @@ test functions when developing a xquery library
  when the function returns  a 'result'
  then  returned 'result' should pass our assertion tests
 
-
-
 DIRECTORY CONVENTIONS
 
 {root}
@@ -35,9 +33,7 @@ NAMING CONVENTIONS
 if we are testing the url lib.
 then the test for a function should be the same as the function
 with an underscore after the function name if we have more
-than one test for the named function
-
-e.g.
+than one test for the named function e.g.
 
 in our 'muURL' lib module
 
@@ -59,6 +55,16 @@ if we need more than one test then
     muURL:get($url)
   }
 
+LIMITATIONS:
+
+ Need to import libs prior to test (could do this dynamically )
+ Can only test one func at a time
+
+
+
+?module=muURL
+?module=muCache
+
 @see http://localhost:8080/exist/apps/doc/xqsuite.xml#D1.2.7
 @see https://github.com/wolfgangmm/xqsuite
 @see http://en.wikibooks.org/wiki/XQuery/XUnit_Annotations
@@ -74,10 +80,14 @@ declare option output:encoding "UTF-8";
 
 import module namespace inspect = "http://exist-db.org/xquery/inspection";
 import module namespace request="http://exist-db.org/xquery/request";
-
 import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
+(: DEPENDENCIES:  import all my libs unders lib folder:)
+import  module namespace muCache = "http://markup.co.nz/#muCache" at 'muCache/muCache.xqm';
+import  module namespace muURL = "http://markup.co.nz/#muURL" at 'muURL/muURL.xqm';
+import  module namespace muSan = "http://markup.co.nz/#muSan" at 'muSan/muSan.xqm';
+import  module namespace mf2 = "http://markup.co.nz/#mf2" at 'mf2/mf2.xqm';
 
-let $module-name := request:get-parameter('module', 'muURL')
+let $module-name := request:get-parameter('module', 'muCache')
 let $test-name := request:get-parameter('test', 'main')
 
 let $module-path := xs:anyURI(  $module-name || '/' || $module-name  || '.xqm' )
@@ -397,7 +407,11 @@ let $style  := <style><![CDATA[
 
 return (
 <html>
-<head>{$style}</head>
+<head>
+    <title>test runner</title>
+    <!--<meta http-equiv="refresh" content="5"/>-->
+    {$style}
+</head>
     <body>{$header}
     <section id="main" role="main">
         <h2>Test Result</h2>
