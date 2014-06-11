@@ -16,6 +16,11 @@ we want to be able to.
  @author Grant MacKenzie
  @version 0.01
 
+@see http://timezra.blogspot.co.nz/2010/05/regex-to-validate-uris.html
+@see http://greenbytes.de/tech/tc/uris/
+@see http://greenbytes.de/tech/webdav/rfc3986.html#examples
+@see http://greenbytes.de/tech/webdav/draft-reschke-ref-parsing-latest.xml
+
 :)
 (:
 User Story
@@ -101,12 +106,56 @@ if a URI was used to retrieve the base document, that URI shall
 
 
 :)
-(:3.1. Scheme Component:)
+(:
+A string that may or may not be a valid URI scheme component according to
+Section 3.1 of [RFC3986].
+
+
+3.1. Scheme Component
+
+
+
+
+
+
+:)
+(:scheme = alpha *( alpha | digit | "+" | "-" | "." ):)
 
 declare
-function muURL:urlScheme( $base   ) {
-substring-before( $base, ':' )
+function muURL:scheme( $u  ) {
+
+let $input :=
+	if( not( contains( $u, ':')) )
+	    then (
+		fn:error(fn:QName('http://markup.co.nz/#muURL',
+				  'urlHasNoScheme'),
+				  'url has no scheme component')
+		)
+	else(substring-before( $u, ':' ))
+
+let $pattern := '^([a-zA-Z][a-zA-Z0-9\+\-\.]+)$'
+let $flags := ''
+
+return
+    if( matches(  $input, $pattern ))
+       then ( $input )
+    else(
+	fn:error(fn:QName('http://markup.co.nz/#muURL',
+			  'urlHasBadScheme'),
+			  'url has bad scheme component')
+    )
 };
+
+
+declare
+function muURL:hasHttpScheme( $u  as xs:string ) as xs:boolean{
+  try{
+  matches( muURL:scheme( $u ) ,'^https?$')
+    } catch * {
+	false()
+    }
+};
+
 
 declare
 function muURL:url-hier_part( $base   ) {
@@ -119,7 +168,66 @@ The authority component is preceded by a double slash "//" and is
 terminated by the next slash "/", question-mark "?", or by the end of
 the URI.  Within the authority component, the characters ";", ":",
 "@", "?", and "/" are reserved.
+
+ authority   = [ userinfo "@" ] host [ ":" port ]
+
+we are after  the host part and will drop  'userinfo' and 'port'
+
 :)
+
+declare
+function muURL:getAuthority( $u ) {
+let $start :=
+	if( not( contains( $u, '//')) )
+	    then (
+		fn:error(fn:QName('http://markup.co.nz/#muURL',
+				  'urlHasNoAuthority'),
+				  'url has no authority component: the authority component is preceded by a double slash "//" ')
+		)
+	else( substring-after( $u, '//' ) )
+
+let $input :=
+    if( matches($start,'^.+/') ) then ( substring-before(  $start , '/' ))
+    else if( matches($start,'^.+\?') ) then ( substring-before(  $start , '?' ))
+    else($start)
+
+let $IPv4address := '[0-9]+((\.[0-9]+){3})'
+let $toplabel    := '[a-zA-Z](([a-zA-Z0-9\-])*[a-zA-Z0-9])?'
+let $domainlabel := '[a-zA-Z0-9](([a-zA-Z0-9\-])*[a-zA-Z0-9])?'
+let $pattern := $domainlabel || '(\.' || $toplabel || '){1,2}'
+
+let $flags := ''
+
+return
+    if( matches(  $input, $pattern))
+       then ( $input )
+    else(
+	fn:error(fn:QName('http://markup.co.nz/#muURL',
+			  'urlHasBadAuthority'),
+			  'url has bad authority component')
+    )
+};
+
+(:
+/(?:\\@[_a-zA-Z0-9]{1,17})|(?:(?:(?:(?:http|https|irc)?:\\/\\/(?:(?:[!$&-.0-9;=?A-Z_a-z]|(?:\\%[a-fA-F0-9]{2}))+(?:\\:(?:[!$&-.0-9;=?A-Z_a-z]|(?:\\%[a-fA-F0-9]{2}))+)?\\@)?)?(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*\\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|j[emop]|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|museum|m[acdeghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\\:\\d{1,5})?)(?:\\/(?:(?:[!#&-;=?-Z_a-z~])|(?:\\%[a-fA-F0-9]{2}))*)?)(?=\\b|\\s|$)/
+
+accept a registered domain name
+not sure about this, what about subdomains
+:)
+declare
+function muURL:hasAcceptableAuthority( $u  as xs:string ) as xs:boolean {
+let $input := 	muURL:getAuthority( $u )
+let $toplabel    := '[a-zA-Z](([a-zA-Z0-9\-])*[a-zA-Z0-9])?'
+let $domainlabel := '[a-zA-Z0-9](([a-zA-Z0-9\-])*[a-zA-Z0-9])?'
+let $pattern :=  '^' || $domainlabel || '(\.' || $toplabel || '){1,3}'	 || '$'
+return
+  try{
+  matches( $input , $pattern)
+    } catch * {
+	false()
+    }
+};
+
 
 declare
 function muURL:urlAuthority( $base   ) {
@@ -174,7 +282,7 @@ else( )
 declare
 function muURL:resolve( $base ,  $relative  ) {
 let $normalized-url :=
-    muURL:urlScheme( $base ) ||
+    muURL:scheme( $base ) ||
     '://'   ||
     muURL:urlAuthority($base ) ||
     muURL:urlAbsolutePath( $base   )

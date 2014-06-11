@@ -10,6 +10,10 @@ http://markup.co.nz/archive/2014/03/16/141619
 module namespace st="http://markup.co.nz/#st";
 import module namespace http = "http://expath.org/ns/http-client";
 import module namespace mf2 = "http://markup.co.nz/#mf2" at "../mf2.xqm";
+(: import my libs :)
+import  module namespace muURL = "http://markup.co.nz/#muURL" at '../muURL/muURL.xqm';
+import  module namespace muSan = "http://markup.co.nz/#muSan" at '../muSan/muSan.xqm';
+import  module namespace muCache = "http://markup.co.nz/#muCache" at '../muCache/muCache.xqm';
 
 
 declare namespace test="http://exist-db.org/xquery/xqsuite";
@@ -17,7 +21,7 @@ declare namespace test="http://exist-db.org/xquery/xqsuite";
 
 
 declare function test:setup(){
-()
+muCache:store( 'http://markup.co.nz/archive/2014/03/16/141619' )
 };
 
 declare function test:testdown(){
@@ -55,7 +59,19 @@ function st:entry-with-just-a-name($node as element()) as element() {
 };
 
 declare
-    %test:name("parse")
+    %test:name("fetch")
+    %test:args('http://markup.co.nz/archive/2014/03/16/141619')
+    %test:assertXPath("$result[1]")
+function st:fetch( $url ) {
+    try {  mf2:fetch( $url ) }
+    catch * {()}
+};
+
+
+
+
+declare
+    %test:name("parse (my url)")
     %test:args('http://markup.co.nz/archive/2014/03/16/141619')
     %test:assertXPath("$result[1]")
 function st:parse( $url ) {
@@ -64,11 +80,12 @@ function st:parse( $url ) {
 };
 
 
+
 declare
-    %test:name("fetch")
-    %test:args('http://markup.co.nz/archive/2014/03/16/141619')
+    %test:name("parse (adactio.com)")
+    %test:args('http://adactio.com/notes/6820/')
     %test:assertXPath("$result[1]")
-function st:fetch( $url ) {
-    try {  mf2:fetch( $url ) }
+function st:parse( $url ) {
+    try {  mf2:parse( $url )}
     catch * {()}
 };

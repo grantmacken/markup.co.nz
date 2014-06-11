@@ -15,7 +15,9 @@ from a cache store
 
  fetch
 
-all function calls return result as node()
+all function calls return result as element()
+
+@see http://stackoverflow.com/questions/8554543/element-vs-node-in-xquery
 
 if there is a problem it will return a http 'problem' node
 if no problem then
@@ -54,101 +56,287 @@ declare variable $muCache:store-path :=
 
 
 (:~
-get resource at url using http-client return node
+given URL get sanitised html that can be stored in db.
 
-@param $URL URL
-@return node as node()
+if there is a problem with the GET then root node (the documentElement ) will
+have the tag name 'problem' if GET is successful then the documentElement name
+will be 'html' and the document content will be sanitised and any 'links' in the
+document will be resolved to the base URL
+
+A GET will return a problem documentElement if the following criteria are not met.
+    * url must look like a registed domain name
+    * text resources only with media type text/html
+
+
+NOTE:
+   $response[1] is instance of element
+   $response[2] is instance of document-node
+
+
+
+@param $URL as xs:string
+@return element()
+
+@see http://hc.apache.org/httpclient-3.x/exception-handling.html
+
+$res[2]//*[local-name(.) eq 'html']  treat as element()
 
 :)
 declare
-function muCache:get( $url  ) as node() {
-let $condition := ''
-let $request :=
-    <http:request   href="{ xs:anyURI( $url ) }"
-		    method="get" />
+function muCache:get( $url as xs:string ) as element() {
 
-let $response := try {
-    http:send-request( $request )
-	} catch * {
-	<problem>
-	    <title>Failed request</title>
-	    <detail>{ string( $err:code ) }</detail>
-	    <instance>{$url}</instance>
-	</problem>
-    }
+let $getSequenceType := function( $item ){
+    if ($item instance of element()) then 'element'
+    else if ( $item instance of attribute()) then 'attribute'
+    else if ( $item instance of text()) then 'text'
+    else if ( $item  instance of document-node()) then 'document-node'
+    else if ( $item instance of comment()) then 'comment'
+    else if ( $item instance of processing-instruction())
+	    then 'processing-instruction'
+    else if ( $item instance of empty())
+	    then 'empty'
+    else 'unknown'
+}
 
+let $isProblem := function( $e ) as xs:boolean {
+    if( $getSequenceType( $e )  eq  'element' )
+	then( local-name( $e ) eq 'problem' )
+    else( false()
+	 )
+}
 
-
-let $responseHeader :=
-    if( $response[1][local-name(.) eq 'problem'] )  then ( $response )
-    else (
-	if( $response[1][local-name(.) eq 'response']  )  then (
-	    if( $response[1]/@status/number()  gt 399 ) then (
+let $checkURL := function( $u as xs:string ) as element(){
+    try {
+     let $hasAcceptableScheme :=
+       if( muURL:hasHttpScheme( $u ) )
+	    then (
+	    <ok>
+	       <status>Check URL SUCCESS: has acceptable Scheme</status>
+	       <detail>{muURL:scheme( $u )  || ' : ' || muURL:hasHttpScheme( $u )}</detail>
+	    </ok>
+	    )
+        else(
 	    <problem>
-		<title>Failed Request</title>
-		<status>{$response[1]/@status/string()}</status>
-		<detail>{$response[1]/@message/string()}</detail>
-		<instance>{$url}</instance>
+		<title>Check URL FAILED: not  acceptable Scheme</title>
+		<detail>{muURL:scheme( $u )  || ' : ' || muURL:hasHttpScheme( $u )}</detail>
+		<instance>{$u}</instance>
 	    </problem>
 	    )
-	    else if( $response[1]/@status/number()  gt 499 ) then (
+
+    let $hasAcceptableAuthority :=
+	if( $isProblem( $hasAcceptableScheme ) )
+	    then ( $hasAcceptableScheme )
+	else(
+	 if( muURL:hasAcceptableAuthority( $u ) )
+	    then (
+	    <ok>
+	       <status>Check URL SUCCESS: has acceptable Authority</status>
+	       <detail>{muURL:urlAuthority($u)  || ' : ' || muURL:hasHttpScheme( $u )}</detail>
+	    </ok>
+	    )
+        else(
+	    <problem>
+		<title>Check URL FAILED: not acceptable Authority</title>
+		<detail>{muURL:scheme( $u )  || ' : ' || muURL:hasAcceptableAuthority( $u )}</detail>
+		<instance>{$u}</instance>
+	    </problem>
+	    )
+	)
+
+	return  $hasAcceptableAuthority
+    }  catch * {
+	<problem>
+	    <title>Failed to check URL</title>
+	    <detail>{ string( $err:description ) }</detail>
+	    <instance>{$u}</instance>
+	</problem>
+    }
+}
+
+
+let $setRequest := function( $u as xs:string ) as element(){
+    if( $isProblem( $checkURL($u) ) )
+	then ( $checkURL($u)  )
+    else(
+	try {
+	    <http:request
+		href="{ xs:anyURI( $u ) }"
+		method="get"
+		send-authorization="false"
+		timeout="4"
+		>
+		<http:header
+		    name = "Connection"
+		    value = "close"/>
+		</http:request>
+
+	}  catch * {
+		<problem>
+		    <title>Failed to set request</title>
+		    <detail>{ string( $err:description ) }</detail>
+		    <instance>{$u}</instance>
+		</problem>
+	}
+    )
+}
+
+let $getResponse := function($req  as element() , $u  as xs:string ){
+    if( $isProblem( $req ) )
+	then ( $req )
+    else(
+    try {
+    http:send-request( $req )
+	} catch * {
+	if( $err:code eq 'java:org.expath.httpclient.HttpClientException')
+	   then (
+	    <problem>
+		<title>Failed request:  Http Client Exception</title>
+		<detail>{ string( $err:description ) }</detail>
+		<instance>{$u}</instance>
+	    </problem>
+	   )
+	else(
+	<problem>
+	    <title>Failed request: </title>
+	    <instance>{$u}</instance>
+	</problem>
+	)
+    }
+    )
+}
+
+let $getResponseHeader := function( $res, $u  as xs:string) as element() {
+    if( $isProblem( $res ) )
+	then ( $res )
+    else(
+	try {
+	 if( $getSequenceType( $res[1] ) eq 'element' )
+	    then ( $res[1]  treat as element() )
+	 else(
+	    <problem>
+	       <title>Failed to get response header: </title>
+	       <instance>{$u}</instance>
+	    </problem>
+	    )
+	} catch * {
+	<problem>
+	    <title>Failed to get response header: </title>
+	    <detail>{ string( $err:description ) }</detail>
+	    <instance>{$u}</instance>
+	</problem>
+	}
+    )
+}
+
+let $checkHeaderResponse := function( $e as element(), $u as xs:string) as element(){
+    if( $isProblem( $e ) )
+	then ( $e )
+    else(
+	try {
+	    if( $e/@status/number()  gt 399 ) then (
+	    <problem>
+		<title>Failed Request</title>
+		<status>{$e/@status/string()}</status>
+		<detail>{$e/@message/string()}</detail>
+		<instance>{$u}</instance>
+	    </problem>
+	    )
+	    else if( $e/@status/number()  gt 499 ) then (
 	    <problem>
 		<title>Failed Request: Server generated error</title>
-		<detail>{$response[1]/@message/string()}</detail>
-		<status>{$response[1]/@status/string()}</status>
-		<instance>{$url}</instance>
+		<detail>{$e/@message/string()}</detail>
+		<status>{$e/@status/string()}</status>
+		<instance>{$u}</instance>
 	    </problem>
 	    )
 	    else(
-		if($response[1]//*/@media-type/string() eq 'text/html') then (
-            	<ok>
-		   <status>{$response[1]/@status/string()}</status>
-		   <media-type>{$response[1]//*/@media-type/string()}</media-type>
-		   <accessed>{$response[1]//*[@name="date"]/@value/string()}</accessed>
-	        </ok>
+		if($e//*/@media-type/string() eq 'text/html') then (
+		<ok>
+		   <status>{$e/@status/string()}</status>
+		   <media-type>{$e//*/@media-type/string()}</media-type>
+		   <accessed>{$e//*[@name="date"]/@value/string()}</accessed>
+		</ok>
 		)
 		else(
 		<problem>
 		    <title>Failed Request: Can not handle media type</title>
-		    <detail>media type should be 'text/html' got {$response[1]//*/@media-type/string()}</detail>
-		    <status>{$response[1]/@status/string()}</status>
-		    <instance>{$url}</instance>
+		    <detail>media type should be 'text/html' got
+		    {$e//*/@media-type/string()}</detail>
+		    <status>{$e/@status/string()}</status>
+		    <instance>{$u}</instance>
 		</problem>
 		)
 	    )
-	    )
-	else (
-	    <problem>
-		<title>Failed Request</title>
-		<detail>No Response Header</detail>
-		<instance>{$url}</instance>
-	    </problem>
-	    )
+    	} catch * {
+	<problem>
+	    <title>Failed to get check header response </title>
+	    <detail>{ string( $err:description ) }</detail>
+	    <instance>{$u}</instance>
+	</problem>
+	}
     )
-let $responseBody :=
-    if( $responseHeader[local-name(.) eq 'problem'] )  then ( $responseHeader )
-    else(
-	let $body := $response[2]/node()
-	return
-	    if( local-name($body) eq 'html' )  then (
-		$body				    )
-	    else(
-	    <problem>
-		<title>Failed Request: no HTML root</title>
-		<detail>{local-name($body)}</detail>
-		<instance>{$url}</instance>
-	    </problem>)
-	)
+}
 
-let $baseURL :=
-	if(muURL:isBaseInDoc($responseBody))
-	    then ( $responseBody//*[local-name(.) eq 'base' ][@href]/@href/string()  )
-	else( $url )
+let $getResponseBody := function( $res, $u   as xs:string) as element(){
+    if( $isProblem( $checkHeaderResponse( $getResponseHeader($res, $u), $u) ) )
+	then ( $checkHeaderResponse( $getResponseHeader($res, $u), $u)  )
+    else(
+	if( $getSequenceType( $res[2] ) eq 'document-node')
+	    then(
+		if( $getSequenceType( $res[2]/* ) eq 'element')
+		    then(
+		    $res[2]/element()   treat as element()
+		    )
+		else(
+		<problem>
+		    <title>Failed to get response body: element</title>
+		    <instance>{$u}</instance>
+		</problem>
+		)
+	    )
+	else(
+	    <problem>
+		<title>Failed to get response body: document-node</title>
+		<instance>{$u}</instance>
+	    </problem>
+	)
+    )
+}
+
+let $getBaseURL := function( $e as element(), $u as xs:string) as xs:string{
+	if( $e//*[local-name(.) eq 'base' ][@href] )
+	    then ( $e//*[local-name(.) eq 'base' ][@href]/@href/string() )
+	else( $u )
+    }
+
+
+
+let $getCleanHTML := function( $e as element() , $u as xs:string ){
+    if( $isProblem( $e ))
+	then ( $e )
+    else(
+	try { muSan:sanitizer( $e, $u ) }
+	    catch * {
+	     <problem>
+		<title>Failed to sanitize: element</title>
+		<detail>{ string( $err:description ) }</detail>
+		<instance>{$u}</instance>
+	    </problem>
+	}
+    )
+}
+
+(: proccess :)
+
+let $request := $setRequest( $url )
+let $response := $getResponse( $request , $url )
+let $responseHeader := $getResponseHeader( $response , $url )
+let $responseBody := $getResponseBody( $response , $url )
+let $baseURL := $getBaseURL( $responseBody , $url )
+let $cleanedHTML := $getCleanHTML( $responseBody , $baseURL )
 
 return
-if( $responseBody[local-name(.) eq 'problem'] )
-    then ( $responseBody )
-else( muSan:sanitizer( $responseBody, $baseURL ) )
+$cleanedHTML
 };
 
 
@@ -162,13 +350,13 @@ hash url to use file name.
 
 :)
 declare
-function muCache:store( $url )  {
-let $responseBody := muCache:get( $url  )
+function muCache:store( $url as xs:string ) as xs:string  {
+let $contents := muCache:get( $url  )
 let $resource-name := muURL:urlHash( $url ) || '.xml'
 let $collection-uri := $muCache:store-path
 let $store :=
 	try {
-	xmldb:store($collection-uri, $resource-name, $responseBody )
+	xmldb:store($collection-uri, $resource-name, $contents )
 	}
 	catch java:org.xmldb.api.base.XMLDBException {
 	"Failed to store document"
@@ -193,28 +381,38 @@ let $contents := if( $responseBody[local-name(.) eq 'problem'] )
 
 let $resource-name := muURL:urlHash( $url ) || '.xml'
 let $collection-uri := $muCache:store-path
-return xmldb:store($collection-uri, $resource-name, $contents )
+
+let $store :=
+	try {
+	xmldb:store($collection-uri, $resource-name, $contents )
+	}
+	catch java:org.xmldb.api.base.XMLDBException {
+	"Failed to store document"
+	}
+
+return $store
 };
 
 
 (:~
-fetch from cache xhtml doc stored from a http-client request
+give URL fetch from cache xhtml doc stored from a http-client request
 if doc is not available in cache then get it and store
 hash url to use file name.
 
 @param $URL
-@return $node as node()
+@return element()
 :)
 declare
-function muCache:fetch( $url ) as node() {
+function muCache:fetch( $url as xs:string) as element() {
 let $resource-name := muURL:urlHash( $url ) || '.xml'
 let $document-uri := $muCache:store-path || '/'  || $resource-name
 return
     if( doc-available( $document-uri ) )
-	then ( doc( $document-uri )/node() )
+	then (
+	      doc( $document-uri )/*  treat as element()
+	    )
     else (
 	let $location := muCache:store( $url )
-	return
-	doc( $location )/node()
+	return doc( $location )/* treat as element()
     )
 };

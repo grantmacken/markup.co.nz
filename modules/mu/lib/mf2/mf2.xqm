@@ -18,7 +18,7 @@ import  module namespace muCache = "http://markup.co.nz/#muCache" at '../muCache
 
 
 declare
-function mf2:fetch( $url ) {
+function mf2:fetch2( $url ) {
 let $resource-name :=  muURL:urlHash( $url ) || '.xml'
 let $collection-uri := $muCache:store-path
 let $document-uri := $collection-uri || '/'  || $resource-name
@@ -28,7 +28,7 @@ $doc
 };
 
 declare
-function mf2:fetch2( $url ) {
+function mf2:fetch( $url ) {
     muCache:fetch( $url )
 };
 
