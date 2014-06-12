@@ -20,6 +20,7 @@ we want to be able to.
 @see http://greenbytes.de/tech/tc/uris/
 @see http://greenbytes.de/tech/webdav/rfc3986.html#examples
 @see http://greenbytes.de/tech/webdav/draft-reschke-ref-parsing-latest.xml
+@see http://rxr.whitequark.org/mri/source/lib/uri/common.rb
 
 :)
 (:
@@ -54,7 +55,7 @@ hash the url to get a unique identifier
 @return string()
 :)
 declare
-function muURL:urlHash( $url ) as xs:string {
+function muURL:urlHash( $url as xs:string ) as xs:string {
 let $base64flag := true()
 let $alogo := 'md5'
 let $hash := replace(util:hash( $url , $alogo, $base64flag), '(=+$)', '')
@@ -62,11 +63,31 @@ return
 translate( $hash, '+/', '-_')
 };
 
-declare
-function muURL:isBaseInDoc( $doc  ) as xs:boolean {
-exists($doc//*[local-name(.) eq 'base' ][@href])
-};
 
+
+
+(:
+  before storing a  html doc we want to be able to resolve links in the doc
+
+ to do this we need to get the base URL for the doc
+
+@see http://www.ietf.org/rfc/rfc2396.txt
+    5.1.3. Base URI from the Retrieval URI
+
+   If no base URI is embedded and the document is not encapsulated
+   within some other entity (e.g., the top level of a composite entity),
+   then, look for base in html doc
+
+    if a URI was used to retrieve the base document, that URI shall
+   be considered the base URI.  Note that if the retrieval was the
+   result of a redirected request, the last URI used (i.e., that which
+   resulted in the actual retrieval of the document) is the base URI.
+:)
+
+declare
+function muURL:isBaseInDoc( $documentElement  as element() ) as xs:boolean {
+exists( $documentElement//*[local-name(.) eq 'base' ][@href] )
+};
 
 declare
 function muURL:getBase($url) {
@@ -76,53 +97,36 @@ function muURL:getBase($url) {
   else( $url )
 };
 
-
-
 (:
-http://www.ietf.org/rfc/rfc2396.txt
-5.1.3. Base URI from the Retrieval URI
+The 'lexical space' of anyURI is finite-length character sequences
+which, when the algorithm defined in Section 5.4 of [XML Linking
+Language] is applied to them, result in strings which are legal URIs
+according to [RFC 2396], as amended by [RFC 2732]
+:)
+declare
+function muURL:canCaste( $url as xs:string ) as xs:boolean{
+let $u :=
+    try {
+	$url cast as xs:anyURI
+    } catch * {()}
 
-
-TODO:
-   If no base URI is embedded and the document is not encapsulated
-   within some other entity (e.g., the top level of a composite entity),
-   then,
-
-look for base in html doc
-
-
-
-if a URI was used to retrieve the base document, that URI shall
-   be considered the base URI.  Note that if the retrieval was the
-   result of a redirected request, the last URI used (i.e., that which
-   resulted in the actual retrieval of the document) is the base URI.
-
-
-
-5.2. Resolving Relative References to Absolute Form
-
-
+return
+    if( empty( $u )  )
+       then ( false() )
+    else( true() )
 };
 
 
-:)
 (:
 A string that may or may not be a valid URI scheme component according to
 Section 3.1 of [RFC3986].
-
-
 3.1. Scheme Component
 
-
-
-
-
-
+scheme = alpha *( alpha | digit | "+" | "-" | "." )
 :)
-(:scheme = alpha *( alpha | digit | "+" | "-" | "." ):)
 
 declare
-function muURL:scheme( $u  ) {
+function muURL:getScheme( $u  ) {
 
 let $input :=
 	if( not( contains( $u, ':')) )
@@ -150,7 +154,7 @@ return
 declare
 function muURL:hasHttpScheme( $u  as xs:string ) as xs:boolean{
   try{
-  matches( muURL:scheme( $u ) ,'^https?$')
+  matches( muURL:getScheme( $u ) ,'^https?$')
     } catch * {
 	false()
     }
@@ -158,8 +162,8 @@ function muURL:hasHttpScheme( $u  as xs:string ) as xs:boolean{
 
 
 declare
-function muURL:url-hier_part( $base   ) {
-substring-after( $base, ':' )
+function muURL:url-hier_part( $u   ) {
+substring-after( $u, ':' )
 };
 
 
@@ -176,7 +180,7 @@ we are after  the host part and will drop  'userinfo' and 'port'
 :)
 
 declare
-function muURL:getAuthority( $u ) {
+function muURL:getAuthority( $u  as xs:string ) {
 let $start :=
 	if( not( contains( $u, '//')) )
 	    then (
@@ -282,9 +286,9 @@ else( )
 declare
 function muURL:resolve( $base ,  $relative  ) {
 let $normalized-url :=
-    muURL:scheme( $base ) ||
+    muURL:getScheme( $base ) ||
     '://'   ||
-    muURL:urlAuthority($base ) ||
+    muURL:getAuthority($base ) ||
     muURL:urlAbsolutePath( $base   )
 
 

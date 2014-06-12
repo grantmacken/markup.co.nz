@@ -1,8 +1,6 @@
 xquery version "3.0";
 (:~
-@feature-name muSanitizer
-
-sanitizer/markup cleaner http-clent
+sanitizer/markup cleaner
 
 @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories
 @see http://www.w3.org/TR/html-markup/elements-by-function.html
@@ -246,10 +244,22 @@ function muSan:fake-getBase($url) {
 };
 
 declare function muSan:fake-sanitizer( $url ) {
-  let $node := 	muSan:fake-fetch( $url )
-  let $baseURL := muSan:fake-getBase($url)
+  let $docElement := 	muCache:get( $url )
+  let $baseURL :=
+	if(muURL:isBaseInDoc($docElement))
+	    then ( $docElement//*[local-name(.) eq 'base' ][@href]/@href/string()  )
+	else( $url )
+
+
+let $getBaseURL := function( $e as element(), $u as xs:string) as xs:string{
+	if( $e//*[local-name(.) eq 'base' ][@href] )
+	    then ( $e//*[local-name(.) eq 'base' ][@href]/@href/string() )
+	else( $u )
+    }
+
     return
-    muSan:sanitizer( $node, $baseURL )
+     (:$baseURL:)
+      $docElement
 };
 
 

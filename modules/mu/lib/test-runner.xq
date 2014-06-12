@@ -1,11 +1,8 @@
 xquery version "3.0";
 (:~
-We want LIVE browser preview testing of tests found in the tests collection as
-we are working on an xquery library module
+We want LIVE browser preview testing of tests found in the tests collection
+when we are working on an xquery library module
 
-
-gist -f '%f' -t 'XQuery' -d '  '%(ask:description:Enter Description)' -o < %f
-gist  -t 'XQuery'  -u %(ask:gistID:61082e441e43653b8b75) < %f
 gistID: 61082e441e43653b8b75
 
 I use this with a Komodo toolbox  macro which
@@ -57,13 +54,9 @@ if we need more than one test then
 
 LIMITATIONS:
 
- Need to import libs prior to test (could do this dynamically )
+ Need to import libs prior to test
+    see  util:eval( $functionCallString )
  Can only test one func at a time
-
-
-
-?module=muURL
-?module=muCache
 
 @see http://localhost:8080/exist/apps/doc/xqsuite.xml#D1.2.7
 @see https://github.com/wolfgangmm/xqsuite
@@ -80,18 +73,30 @@ declare option output:encoding "UTF-8";
 
 import module namespace inspect = "http://exist-db.org/xquery/inspection";
 import module namespace request="http://exist-db.org/xquery/request";
-import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
+import module namespace test="http://exist-db.org/xquery/xqsuite"
+    at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
 (: DEPENDENCIES:  import all my libs unders lib folder:)
-import  module namespace muCache = "http://markup.co.nz/#muCache" at 'muCache/muCache.xqm';
-import  module namespace muURL = "http://markup.co.nz/#muURL" at 'muURL/muURL.xqm';
-import  module namespace muSan = "http://markup.co.nz/#muSan" at 'muSan/muSan.xqm';
-import  module namespace mf2 = "http://markup.co.nz/#mf2" at 'mf2/mf2.xqm';
+import  module namespace muCache = "http://markup.co.nz/#muCache"
+    at 'muCache/muCache.xqm';
+import  module namespace muURL = "http://markup.co.nz/#muURL"
+    at 'muURL/muURL.xqm';
+import  module namespace muSan = "http://markup.co.nz/#muSan"
+    at 'muSan/muSan.xqm';
+import  module namespace mf2 = "http://markup.co.nz/#mf2"
+    at 'mf2/mf2.xqm';
 
+(:NOTE:
+change test by changing default param
+or adding query e.g.
+?module=muURL
+?module=muCache
+?module=muSan
+:)
 let $module-name := request:get-parameter('module', 'muCache')
-let $test-name := request:get-parameter('test', 'main')
+let $test-name := request:get-parameter('test', $module-name )
 
 let $module-path := xs:anyURI(  $module-name || '/' || $module-name  || '.xqm' )
-let $test-path :=  xs:anyURI( $module-name ||  '/tests/' || $test-name || ".xqm" )
+let $test-path :=  xs:anyURI(  'tests/' || $test-name || ".xqm" )
 
 let $inspectModule :=  inspect:inspect-module( $module-path  )
 let $funcs-out :=  inspect:inspect-module( $test-path )
@@ -409,7 +414,9 @@ return (
 <html>
 <head>
     <title>test runner</title>
-    <!--<meta http-equiv="refresh" content="5"/>-->
+<!--
+    <meta http-equiv="refresh" content="5"/>
+-->
     {$style}
 </head>
     <body>{$header}
