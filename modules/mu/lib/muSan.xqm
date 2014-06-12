@@ -19,8 +19,8 @@ import module namespace system="http://exist-db.org/xquery/system";
 import module namespace http = "http://expath.org/ns/http-client";
 (:import module namespace err = "http://www.w3.org/2005/xqt-errors";:)
 (: DEPENDENCIES:  import my libs :)
-import  module namespace muCache = "http://markup.co.nz/#muCache" at '../muCache/muCache.xqm';
-import  module namespace muURL = "http://markup.co.nz/#muURL" at '../muURL/muURL.xqm';
+import  module namespace muCache = "http://markup.co.nz/#muCache" at 'muCache.xqm';
+import  module namespace muURL = "http://markup.co.nz/#muURL" at 'muURL.xqm';
 
 (: NAMESPACES: :)
 declare namespace  xhtml = "http://www.w3.org/1999/xhtml";

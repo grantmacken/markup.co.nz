@@ -34,8 +34,8 @@ import module namespace system="http://exist-db.org/xquery/system";
 import module namespace http = "http://expath.org/ns/http-client";
 (:import module namespace err = "http://www.w3.org/2005/xqt-errors";:)
 (: import my libs :)
-import  module namespace muURL = "http://markup.co.nz/#muURL" at '../muURL/muURL.xqm';
-import  module namespace muSan = "http://markup.co.nz/#muSan" at '../muSan/muSan.xqm';
+import  module namespace muURL = "http://markup.co.nz/#muURL" at 'muURL.xqm';
+import  module namespace muSan = "http://markup.co.nz/#muSan" at 'muSan.xqm';
 
 declare variable $muCache:store-path :=
     let $rawPath := system:get-module-load-path()

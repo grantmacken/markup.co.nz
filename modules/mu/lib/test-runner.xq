@@ -18,12 +18,14 @@ test functions when developing a xquery library
 
 DIRECTORY CONVENTIONS
 
-{root}
+lib
     - test-runner.xqm
-    + lib
-	+ {module-name}
-	    + tests
-	    - {$test-name}.xqm (main.xqm default)
+    - {module-name}.xqm
+    - {another-module-name}.xqm
+    + tests
+	- {test-name}.xqm
+	- {another-test-name}.xqm
+
 
 NAMING CONVENTIONS
 
@@ -77,13 +79,13 @@ import module namespace test="http://exist-db.org/xquery/xqsuite"
     at "resource:org/exist/xquery/lib/xqsuite/xqsuite.xql";
 (: DEPENDENCIES:  import all my libs unders lib folder:)
 import  module namespace muCache = "http://markup.co.nz/#muCache"
-    at 'muCache/muCache.xqm';
+    at 'muCache.xqm';
 import  module namespace muURL = "http://markup.co.nz/#muURL"
-    at 'muURL/muURL.xqm';
+    at 'muURL.xqm';
 import  module namespace muSan = "http://markup.co.nz/#muSan"
-    at 'muSan/muSan.xqm';
+    at 'muSan.xqm';
 import  module namespace mf2 = "http://markup.co.nz/#mf2"
-    at 'mf2/mf2.xqm';
+    at 'mf2.xqm';
 
 (:NOTE:
 change test by changing default param
@@ -95,7 +97,7 @@ or adding query e.g.
 let $module-name := request:get-parameter('module', 'muCache')
 let $test-name := request:get-parameter('test', $module-name )
 
-let $module-path := xs:anyURI(  $module-name || '/' || $module-name  || '.xqm' )
+let $module-path := xs:anyURI(  $module-name  || '.xqm' )
 let $test-path :=  xs:anyURI(  'tests/' || $test-name || ".xqm" )
 
 let $inspectModule :=  inspect:inspect-module( $module-path  )

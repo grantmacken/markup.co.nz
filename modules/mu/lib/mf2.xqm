@@ -12,9 +12,9 @@ declare option output:omit-xml-declaration "yes";
 declare option output:indent "yes";
 
 (: import my libs :)
-import  module namespace muURL = "http://markup.co.nz/#muURL" at '../muURL/muURL.xqm';
-import  module namespace muSan = "http://markup.co.nz/#muSan" at '../muSan/muSan.xqm';
-import  module namespace muCache = "http://markup.co.nz/#muCache" at '../muCache/muCache.xqm';
+import  module namespace muURL = "http://markup.co.nz/#muURL" at 'muURL.xqm';
+import  module namespace muSan = "http://markup.co.nz/#muSan" at 'muSan.xqm';
+import  module namespace muCache = "http://markup.co.nz/#muCache" at 'muCache.xqm';
 
 
 declare

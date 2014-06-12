@@ -45,7 +45,7 @@ import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 import module namespace system="http://exist-db.org/xquery/system";
 import module namespace http = "http://expath.org/ns/http-client";
 (: DEPENDENCIES:  import my libs :)
-import  module namespace muCache = "http://markup.co.nz/#muCache" at '../muCache/muCache.xqm';
+import  module namespace muCache = "http://markup.co.nz/#muCache" at 'muCache.xqm';
 
 (:import module namespace err = "http://expath.org/ns/error";:)
 
