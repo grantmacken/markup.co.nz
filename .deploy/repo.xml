@@ -10,5 +10,4 @@
   <target>markup.co.nz</target>
   <prepare />
   <finish />
-  <permissions group="dba" mode="rw-rw-r--" password="ntere37" user="grant" />
 </meta>
